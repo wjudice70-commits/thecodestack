@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<g stroke="#AFC3CC" fill="none" stroke-width="1.2" opacity=".26">
+ <line x1="40" y1="80" x2="1880" y2="80"/>
+ <line x1="40" y1="300" x2="1880" y2="300"/>
+ <line x1="40" y1="520" x2="1880" y2="520"/>
+ <line x1="40" y1="740" x2="1880" y2="740"/>
+ <line x1="40" y1="960" x2="1880" y2="960"/>
+</g>
+</svg>

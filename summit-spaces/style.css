@@ -1,0 +1,52 @@
+:root{--bg:#0e1011;--bg2:#111315;--bg3:#171a1c;--line:#afc3cc;--warm:#d4c2a3;--text:#e8e6e1;--mute:#9aa3a8}
+*{box-sizing:border-box;margin:0;padding:0;border-radius:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font:17px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+h1,h2,h3{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;font-weight:500;line-height:1.1;letter-spacing:-.01em}
+h1{font-size:clamp(2.6rem,7vw,5.5rem)}
+h2{font-size:clamp(2rem,4.5vw,3.4rem)}
+h3{font-size:1.6rem}
+a{color:inherit}
+p{max-width:60ch;color:var(--mute)}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+header.site{position:sticky;top:0;z-index:10;background:rgba(14,16,17,.92);border-bottom:1px solid rgba(175,195,204,.15)}
+header.site .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{font-family:Georgia,serif;font-size:1.25rem;text-decoration:none;letter-spacing:.04em}
+nav a{margin-left:22px;text-decoration:none;font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+nav a:hover,nav a[aria-current]{color:var(--text)}
+nav a.cta{color:var(--warm);border:1px solid var(--warm);padding:8px 14px}
+.section{position:relative;padding:110px 0;background:var(--bg) url(assets/16_charcoal_section_texture.png);background-blend-mode:soft-light;border-top:1px solid rgba(175,195,204,.08);overflow:hidden}
+.section.alt{background-color:var(--bg3)}
+.section>.wrap{position:relative;z-index:1}
+.bp{position:absolute;pointer-events:none;opacity:.5;max-width:60%}
+.bp.tl{top:0;left:0}.bp.br{bottom:0;right:0}
+.hero{min-height:88vh;display:flex;align-items:center;background:radial-gradient(ellipse 70% 60% at 50% 0,#2a2f32 0,rgba(14,16,17,0) 70%),var(--bg)}
+.hero .stamp{display:block;margin-top:48px;width:260px;opacity:.9}
+.eyebrow{font-size:.78rem;letter-spacing:.3em;text-transform:uppercase;color:var(--warm);margin-bottom:22px;display:block}
+.hero p{margin:26px 0 38px;font-size:1.15rem}
+.btn{display:inline-block;background:var(--warm);color:#0e1011;padding:16px 30px;text-decoration:none;font-size:.85rem;letter-spacing:.2em;text-transform:uppercase;border:0;cursor:pointer;font-family:inherit}
+.btn:hover{background:#e6d8bd}
+.btn.ghost{background:none;color:var(--text);border:1px solid rgba(175,195,204,.4);margin-left:12px}
+.rows{margin-top:48px}
+.row{display:grid;grid-template-columns:70px 1fr 1.2fr;gap:24px;padding:34px 0;border-top:1px solid rgba(175,195,204,.18)}
+.row:last-child{border-bottom:1px solid rgba(175,195,204,.18)}
+.row .n{color:var(--warm);font-size:.85rem;letter-spacing:.2em;padding-top:8px}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:48px}
+.cols>div{border-top:1px solid rgba(175,195,204,.25);padding-top:18px}
+.cols h3{margin-bottom:10px}
+.steps{list-style:none;margin-top:48px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:70px 1fr;gap:24px;padding:28px 0;border-top:1px solid rgba(175,195,204,.18)}
+.steps li:before{counter-increment:s;content:"0" counter(s);color:var(--warm);letter-spacing:.2em;padding-top:6px}
+.steps h3{margin-bottom:6px}
+.big{font-size:clamp(2.4rem,7vw,5rem)}
+.cta-block{text-align:center}
+.cta-block p{margin:20px auto 36px}
+.glow{display:inline-block;width:10px;height:14px;background:var(--warm);box-shadow:0 0 22px 8px rgba(212,194,163,.35);margin-bottom:26px}
+form{display:grid;gap:18px;margin-top:40px;max-width:640px}
+label{font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);display:grid;gap:8px}
+input,select,textarea{background:var(--bg2);color:var(--text);border:1px solid rgba(175,195,204,.3);padding:14px;font:inherit}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--warm);outline-offset:1px}
+.hp{position:absolute;left:-9999px}
+footer.site{padding:48px 0;border-top:1px solid rgba(175,195,204,.15);font-size:.85rem;color:var(--mute)}
+footer.site .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+@media(max-width:760px){.row,.steps li{grid-template-columns:1fr;gap:8px}.cols{grid-template-columns:1fr}nav a{margin-left:12px;font-size:.7rem}.section{padding:72px 0}.btn.ghost{margin:14px 0 0}}

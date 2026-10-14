@@ -20,7 +20,8 @@ Get the site live on Netlify and turn visitors into quote requests. Revenue come
 - Image prompts live in Drive: `summit-spaces-image-prompts-by-section-v2.md` (v2 supersedes v1).
 
 ## Stack and deploy
-- TODO: confirm stack (plain HTML/CSS vs framework).
+- Plain HTML/CSS, no build step. Publish the `summit-spaces/` folder (netlify.toml included; CLAUDE.md is blocked from public access).
+- Note: the Drive homepage kit is a Wix build guide for "Elevated Property 1". Only its overlay SVG/texture assets were used here (in `assets/`).
 - Deploy: Netlify. Upload the folder that has `index.html` at its top level (or the build output folder: dist/build/out). Never the zip, never the notes.
 - Starting material: `Summit_Spaces_to_EP1_Homepage_Kit.zip` in Drive (unverified contents).
 
@@ -29,8 +30,9 @@ Get the site live on Netlify and turn visitors into quote requests. Revenue come
 - Plan: Netlify Forms (`data-netlify="true"`) on a quote form, plus a click-to-text/call button.
 
 ## Status
-- Done: image prompts (v2), blueprint overlay SVG, homepage kit (unverified)
-- To do: confirm site code is in this repo, build remaining pages, add quote form, real photos, privacy policy, Google Business Profile, analytics, connect domain
+- Done: image prompts (v2), overlay assets, static site built (home, services, process, about, quote form with Netlify Forms, thanks, 404)
+- Placeholder: no photos yet (CSS gradient/blueprint overlays only); the 5 hero images from the kit live in Wix, not Drive
+- To do: phone/email/service area/license wording (no phone shown yet), real photos from v2 prompts, privacy policy, deploy to Netlify and confirm the form works, Google Business Profile, analytics, domain
 
 ## Working rules
 - Keep this file short and current. Update the Status section at the end of each session.
