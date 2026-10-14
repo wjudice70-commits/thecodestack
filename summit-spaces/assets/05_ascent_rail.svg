@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="270" height="1080" viewBox="0 0 270 1080">
+<g fill="none" stroke="#AFC3CC" stroke-width="2" opacity=".55">
+ <line x1="44" y1="30" x2="44" y2="1050"/>
+ <circle cx="44" cy="108" r="8" fill="#AFC3CC"/>
+ <circle cx="44" cy="278" r="6"/>
+ <circle cx="44" cy="448" r="6"/>
+ <circle cx="44" cy="618" r="6"/>
+ <circle cx="44" cy="788" r="6"/>
+ <circle cx="44" cy="958" r="6"/>
+ <path d="M44 108 L66 130" />
+</g>
+<g fill="#AFC3CC" opacity=".6" font-family="Arial,Helvetica,sans-serif" font-size="15" letter-spacing="3">
+ <text x="76" y="114">BASECAMP</text>
+ <text x="76" y="284">STANDARD</text>
+ <text x="76" y="454">SERVICES</text>
+ <text x="76" y="624">EVIDENCE</text>
+ <text x="76" y="794">CLIMB</text>
+ <text x="76" y="964">SUMMIT</text>
+</g></svg>

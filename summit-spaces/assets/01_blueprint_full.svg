@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<g fill="none" stroke="#AFC3CC" stroke-width="1.4" opacity=".28">
+  <rect x="42" y="42" width="1836" height="996"/>
+  <line x1="96" y1="0" x2="96" y2="1080"/><line x1="360" y1="0" x2="360" y2="1080"/><line x1="720" y1="0" x2="720" y2="1080"/><line x1="1080" y1="0" x2="1080" y2="1080"/><line x1="1440" y1="0" x2="1440" y2="1080"/><line x1="1824" y1="0" x2="1824" y2="1080"/>
+  <line x1="0" y1="148" x2="1920" y2="148"/><line x1="0" y1="340" x2="1920" y2="340"/><line x1="0" y1="612" x2="1920" y2="612"/><line x1="0" y1="878" x2="1920" y2="878"/>
+  <circle cx="250" cy="214" r="290"/>
+  <circle cx="1660" cy="835" r="270"/>
+  <path d="M520 160 L1030 670 L1420 280"/>
+  <path d="M520 900 L930 900 L930 575 L1260 575"/>
+  <path d="M117 770 L510 770 L510 925 L690 925"/>
+  <path d="M1340 155 L1765 155 L1765 410 L1460 410"/>
+  <g stroke-dasharray="8 8" opacity=".7">
+    <line x1="250" y1="0" x2="250" y2="1080"/>
+    <line x1="965" y1="0" x2="965" y2="1080"/>
+    <line x1="1658" y1="550" x2="1658" y2="1080"/>
+    <line x1="0" y1="505" x2="1180" y2="505"/>
+    <line x1="1280" y1="755" x2="1920" y2="755"/>
+  </g>
+  <line x1="540" y1="285" x2="1110" y2="285"/>
+  <line x1="540" y1="270" x2="540" y2="300"/>
+  <line x1="1110" y1="270" x2="1110" y2="300"/>
+  <circle cx="690" cy="760" r="14"/>
+  <line x1="660" y1="760" x2="720" y2="760"/>
+  <line x1="690" y1="730" x2="690" y2="790"/>
+  <circle cx="1345" cy="205" r="18"/>
+  <line x1="1310" y1="205" x2="1380" y2="205"/>
+  <line x1="1345" y1="170" x2="1345" y2="240"/>
+</g>
+<g fill="#AFC3CC" opacity=".30" font-family="Arial,Helvetica,sans-serif" font-size="16" letter-spacing="4">
+  <text x="120" y="112">SUMMIT SPACES</text>
+  <text x="120" y="136">RESIDENTIAL / REPAIR / RENOVATION</text>
+  <text x="775" y="265">2400</text>
+  <text x="118" y="960">DETAIL A / SCALE 1:50</text>
+  <text x="1370" y="945">BUILD / REFINE / ELEVATE</text>
+</g></svg>
