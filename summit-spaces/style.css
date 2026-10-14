@@ -50,3 +50,9 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--warm);outline-of
 footer.site{padding:48px 0;border-top:1px solid rgba(175,195,204,.15);font-size:.85rem;color:var(--mute)}
 footer.site .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
 @media(max-width:760px){.row,.steps li{grid-template-columns:1fr;gap:8px}.cols{grid-template-columns:1fr}nav a{margin-left:12px;font-size:.7rem}.section{padding:72px 0}.btn.ghost{margin:14px 0 0}}
+.house{display:block;width:min(320px,70%);margin:0 auto 28px}
+nav a.phone{color:var(--text)}
+footer.site a{text-decoration:none}
+.callbar{display:none}
+@media(max-width:760px){nav a.phone{display:none}.callbar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:20;background:#0e1011;border-top:1px solid rgba(212,194,163,.4)}.callbar a{flex:1;text-align:center;padding:15px 0;text-decoration:none;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--warm)}.callbar a+a{border-left:1px solid rgba(175,195,204,.2)}body{padding-bottom:50px}}
+@media(max-width:760px){.brand{white-space:nowrap;font-size:1.05rem}nav a.cta{display:none}nav a{margin-left:14px}}

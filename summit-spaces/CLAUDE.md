@@ -26,13 +26,14 @@ Get the site live on Netlify and turn visitors into quote requests. Revenue come
 - Starting material: `Summit_Spaces_to_EP1_Homepage_Kit.zip` in Drive (unverified contents).
 
 ## Lead path
-- TODO: phone number, email for leads, service area (Nashville + surrounding?), license/insurance wording.
+- Phone/text: 832-832-1998. Email: wjudice70@gmail.com (temporary). Both are in the header, footer, quote page, CTA and a mobile call/text bar.
+- TODO: service area (Nashville + surrounding?), license/insurance wording. Set Netlify form notifications (Site settings > Forms) to email leads.
 - Plan: Netlify Forms (`data-netlify="true"`) on a quote form, plus a click-to-text/call button.
 
 ## Status
 - Done: image prompts (v2), overlay assets, static site built (home, services, process, about, quote form with Netlify Forms, thanks, 404)
-- Placeholder: no photos yet (CSS gradient/blueprint overlays only); the 5 hero images from the kit live in Wix, not Drive
-- To do: phone/email/service area/license wording (no phone shown yet), real photos from v2 prompts, privacy policy, deploy to Netlify and confirm the form works, Google Business Profile, analytics, domain
+- Placeholder: no photos yet (new business). Using CSS gradients, blueprint overlays and an SVG house-with-lit-window on the CTA; the 5 hero images from the kit live in Wix, not Drive
+- To do: phone/email/service area/license wording (real photos from v2 prompts, privacy policy, deploy to Netlify and confirm the form works, Google Business Profile, analytics, domain
 
 ## Working rules
 - Keep this file short and current. Update the Status section at the end of each session.
