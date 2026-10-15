@@ -156,12 +156,30 @@
     });
   }
 
+  // Character scenes (rigged William and Nesrin). Same rules as the city films: only with WebGL 2, and any
+  // failure (no WebGL, missing model, render error) plays the poster shot instead. Unlocking never waits on this.
+  const hasScene = webgl && !new URLSearchParams(location.search).has("nocine");
+  async function playScene(id, extra = {}) {
+    const mod = await import("./film3d/index.js");
+    return mod.playScene(id, { lang: YY.lang(), mode: "walk", hold: extra.hold });
+  }
+  // A still for the painted player: cover-fit image, slow push-in.
+  function posterPainter(src) {
+    const img = new Image(); img.src = src;
+    return (x) => {
+      const { c, W, H, u } = x; x.full(); c.fillStyle = "#050405"; c.fillRect(0, 0, W, H);
+      if (!img.complete || !img.naturalWidth) return;
+      const k = Math.max(W / img.naturalWidth, H / img.naturalHeight) * (1 + .05 * u), w = img.naturalWidth * k, h = img.naturalHeight * k;
+      c.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+    };
+  }
+
   function showShot() {
     const s = reel[shot], f = $("#film");
-    if (s.cine != null) {
+    if (s.cine != null || s.scene) {
       cancelAnimationFrame(tickRaf); film.stop(); f.classList.add("is-cine");
-      playCine(s.cine).then((r) => { f.classList.remove("is-cine"); film.start(); r === "closed" ? endReel() : next(); })
-        .catch((err) => { console.warn("3D film unavailable, playing the painted one", err); f.classList.remove("is-cine"); film.start(); reel[shot] = { ...s, cine: null }; showShot(); });
+      (s.scene ? playScene(s.scene) : playCine(s.cine)).then((r) => { f.classList.remove("is-cine"); film.start(); r === "closed" ? endReel() : next(); })
+        .catch((err) => { console.warn("3D film unavailable, playing the painted one", err); f.classList.remove("is-cine"); film.start(); reel[shot] = { ...s, cine: null, scene: null }; showShot(); });
       return;
     }
     film.show(s.painter, s.dur || readTime(s));
@@ -225,6 +243,12 @@
       painter: (YY.cityScenes && YY.cityScenes[s.id]) || YY.storyScenes.dawn,
       kicker: `${i === stops.length - 1 ? t("home") : t("arrived")} · ${t("stop", i + 1, stops.length)}`,
       title: s.name, text: L(s.line), cta: t("close"),
+    });
+    // Trial: İstanbul also gets the bench scene with the 3D William and Nesrin.
+    if (s.id === "istanbul") shots.push({
+      scene: hasScene ? "istanbul-bench" : null,
+      painter: posterPainter("models/istanbul-bench-poster.jpg"),
+      kicker: "İstanbul", title: L({ tr: "Yan yana", en: "Side by side" }), text: L({ tr: "Yavaş yavaş, biz olduk.", en: "Slowly, slowly, it became us." }), cta: t("close"),
     });
     return shots;
   }
@@ -300,10 +324,12 @@
     });
 
     if (YY.preview) {
-      window.YYdebug = { playStory, playReel, arrivalShots, go, addSteps, progress, playCine };
+      window.YYdebug = { playStory, playReel, arrivalShots, go, addSteps, progress, playCine, playScene };
       // ?preview&cine=istanbul&mode=run opens a city's 3D film straight away.
       const qs = new URLSearchParams(location.search), cid = qs.get("cine");
-      if (cid) { const i = D.stops.stops.findIndex(x => x.id === cid); if (i >= 0) { state.storySeen = true; state.seenStop = Math.max(state.seenStop, D.stops.stops.length); playCine(i, { mode: qs.get("mode"), hold: qs.has("hold") }); } }
+      // ?preview&cine=istanbul-bench opens the bench scene straight away (add &hold to pause on the first frame).
+      if (cid === "istanbul-bench") { state.storySeen = true; state.seenStop = Math.max(state.seenStop, D.stops.stops.length); playScene(cid, { hold: qs.has("hold") }).catch((e) => console.warn("bench scene failed", e)); }
+      else if (cid) { const i = D.stops.stops.findIndex(x => x.id === cid); if (i >= 0) { state.storySeen = true; state.seenStop = Math.max(state.seenStop, D.stops.stops.length); playCine(i, { mode: qs.get("mode"), hold: qs.has("hold") }); } }
       const bar = $("#preview-bar"); bar.hidden = false;
       bar.addEventListener("click", (e) => {
         const b = e.target.closest("button"); if (!b) return;

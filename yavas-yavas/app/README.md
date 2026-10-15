@@ -24,3 +24,10 @@ A gift for Nesrin: an offline web app (plain HTML, CSS and JS, no build step) th
 
 ## Deploying
 It's a static folder: drag `app/` onto Netlify (or point a Netlify site at `yavas-yavas/app`). Not deployed yet.
+
+## 3D William and Nesrin (trial: İstanbul bench scene)
+- `models/william.glb`, `models/nesrin.glb`: rigged characters (six clips each: idle_stand, walk, sit_down, idle_seated, turn_180, wave). Sources and the Blender script are in `../characters/` (not deployed). **The faces are placeholder quality**; improve likeness in `build_char.py`, re-export, and replace the two .glb files.
+- `js/film3d/characters.js` loads and drives them (Three.js r170 `GLTFLoader` is vendored in `js/vendor/`). `js/film3d/scenes/istanbul-bench.js` is the scene: they walk to the bench, turn, sit, then a glance.
+- It plays as an extra shot after the İstanbul arrival film. Unlocking İstanbul never waits on it: if WebGL 2 is missing, a model fails to load, or rendering errors, the poster `models/istanbul-bench-poster.jpg` shows instead.
+- Open it straight away: `?preview&cine=istanbul-bench` (add `&hold` to pause on the first frame). `?nocine` forces the poster.
+- Replace the poster whenever the scene changes. It is a screenshot of the scene with the captions hidden.
