@@ -32,8 +32,9 @@ Get the site live on Netlify and turn visitors into quote requests. Revenue come
 
 ## Status
 - Done: image prompts (v2), overlay assets, static site built (home, services, process, about, quote form with Netlify Forms, thanks, 404)
-- Placeholder: no photos yet (new business). Using CSS gradients, blueprint overlays and an SVG house-with-lit-window on the CTA; the 5 hero images from the kit live in Wix, not Drive
-- To do: service area + license wording, real photos (v2 prompts or job photos), privacy policy, deploy to Netlify and confirm the form works, Google Business Profile, analytics, domain
+- Done (launch prep): favicon (`favicon.svg`, `favicon-32.png`, `apple-touch-icon.png`), share image `og-image.jpg`, OG/Twitter meta on every page, styled 404, noindex on thanks/404, hero alignment fix. Checked every page at 390px and 1366px.
+- Placeholder photos: matte-black line-art SVGs in `assets/photos/` (repair, improve, renovate on Services; about on About). To swap: drop a real photo in that folder and change the `src` in the `<figure class="ph">` tag (any ratio works, it crops to fit).
+- To do: add `og:url`/canonical and a sitemap once the domain is known, service area + license wording, real photos (v2 prompts or job photos), privacy policy, deploy to Netlify and confirm the form works, Google Business Profile, analytics, domain
 
 ## Working rules
 - Keep this file short and current. Update the Status section at the end of each session.
