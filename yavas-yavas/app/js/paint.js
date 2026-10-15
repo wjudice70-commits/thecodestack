@@ -198,6 +198,102 @@
     c.restore();
   };
 
+  /* ---------- matte-painting helpers (added for the story polish) ---------- */
+
+  // Paint a static layer once into an offscreen canvas (kept in m[key]) and blit it every frame.
+  // fn receives a ctx just like a painter's, drawing at the un-zoomed scale; the blit follows the
+  // film's slow push-in so the cached layer stays registered with props drawn live on the stage.
+  P.layer = (x, key, fn) => {
+    let L = x.m[key];
+    if (!L || L.W !== x.W || L.H !== x.H) {
+      const oc = document.createElement("canvas"); oc.width = x.W; oc.height = x.H;
+      const o = oc.getContext("2d"), k0 = x.S / 1000;
+      const y = Object.assign({}, x, {
+        c: o, k: k0,
+        stage() { o.setTransform(k0, 0, 0, k0, x.cx, x.cy); },
+        full() { o.setTransform(1, 0, 0, 1, 0, 0); },
+        sx: (v) => x.cx + v * k0, sy: (v) => x.cy + v * k0,
+      });
+      fn(y, o);
+      L = x.m[key] = { oc, k0, W: x.W, H: x.H };
+    }
+    const r = x.k / L.k0, c = x.c;
+    c.setTransform(r, 0, 0, r, x.cx * (1 - r), x.cy * (1 - r));
+    c.drawImage(L.oc, 0, 0);
+    c.setTransform(1, 0, 0, 1, 0, 0);
+  };
+
+  // A soft contact shadow under an object.
+  P.shadow = (c, x, y, rx, ry, a = .55, col = "#000000") => {
+    c.save(); c.translate(x, y); c.scale(1, ry / rx);
+    const g = c.createRadialGradient(0, 0, 0, 0, 0, rx);
+    g.addColorStop(0, rgba(col, a)); g.addColorStop(.55, rgba(col, a * .45)); g.addColorStop(1, rgba(col, 0));
+    c.fillStyle = g; c.beginPath(); c.arc(0, 0, rx, 0, 7); c.fill();
+    c.restore();
+  };
+
+  // A volumetric light shaft from (x0,y0) of width w0 to (x1,y1) of width w1, soft at the sides.
+  P.shaft = (c, x0, y0, w0, x1, y1, w1, color, a = .2) => {
+    if (a <= 0) return;
+    const op = c.globalCompositeOperation; c.globalCompositeOperation = "lighter";
+    const g = c.createLinearGradient(x0, y0, x1, y1);
+    g.addColorStop(0, rgba(color, a)); g.addColorStop(.5, rgba(color, a * .5)); g.addColorStop(1, rgba(color, 0));
+    c.fillStyle = g;
+    for (const s of [1, .62, .3]) {
+      c.globalAlpha = .45;
+      c.beginPath();
+      c.moveTo(x0 - w0 * s / 2, y0); c.lineTo(x0 + w0 * s / 2, y0);
+      c.lineTo(x1 + w1 * s / 2, y1); c.lineTo(x1 - w1 * s / 2, y1); c.closePath(); c.fill();
+    }
+    c.globalAlpha = 1; c.globalCompositeOperation = op;
+  };
+
+  // Mottled texture (plaster, fabric, haze) of soft blobs: for cached layers.
+  P.mottle = (c, x0, y0, w, h, seed, n, colors, a = .06, r0 = 20, r1 = 120) => {
+    const R = rng(seed);
+    for (let i = 0; i < n; i++) {
+      const x = x0 + R() * w, y = y0 + R() * h, r = lerp(r0, r1, R()), col = colors[(R() * colors.length) | 0];
+      const g = c.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, rgba(col, a * (.4 + R() * .6))); g.addColorStop(1, rgba(col, 0));
+      c.fillStyle = g; c.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+  };
+
+  // Wood grain: long wavering strokes across a board. For cached layers.
+  P.woodGrain = (c, x0, y0, w, h, seed, n, color, a = .12, vertical = false) => {
+    const R = rng(seed);
+    c.save(); c.beginPath(); c.rect(x0, y0, w, h); c.clip(); c.lineCap = "round";
+    for (let i = 0; i < n; i++) {
+      const off = R(), amp = lerp(1, 6, R()), fr = lerp(.004, .02, R()), ph = R() * 6;
+      c.strokeStyle = rgba(color, a * lerp(.3, 1, R())); c.lineWidth = lerp(.6, 2.6, R() * R());
+      c.beginPath();
+      const L = vertical ? h : w;
+      for (let s = 0; s <= 24; s++) {
+        const v = s / 24 * L, d = Math.sin(v * fr + ph) * amp + Math.sin(v * fr * 3.1 + ph * 2) * amp * .3;
+        const px = vertical ? x0 + off * w + d : x0 + v, py = vertical ? y0 + v : y0 + off * h + d;
+        s ? c.lineTo(px, py) : c.moveTo(px, py);
+      }
+      c.stroke();
+    }
+    c.restore();
+  };
+
+  // A horizontal band of atmospheric haze.
+  P.haze = (c, x0, x1, y, h, color, a = .2) => {
+    const g = c.createLinearGradient(0, y - h, 0, y + h);
+    g.addColorStop(0, rgba(color, 0)); g.addColorStop(.5, rgba(color, a)); g.addColorStop(1, rgba(color, 0));
+    c.fillStyle = g; c.fillRect(x0, y - h, x1 - x0, h * 2);
+  };
+
+  // A crisp specular streak (glass, ceramic, metal), additive.
+  P.spec = (c, x0, y0, x1, y1, w, a = .6, color = "#fff6e8") => {
+    const op = c.globalCompositeOperation; c.globalCompositeOperation = "lighter";
+    c.lineCap = "round";
+    c.strokeStyle = rgba(color, a * .35); c.lineWidth = w * 2.6; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+    c.strokeStyle = rgba(color, a); c.lineWidth = w; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+    c.globalCompositeOperation = op;
+  };
+
   /* ---------- the film player ---------- */
 
   // fit(): where the 1000×1000 stage sits. Portrait leaves the lower part for words; landscape leaves the left.
@@ -238,8 +334,8 @@
         c.fillStyle = `rgba(255,226,190,${a.toFixed(3)})`; c.beginPath(); c.arc(x, y, d.s * DPR, 0, 7); c.fill();
       }
       c.globalCompositeOperation = "soft-light";
-      c.fillStyle = "rgba(255,150,90,.16)"; c.fillRect(0, 0, W, H * .5);
-      c.fillStyle = "rgba(40,60,120,.18)"; c.fillRect(0, H * .5, W, H * .5);
+      if (!f.grade) { f.grade = c.createLinearGradient(0, 0, 0, H); f.grade.addColorStop(0, "rgba(255,150,90,.16)"); f.grade.addColorStop(.35, "rgba(255,150,90,.1)"); f.grade.addColorStop(.65, "rgba(40,60,120,.1)"); f.grade.addColorStop(1, "rgba(40,60,120,.18)"); }
+      c.fillStyle = f.grade; c.fillRect(0, 0, W, H);
       c.globalCompositeOperation = "source-over";
       c.fillStyle = f.v; c.fillRect(0, 0, W, H);
     }
