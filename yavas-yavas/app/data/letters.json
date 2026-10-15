@@ -1,0 +1,25 @@
+{
+  "_note": "One letter per day, in order. Michael's are drafts to edit. Add family letters (Annem, Babam, Neslie...) by adding entries with 'from'. Photos can go in 'photo' as a path under photos/.",
+  "letters": [
+    { "from": "Michael", "tr": "Günaydın sevgilim. Bugün hiçbir şey yapmasan bile ilerliyorsun. İyileşmek de bir iş, ve sen onu çok güzel yapıyorsun.",
+      "en": "Good morning, my love. Even on a day you do nothing, you're moving forward. Healing is work, and you're doing it beautifully." },
+    { "from": "Michael", "tr": "Bir yıl boyunca sen beni taşıdın. Şimdi sıra bende, ve bunu bir yük olarak değil, bir onur olarak görüyorum.",
+      "en": "For a year you carried me. Now it's my turn, and I don't feel it as a weight. I feel it as an honor." },
+    { "from": "Michael", "tr": "Avucuma yazdığın o iki kelimeyi hâlâ hissediyorum.",
+      "en": "I can still feel those words you wrote on my palm." },
+    { "from": "Michael", "tr": "Küçük bir ilerlemeyi küçümseme. Hastanede tek isteğin su içebilmekti. Bak şimdi nerdesin.",
+      "en": "Don't call a small step small. In the hospital all you wanted was a sip of water. Look where you are now." },
+    { "from": "Michael", "tr": "Sabırsız olman çok normal. Sen hep koşan, hep çalışan birisin. O kadın hâlâ orada, sadece biraz dinleniyor.",
+      "en": "It's normal to feel impatient. You've always been the one who runs, who works. That woman is still right there; she's just resting for a while." },
+    { "from": "Michael", "tr": "Bugün sana kahve yapacağım ve balkonda oturacağız. Mehmet'inki kadar güzel olmayabilir. Et sote kadar kötü de olmayacak, söz.",
+      "en": "Today I'm making you coffee and we'll sit by the balcony. It might not be as good as Mehmet's. It won't be as bad as the et sote, I promise." },
+    { "from": "Michael", "tr": "Bana gösterdiğin sabrı şimdi kendine göster. Sen buna en çok layık olan kişisin.",
+      "en": "Give yourself the patience you always gave me. No one deserves it more than you." },
+    { "from": "Michael", "tr": "Değişeceğimi söylemiyorum, gösteriyorum. Her gün. Sen de görüyorsun, biliyorum.",
+      "en": "I'm not telling you I've changed. I'm showing you, every day. I know you see it." },
+    { "from": "Michael", "tr": "Buz fırtınasını hatırla: elektrik yoktu, dışarısı donuyordu, ama biz sıcaktık. Bu da öyle bir fırtına. Geçecek.",
+      "en": "Remember the ice storm: no power, freezing outside, and we were warm anyway. This is that kind of storm. It will pass." },
+    { "from": "Michael", "tr": "Seni seviyorum. Dün de, bugün de, yavaş yavaş, her gün biraz daha.",
+      "en": "I love you. Yesterday, today, slowly, slowly, a little more every day." }
+  ]
+}
