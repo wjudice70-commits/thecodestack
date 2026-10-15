@@ -85,7 +85,7 @@
 
   /* ---------------- Data ---------------- */
   YY.load = async () => {
-    const names = ["config", "stops", "story", "wins", "letters", "notes"];
+    const names = ["config", "stops", "story", "wins", "letters", "notes", "films"];
     const all = await Promise.all(names.map(n => fetch(`data/${n}.json`).then(r => r.json())));
     YY.data = Object.fromEntries(names.map((n, i) => [n, all[i]]));
     return YY.data;

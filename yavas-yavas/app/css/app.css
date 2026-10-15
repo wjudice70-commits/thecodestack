@@ -220,3 +220,44 @@ svg { display: block; }
   .grain { animation: none; }
 }
 .in-film .preview-bar { display: none; }
+
+/* ---------- 3D city films ---------- */
+.film.is-cine .film-copy, .film.is-cine .film-top, .film.is-cine .tap { visibility: hidden; }
+.cine { position: fixed; inset: 0; z-index: 40; background: #000; opacity: 0; transition: opacity .9s var(--ease-film); }
+.cine.is-in { opacity: 1; }
+.cine-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.cine-scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 46%; pointer-events: none; z-index: 1;
+  background: linear-gradient(to top, rgba(5,4,5,.9) 0%, rgba(5,4,5,.72) 34%, rgba(5,4,5,.28) 70%, rgba(5,4,5,0) 100%); }
+.cine-top { position: absolute; top: 0; left: 0; right: 0; z-index: 4; display: flex; align-items: center; gap: 12px; padding: max(env(safe-area-inset-top), 16px) 16px 0; }
+.cine-ticks { flex: 1; }
+.cine-mode { position: relative; flex: none; }
+.cine-mode .chip { height: 36px; padding: 0 14px; border-radius: 18px; background: rgba(10,6,8,.62); border: 1px solid var(--line); font-size: 13px; color: var(--ink); letter-spacing: .02em; white-space: nowrap; }
+.cine-modes { position: absolute; right: 0; top: 44px; list-style: none; padding: 6px; border-radius: 14px; background: rgba(14,9,10,.94); border: 1px solid var(--line); min-width: 190px; }
+.cine-modes button { width: 100%; text-align: left; padding: 10px 12px; border-radius: 9px; font-size: 15px; color: var(--ink-2); }
+.cine-modes button.is-on, .cine-modes button:hover { background: rgba(143,29,46,.35); color: var(--ink); }
+.cine .tap { z-index: 2; }
+.cine-cap { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; pointer-events: none; padding: 0 clamp(22px, 6vw, 96px) max(env(safe-area-inset-bottom), 34px); max-width: 760px; }
+.cine-cap > * { opacity: 0; translate: 0 14px; }
+.cine-cap.is-on > * { animation: fade-up 1.4s var(--ease-film) forwards; }
+.cine-cap.is-on .kicker { animation-delay: .5s; } .cine-cap.is-on .cine-title { animation-delay: .8s; } .cine-cap.is-on .cine-text { animation-delay: 1.15s; }
+.cine-title { font-family: var(--display); font-weight: 500; font-size: clamp(40px, 6vw, 78px); line-height: 1; margin: 10px 0 14px; text-shadow: 0 2px 24px rgba(0,0,0,.8); }
+.cine-title:empty { display: none; }
+.cine-text { font-size: clamp(17px, 1.4vw, 20px); line-height: 1.6; color: var(--ink-2); max-width: 36ch; }
+.cine-cap.is-hand .cine-title { font-style: italic; font-size: clamp(34px, 4.6vw, 58px); }
+/* Scrapbook: the clips sit in a dark paper mount with gold tape at the corners. */
+.cine-scrap { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transition: opacity .6s var(--ease-film);
+  box-shadow: inset 0 0 0 clamp(10px, 2.2vmin, 22px) #120b0c, inset 0 0 0 calc(clamp(10px, 2.2vmin, 22px) + 1px) rgba(217,165,74,.35), inset 0 0 60px 30px rgba(0,0,0,.55); }
+.cine.is-scrap .cine-scrap { opacity: 1; }
+.tape { position: absolute; width: clamp(64px, 11vmin, 110px); height: clamp(20px, 3vmin, 30px); background: linear-gradient(90deg, rgba(217,165,74,.42), rgba(244,211,154,.5) 50%, rgba(217,165,74,.42)); box-shadow: 0 1px 6px rgba(0,0,0,.4); }
+.tape.t1 { top: calc(max(env(safe-area-inset-top), 16px) + 54px); left: -10px; rotate: -32deg; }
+.tape.t2 { top: calc(max(env(safe-area-inset-top), 16px) + 54px); right: -10px; rotate: 32deg; }
+.tape.t3 { bottom: 26%; right: -14px; rotate: -28deg; opacity: .7; }
+/* The proverb card */
+.cine-end { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; text-align: center; padding: 0 22px max(env(safe-area-inset-bottom), 40px); opacity: 0; translate: 0 16px; transition: opacity 1.4s var(--ease-film), translate 1.4s var(--ease-film); pointer-events: none; }
+.cine-end.is-on { opacity: 1; translate: 0 0; pointer-events: auto; }
+.cine-proverb { font-family: var(--display); font-style: italic; font-weight: 500; font-size: clamp(32px, 5vw, 60px); line-height: 1.08; margin: 12px auto 10px; max-width: 18ch; text-shadow: 0 2px 30px rgba(0,0,0,.9); }
+.cine-trans { font-size: clamp(16px, 1.3vw, 19px); color: var(--ink-2); line-height: 1.5; }
+.cine-trans:empty { display: none; }
+.cine-end .cta { margin-top: 22px; }
+@media (prefers-reduced-motion: reduce) { .cine, .cine-end, .cine-scrap { transition: none; } .cine-cap.is-on > * { animation: none; opacity: 1; translate: 0 0; } }
+body.in-cine .preview-bar { display: none !important; }

@@ -1,9 +1,10 @@
 /* Offline: cache every file on install, serve from cache first. Bump VERSION whenever any file changes. */
-const VERSION = "yy-2026-10-15-2";
+const VERSION = "yy-2026-10-15-3";
 const FILES = [
   "./", "index.html", "manifest.webmanifest", "css/app.css",
   "js/core.js", "js/paint.js", "js/rose.js", "js/story.js", "js/cities.js", "js/map.js", "js/main.js",
-  "data/config.json", "data/stops.json", "data/story.json", "data/wins.json", "data/letters.json", "data/notes.json",
+  "data/config.json", "data/stops.json", "data/story.json", "data/wins.json", "data/letters.json", "data/notes.json", "data/films.json",
+  "js/vendor/three.module.min.js", "js/film3d/index.js", "js/film3d/engine.js", "js/film3d/film.js", "js/film3d/kit.js", "js/film3d/people.js", "js/film3d/cities/istanbul.js",
   "fonts/cormorant-normal-latin.woff2", "fonts/cormorant-normal-latin-ext.woff2",
   "fonts/cormorant-italic-latin.woff2", "fonts/cormorant-italic-latin-ext.woff2",
   "fonts/inter-normal-latin.woff2", "fonts/inter-normal-latin-ext.woff2",
