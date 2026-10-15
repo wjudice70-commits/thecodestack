@@ -1,0 +1,124 @@
+{
+  "_note": "Our Story, one entry per scene. 'scene' names a painter in js/story.js. Edit the words freely; keep the ids.",
+  "scenes": [
+    { "id": "lake", "scene": "lake",
+      "title": { "tr": "Üçüncü kat", "en": "The third floor" },
+      "text": { "tr": "Göle bakan, üçüncü kattaki bir pencere. Seninle tanışmak için o merdivenleri çıktım ve bir daha hiç gitmedim.",
+                "en": "A window on the third floor, looking over the lake. I climbed those stairs to meet you, and I never really left." } },
+
+    { "id": "talk", "scene": "candles",
+      "title": { "tr": "Gökyüzü değişene kadar", "en": "Until the sky changed" },
+      "text": { "tr": "Gece bitene kadar konuştuk. O günden sonra neredeyse hiç ayrılmadık. Hep gülen, hep sarılan, arkadaşlarımızı şakayla bıktıran iki kişi olduk.",
+                "en": "We talked until the night ran out. After that we were hardly ever apart: always smiling, always holding on, the kind of love our friends jokingly said made them sick." } },
+
+    { "id": "panda", "scene": "lanterns",
+      "title": { "tr": "Panda Fest", "en": "Panda Fest" },
+      "text": { "tr": "Sevil ve Tommy ile ilk çifte randevumuz. Nashville'de, binlerce parlayan fenerin altında.",
+                "en": "Our first double date, with Sevil and Tommy, under a thousand glowing lanterns in Nashville." } },
+
+    { "id": "kitchen", "scene": "kitchen",
+      "title": { "tr": "Senin mutfağın", "en": "Your kitchen" },
+      "text": { "tr": "Elinle kapattığın mantılar. Poşette pişen tavuk ve pilav. Sıcak ekmekle bandığımız menemen. Beni ilk günden ailenden biri gibi doyurdun.",
+                "en": "Mantı folded by hand. Chicken baked in its bag with rice. Menemen we scooped up with warm bread. From the start you fed me like family." } },
+
+    { "id": "etsote", "scene": "smoke",
+      "title": { "tr": "Benim et sotem", "en": "My et sote" },
+      "text": { "tr": "Sonra ben sana et sote yapmayı denedim. Et soteden bahsetmiyoruz.",
+                "en": "Then I tried to make you et sote. We do not talk about the et sote." } },
+
+    { "id": "friends", "scene": "balcony",
+      "title": { "tr": "Senin dünyan", "en": "Your world" },
+      "text": { "tr": "Beni kendi dünyana aldın: Eda ile Mehmet'in güzel evi, Türk restoranları, balkonlarda elden ele dolaşan Türk kahveleri.",
+                "en": "You brought me into your world: Eda and Mehmet's beautiful home, Turkish restaurants, Turkish coffee passed around on balconies late into the night." } },
+
+    { "id": "tired", "scene": "door",
+      "title": { "tr": "\"Ben yoruldum\"", "en": "\"I'm the tired one\"" },
+      "text": { "tr": "Kaygım yüzünden erken kalkmak zorunda kaldığımız her gece bir kez bile şikâyet etmedin. Herkese yorgun olanın sen olduğunu söyledin.",
+                "en": "Every night my anxiety made us leave early, you never once complained. You told everyone you were the tired one." } },
+
+    { "id": "held", "scene": "water",
+      "title": { "tr": "Beni tuttun", "en": "You held me" },
+      "text": { "tr": "Her nöbette yanımdaydın. Benim acım için ağladın, geçene kadar beni tuttun ve bedenim kendine gelene kadar su içmeme yardım ettin.",
+                "en": "Through every seizure you were there. You cried for my pain, held me until it passed, and helped me drink water until my body came back to me." } },
+
+    { "id": "splash", "scene": "shop",
+      "title": { "tr": "On iki saatlik günler", "en": "Twelve-hour days" },
+      "text": { "tr": "Splash'te, sabunların ve mumların arasında on, on iki saat çalıştın. Sonra eve gelip yine yemek yaptın, yine benimle ilgilendin.",
+                "en": "You worked ten, twelve hours at Splash among the soaps and candles. Then you came home and still cooked, and still took care of me." } },
+
+    { "id": "gurban", "scene": "tea",
+      "title": { "tr": "Gurban", "en": "Gurban" },
+      "text": { "tr": "Günde yüz kere \"Gurban\" dedin. Bir ev ilacı, sıcak bir tabak, başımda bir el. Hep hasta olan bana hem hemşire hem yuva oldun.",
+                "en": "\"Gurban,\" a hundred times a day. A home remedy, a warm plate, a hand on my head. I was always sick, and you were my nurse and my home." } },
+
+    { "id": "stayed", "scene": "rain",
+      "title": { "tr": "Kaldın", "en": "You stayed" },
+      "text": { "tr": "Uzun süre kaybolmuştum. Bizi tek başına taşıdın. Gitmek için her sebebin vardı ama kaldın. Bunun sana neye mal olduğunu biliyorum ve asla unutmayacağım.",
+                "en": "I was lost for a long time, and you carried us both on your own. You had every reason to leave, and you stayed. I know what that cost you, and I will never forget it." } },
+
+    { "id": "began", "scene": "cinema",
+      "title": { "tr": "Yavaş yavaş", "en": "Slowly, I began" },
+      "text": { "tr": "Yavaş yavaş kendime gelmeye başladım. Çiçekler. Pırıl pırıl bir ev. Çarşamba akşamları sinema, sadece ikimiz.",
+                "en": "Slowly, I started showing up. Flowers. A spotless home. Wednesday nights at the movies, just us." } },
+
+    { "id": "candlenight", "scene": "candleroom",
+      "title": { "tr": "Mumlar gecesi", "en": "The night of candles" },
+      "text": { "tr": "Eve geldiğinde her yerde mumlar vardı. Beyaz halının üstünde gül yaprakları, balkonda ışıklar, İtalyan yemeğinin yanında çiçekler.",
+                "en": "You came home to candles everywhere, rose petals on the white carpet, lights strung across the balcony, and flowers beside an Italian dinner." } },
+
+    { "id": "storm", "scene": "icestorm",
+      "title": { "tr": "Buz fırtınası", "en": "The ice storm" },
+      "text": { "tr": "Dondurucu fırtına Nashville'i durdurduğunda elimizdeki bütün mumları yaktık ve birbirimizi ısıttık.",
+                "en": "When the freezing storm shut Nashville down, we lit every candle we had and kept each other warm." } },
+
+    { "id": "fort", "scene": "fort",
+      "title": { "tr": "Kalemiz", "en": "Our fort" },
+      "text": { "tr": "Yatağı salona taşıdık, sandalyelerin üstüne çarşaf serdik ve çocuklar gibi kendimize bir kale kurduk.",
+                "en": "We dragged the mattress into the living room, draped sheets over the chairs, and built ourselves a fort like kids." } },
+
+    { "id": "jacket", "scene": "jacket",
+      "title": { "tr": "Deri ceket", "en": "The jacket" },
+      "text": { "tr": "Kahverengi Levi's deri ceket. Onu ne kadar sevdiğimi biliyordun. Ben kollarımı geçirirken sen tutuyordun.",
+                "en": "The brown Levi's leather jacket. You knew how much I loved it. You held it open while I slipped my arms in." } },
+
+    { "id": "birthdays", "scene": "cake",
+      "title": { "tr": "Doğum günleri", "en": "Birthdays" },
+      "text": { "tr": "Birbirimizin doğum günlerinde güzel yemekler, mumlar, kadehler. Artık dilek tutmama gerek yoktu; dileğim karşımda oturuyordu.",
+                "en": "Birthday dinners for each other, candles, raised glasses. I didn't need to make a wish anymore. It was sitting across from me." } },
+
+    { "id": "bakery", "scene": "bakery",
+      "title": { "tr": "Paris Baguette", "en": "Paris Baguette" },
+      "text": { "tr": "Şehir merkezinde kruvasanlar ve bagetler, masada kırıntılar, pencereden süzülen sabah ışığı.",
+                "en": "Croissants and baguettes downtown, flaky crumbs on the table, morning light through the window." } },
+
+    { "id": "morning", "scene": "emptybed",
+      "title": { "tr": "O sabah", "en": "That morning" },
+      "text": { "tr": "Saat altı gibi evde olman gerekiyordu. Uyandım, yatağın senin tarafı boştu. Sonra telefon çaldı ve dünyam durdu.",
+                "en": "You were supposed to be home by six. I woke up and your side of the bed was empty. Then the phone rang, and my whole world stopped." } },
+
+    { "id": "hospital", "scene": "hospital",
+      "title": { "tr": "Başka biri oldum", "en": "I became someone else" },
+      "text": { "tr": "Bildiğim bütün dualarla sana nazik olmalarını istedim. İkinci gün başka biri oldum: sana dayanak olacak biri.",
+                "en": "I prayed to every God I knew to be gentle with you. On the second day I became someone else: someone strong enough to be your rock." } },
+
+    { "id": "palm", "scene": "palm",
+      "title": { "tr": "Avucumda", "en": "On my palm" },
+      "text": { "tr": "Sonra biraz uyandın ve parmağınla avucuma \"seni seviyorum\" yazdın.",
+                "en": "Then you woke a little, and with one finger you wrote \"I love you\" on my palm." } },
+
+    { "id": "watch", "scene": "nightshift",
+      "title": { "tr": "Uyuyan güzelim", "en": "My sleeping beauty" },
+      "text": { "tr": "Odanın köşesinde gece geç saatlere kadar çalıştım. Arada başımı kaldırıp sana baktım ve hâlâ burada olduğun için şükrettim.",
+                "en": "I worked from the corner of your room late into the night, looking up now and then at you, grateful beyond words that you were still here." } },
+
+    { "id": "stairs", "scene": "stairs",
+      "title": { "tr": "Üç kat, eve", "en": "Three flights home" },
+      "text": { "tr": "O üç kat merdiveni birlikte çıktık. Tekerlekli sandalyen rahat geçsin diye evi baştan düzenlemiştim.",
+                "en": "We made it up those three flights together. I had already rearranged our home so your wheelchair could pass." } },
+
+    { "id": "now", "scene": "dawn",
+      "title": { "tr": "Artık ben buradayım", "en": "I've got this now" },
+      "text": { "tr": "Bizi o kadar uzun taşıdın ki. Şimdi bırak ben seni taşıyayım. Sen sadece iyileş. Yavaş olsun; en güzel şeyler zaman alır. Yavaş yavaş.",
+                "en": "You carried us for so long. Now let me carry you. You just focus on getting better. Let it be slow; the greatest things take time. Yavaş yavaş." } }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "_note": "'Open when...' notes from Michael. Drafts to edit.",
+  "notes": [
+    {
+      "id": "pain",
+      "when": {
+        "tr": "Canın çok yandığında aç",
+        "en": "Open when it hurts a lot"
+      },
+      "tr": "Keşke acını alabilsem. Alamıyorum ama yanındayım. Nefes al, elimi tut, bu dalga da geçecek. Senin için buradayım, her an.",
+      "en": "I wish I could take your pain. I can't, but I'm right here. Breathe, hold my hand, and this wave will pass too. I'm here for you, every minute."
+    },
+    {
+      "id": "slow",
+      "when": {
+        "tr": "İlerlemediğini düşündüğünde aç",
+        "en": "Open when you feel you're not getting better"
+      },
+      "tr": "Haritaya bak. Her adım orada, ve hiçbiri geri gitmiyor. Bir yayla gibi düşün: düz görünür ama sen yine de yükseliyorsun.",
+      "en": "Look at the map. Every step is there, and none of them go backwards. Think of a plateau: it looks flat, but you're still climbing."
+    },
+    {
+      "id": "outside",
+      "when": {
+        "tr": "Dışarıyı özlediğinde aç",
+        "en": "Open when you miss being outside"
+      },
+      "tr": "Dışarısı seni bekliyor: Paris Baguette'teki kruvasanlar, çarşamba sinemaları, göl kenarı. Hepsine birlikte gideceğiz.",
+      "en": "Outside is waiting for you: croissants at Paris Baguette, Wednesday movies, the lake. We're going to all of them, together."
+    },
+    {
+      "id": "burden",
+      "when": {
+        "tr": "Kendini yük gibi hissettiğinde aç",
+        "en": "Open when you feel like a burden"
+      },
+      "tr": "Bunca zaman bana bir kez bile yük olduğumu hissettirmedin. Şimdi sıra bende. Seni taşımak bana dünyanın en doğal şeyi gibi geliyor.",
+      "en": "You never once made me feel like a burden, all those years. Now it's my turn. Taking care of you feels like the most natural thing in the world."
+    },
+    {
+      "id": "sleep",
+      "when": {
+        "tr": "Uyuyamadığında aç",
+        "en": "Open when you can't sleep"
+      },
+      "tr": "Gözlerini kapat ve kalemizi hatırla: yatak salonda, çarşaflar sandalyelerin üstünde, küçük ışıklar. Oradayız. Uyu güzelim.",
+      "en": "Close your eyes and remember our fort: the mattress in the living room, sheets over the chairs, little lights. We're there. Sleep, beautiful."
+    },
+    {
+      "id": "proud",
+      "when": {
+        "tr": "Kendinle gurur duymak istediğinde aç",
+        "en": "Open when you want to feel proud"
+      },
+      "tr": "Kırık kaburgalar, kırık göğüs kemiği ve omuz, yorgun bir kalp, ve sen hâlâ gülümsüyorsun. Tanıdığım en güçlü insan sensin.",
+      "en": "Broken ribs, a broken sternum and shoulder, a tired heart, and you're still smiling. You are the strongest person I have ever known."
+    }
+  ]
+}

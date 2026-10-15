@@ -1,0 +1,8 @@
+{
+  "_note": "Pace of the journey. She earns 1 step for opening the app each day and 1 per small win, but only winsPerDay wins count toward steps each day, so she can't race ahead. With these numbers the fastest possible pace is about 4 days per city (about 2 months door to door); a gentler pace takes longer, and that's fine.",
+  "stepsPerStop": 24,
+  "winsPerDay": 5,
+  "defaultLang": "tr",
+  "from": "Michael",
+  "to": "Nesrin"
+}
