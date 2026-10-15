@@ -387,25 +387,47 @@
     c.moveTo(X - R * .28, Y + R * 1.12); c.lineTo(X - R * .14, Y + R * 1.42); c.moveTo(X + R * .28, Y + R * 1.12); c.lineTo(X + R * .14, Y + R * 1.42); c.stroke();
     c.fillStyle = mix("#3a2416", hazeCol, hazeA || 0); c.fillRect(X - R * .15, Y + R * 1.42, R * .3, R * .19);
   }
-  // A fairy chimney: a bulging tuff stem narrowing to a neck, lit on one side, streaked by rain, with its basalt cap.
-  function chimney(c, X, base, h, w, lit, shade, cap) {
+  // A fairy chimney: an eroded tuff cone with a ragged, rain-worn edge, a neck, and a tilted dark basalt cap.
+  // o: { sd: seed, tl: cap tilt, win: carved openings, rim: warm rim light strength }
+  function chimney(c, X, base, h, w, lit, shade, cap, o = {}) {
+    const sd = o.sd || X * .013, nk = cap ? .22 : .08, N = 14;
+    const hw = (v) => w * (1 - (1 - nk) * Math.pow(v, .8)) * (1 + .1 * Math.sin(v * 5 + sd));
+    const ed = (v, s) => (noise(v * 9 + sd + s * 5) - .5) * w * .16 + (noise(v * 31 + sd * 2 + s) - .5) * w * .06;
+    const L = [], Rr = [];
+    for (let j = 0; j <= N; j++) { const v = j / N, y = base - h * v; L.push([X - hw(v) + ed(v, 0), y]); Rr.push([X + hw(v) + ed(v, 1), y]); }
     const g = c.createLinearGradient(X - w, 0, X + w, 0);
-    g.addColorStop(0, shade); g.addColorStop(.45, mix(shade, lit, .5)); g.addColorStop(.8, lit); g.addColorStop(1, mix(lit, shade, .35));
-    c.fillStyle = g; c.beginPath();
-    const nk = cap ? .2 : .1;
-    c.moveTo(X - w, base); c.bezierCurveTo(X - w * .72, base - h * .36, X - w * .3, base - h * .72, X - w * nk, base - h);
-    c.quadraticCurveTo(X, base - h - (cap ? 0 : w * .12), X + w * nk, base - h); c.bezierCurveTo(X + w * .3, base - h * .72, X + w * .72, base - h * .36, X + w, base); c.fill();
-    const hw = (v) => w * (1 - .82 * Math.pow(v, .75));
-    c.strokeStyle = rgba(mix(shade, "#000000", .3), .16); c.lineWidth = Math.max(.8, w * .03); c.beginPath();
-    for (let k = 0; k < 6; k++) { const f = -.85 + k * .32 + (k % 2) * .05; for (let j = 0; j <= 5; j++) { const v = .04 + j * .17, xx = X + f * hw(v) + Math.sin(j * 2 + k) * w * .03, yy = base - h * v; j ? c.lineTo(xx, yy) : c.moveTo(xx, yy); } }
+    g.addColorStop(0, shade); g.addColorStop(.45, mix(shade, lit, .5)); g.addColorStop(.8, lit); g.addColorStop(1, mix(lit, shade, .3));
+    c.fillStyle = g; c.beginPath(); c.moveTo(L[0][0] - w * .1, base + 2);
+    for (const p of L) c.lineTo(p[0], p[1]);
+    if (!cap) c.quadraticCurveTo(X, base - h - w * .14, Rr[N][0], Rr[N][1]);
+    for (let j = N; j >= 0; j--) c.lineTo(Rr[j][0], Rr[j][1]);
+    c.lineTo(Rr[0][0] + w * .1, base + 2); c.closePath(); c.fill();
+    // rain-cut runnels and soft horizontal tuff bands
+    c.strokeStyle = rgba(mix(shade, "#000000", .3), .15); c.lineWidth = Math.max(.8, w * .03); c.beginPath();
+    for (let k = 0; k < 5; k++) { const f = -.75 + k * .36; for (let j = 0; j <= 5; j++) { const v = .05 + j * .16, xx = X + f * hw(v) + Math.sin(j * 2 + k + sd) * w * .04, yy = base - h * v; j ? c.lineTo(xx, yy) : c.moveTo(xx, yy); } }
     c.stroke();
-    c.strokeStyle = rgba(lit, .55); c.lineWidth = Math.max(1, w * .05); c.beginPath();
-    for (const v of [.3]) { c.moveTo(X - hw(v) * .9, base - h * v); c.quadraticCurveTo(X, base - h * v + w * .08, X + hw(v) * .95, base - h * v); }
+    c.strokeStyle = rgba(lit, .3); c.lineWidth = Math.max(1, w * .04); c.beginPath();
+    for (const v of [.22, .48]) { c.moveTo(X - hw(v) * .9, base - h * v); c.quadraticCurveTo(X, base - h * v + w * .07, X + hw(v) * .95, base - h * v); }
     c.stroke();
+    // carved doors and windows, dark, with a lit sill
+    if (o.win) {
+      const R = rng((sd * 1000) | 0); c.fillStyle = rgba("#1a0c14", .85); c.beginPath(); const sills = [];
+      for (let i = 0; i < o.win; i++) { const v = lerp(.12, .62, R()), ww = hw(v) * lerp(.12, .2, R()), wx = X + hw(v) * lerp(-.5, .45, R()), wy = base - h * v; archPath(c, wx, wy, ww, ww * 1.6); sills.push([wx - ww / 2, wy, ww]); }
+      c.fill(); c.fillStyle = rgba(lit, .5); c.beginPath(); for (const [a, b, ww] of sills) c.rect(a, b, ww, Math.max(.8, ww * .12)); c.fill();
+    }
+    // the sunward edge catching dawn: an additive rim light
+    const op = c.globalCompositeOperation; c.globalCompositeOperation = "lighter";
+    c.strokeStyle = rgba("#ffb07a", .45 * (o.rim == null ? 1 : o.rim)); c.lineWidth = Math.max(1, w * .07); c.beginPath();
+    for (let j = 1; j <= N; j++) j === 1 ? c.moveTo(Rr[j][0] - w * .03, Rr[j][1]) : c.lineTo(Rr[j][0] - w * .03, Rr[j][1]);
+    c.stroke(); c.globalCompositeOperation = op;
     if (cap) {
-      c.fillStyle = cap; c.beginPath(); c.ellipse(X, base - h + 2, w * .44, w * .34, 0, PI, 0); c.fill();
-      c.fillRect(X - w * .44, base - h, w * .88, w * .07);
-      c.fillStyle = rgba(lit, .35); c.beginPath(); c.ellipse(X, base - h + 2, w * .43, w * .33, 0, -PI * .45, -PI * .05); c.lineTo(X, base - h); c.fill();
+      const tl = o.tl || 0, cy = base - h, cx = (L[N][0] + Rr[N][0]) / 2;
+      c.save(); c.translate(cx, cy); c.rotate(tl);
+      c.fillStyle = cap; c.beginPath();
+      c.moveTo(-w * .5, w * .04); c.lineTo(-w * .44, -w * .1); c.quadraticCurveTo(-w * .2, -w * .36, w * .06, -w * .34); c.quadraticCurveTo(w * .4, -w * .26, w * .5, -w * .04); c.lineTo(w * .46, w * .06); c.closePath(); c.fill();
+      c.globalCompositeOperation = "lighter"; c.strokeStyle = rgba("#ffc890", .55 * (o.rim == null ? 1 : o.rim)); c.lineWidth = Math.max(1, w * .045); c.beginPath();
+      c.moveTo(-w * .05, -w * .35); c.quadraticCurveTo(w * .4, -w * .26, w * .5, -w * .04); c.stroke();
+      c.globalCompositeOperation = op; c.restore();
     }
   }
   // A light shaft across the floor of a room, as a parallelogram.
@@ -726,81 +748,94 @@
     c.beginPath(); c.arc(X, B - 612 * s, 4 * s, 0, 7); c.fill();
   }
 
-  /* 5. Pamukkale: white travertine terraces stepping down toward us, turquoise pools holding the sunset */
+  /* 5. Pamukkale: white travertine terraces stepping down toward us; calm turquoise pools mirror the sunset */
   C.pamukkale = (x) => {
     const { c, W, H, t, u, m } = x, hz = -210, V = view(x), edge = -80;
     if (!m.i) {
       m.i = 1;
       m.pl = profile(4, V.l - 40, V.r + 40, edge, 26, (v) => .5 + .5 * Math.sin(v * 9), 50, .4);
       m.tw = windowSet(6, 50, m.pl, edge - 4, [1.5, 2.5]);
-      const R = rng(77); m.rows = [];
-      let Y = edge + 16;
-      for (let r = 0; Y < V.b + 160; r++) {
-        const gap = 30 + r * 15 + r * r * 1.2, pools = [];
-        let X = V.l - R() * 220;
-        while (X < V.r + 60) { const w = lerp(140, 420, Math.min(1, r / 7)) * lerp(.55, 1.4, R()); pools.push({ x0: X, x1: X + w, b: lerp(.1, .3, R()), ph: R() * 6, st: Array.from({ length: 3 + (w / 60 | 0) }, () => R()) }); X += w; }
-        m.rows.push({ y: Y, gap, r, pools, ph: R() * 6 });
-        Y += gap;
+      const R = rng(78); m.rows = [];
+      let Y = edge + 26, g = 34;
+      for (let r = 0; Y < V.b + 200; r++) {
+        const pools = []; let X = V.l - R() * 200;
+        const wBase = 220 * Math.pow(1.5, r);
+        while (X < V.r + 40) { const w = wBase * lerp(.7, 1.3, R()); pools.push({ x0: X, x1: X + w }); X += w; }
+        m.rows.push({ y: Y, g, b: g * .32, ch: g * .42, r, pools, ph: R() * 6, sf: lerp(.05, .09, R()) / (1 + r * .4) });
+        Y += g; g *= 1.72;
       }
+      m.mo = motesSet(12, 30, [V.l, edge, V.r, 400]);
     }
-    const set = smooth(0, 1, u);
-    sky(x, hz, [[0, mix("#3a3c78", "#2a2a62", set)], [.5, mix("#a07090", "#9a5a80", set)], [.85, mix("#f0a890", "#f08a70", set)], [1, mix("#ffe0b0", "#ffc080", set)]]);
-    const sunY = lerp(hz - 150, hz - 20, set), sx = -250;
+    const set = smooth(0, 1, u), sunY = lerp(hz - 150, hz - 20, set), sx = -250;
+    const skyTop = mix("#3a3c78", "#2a2a62", set), skyMid = mix("#a07090", "#9a5a80", set), skyLow = mix("#f0a890", "#f08a70", set), skyHz = mix("#ffe0b0", "#ffc080", set);
+    sky(x, hz, [[0, skyTop], [.5, skyMid], [.85, skyLow], [1, skyHz]]);
     x.full(); P.glow(c, x.sx(sx), x.sy(sunY), x.S * 1.1, "#ffaa70", .42);
     x.stage();
     c.fillStyle = "#fff0c8"; c.beginPath(); c.arc(sx, sunY, 30, 0, 7); c.fill();
     P.glow(c, sx, sunY, 130, "#ffe0a0", .5);
     ridge(x, hz, 80, 6.2, "#7a5a86", 2);
     haze(x, hz, 40, "#ffb898", .45);
-    // the Çürüksu plain far below, Denizli's lights waking
+    // the plain far below, fields and poplars, Denizli's lights waking
     x.stage();
     c.fillStyle = P.vgrad(c, 0, hz, 0, edge, [[0, "#b08a90"], [1, "#8a8070"]]); c.fillRect(V.l, hz - 2, V.r - V.l, edge - hz + 4);
-    c.fillStyle = "rgba(90,80,60,.25)"; c.beginPath();
+    c.fillStyle = "rgba(90,80,60,.22)"; c.beginPath();
     for (let i = 0; i < 9; i++) { const y = lerp(hz + 20, edge - 10, i / 9), sh = (i * 97) % 300; for (let X = V.l - sh; X < V.r; X += 300) c.rect(X, y, 140 + (i * 31) % 90, 2 + i * .6); }
     c.fill();
-    c.fillStyle = "rgba(70,70,50,.55)"; c.beginPath();
-    for (let i = 0; i < 40; i++) { const X = V.l + (i * 137) % (V.r - V.l), y = lerp(hz + 30, edge - 6, ((i * 53) % 40) / 40), h = 6 + ((i * 53) % 40) / 4; c.moveTo(X, y); c.quadraticCurveTo(X - 2, y - h * .6, X, y - h); c.quadraticCurveTo(X + 2, y - h * .6, X, y); }
-    c.fill();
     windows(c, m.tw, "#ffd8a0", .9, set);
-    haze(x, edge - 30, 50, "#ffc8a8", .45);
-    // the white hillside starts at the edge of the plateau
-    below(x, edge, [[0, "#fff4ea"], [.4, "#ead4d4"], [1, "#9a8498"]]);
+    haze(x, edge - 30, 50, "#ffc8a8", .5);
+    below(x, edge, [[0, "#fff4ea"], [1, "#d8c4cc"]]);
     x.stage();
-    const rows = m.rows, ry = (row, X) => row.y + Math.sin(X * .004 + row.ph) * row.gap * .18;
-    const op = c.globalCompositeOperation;
+    const rows = m.rows;
+    // a terrace's rim: big lobes bulging toward us, and small scallops along the edge of each lobe
+    const lip = (row, X) => {
+      let p = row.pools[0]; for (const q of row.pools) if (X >= q.x0) p = q; else break;
+      const v = (X - p.x0) / (p.x1 - p.x0) * 2 - 1;
+      return row.y + Math.sin(X * .003 + row.ph) * row.g * .1 + row.b * (1 - v * v) + Math.abs(Math.sin(X * 3.4 / row.g + row.ph)) * row.g * .06;
+    };
+    const drip = (row, X) => row.ch * (1 + .3 * Math.pow(Math.abs(Math.sin(X * 2.4 / row.g + row.ph)), 5) + .1 * Math.pow(Math.abs(Math.sin(X * 6.1 / row.g + row.r)), 3));
+    const cb = (row, X) => lip(row, X) + drip(row, X);
+    const op = c.globalCompositeOperation, st = (row) => Math.max(3, row.g * .045);
     for (let i = 0; i < rows.length; i++) {
-      const row = rows[i], G = i ? rows[i].y - rows[i - 1].y : 24, top = (X) => ry(row, X) - G * .55, nxt = rows[i + 1] ? rows[i + 1].y - row.y : row.gap;
-      for (const p of row.pools) {
-        const ov = (p.x1 - p.x0) * .05, x0 = p.x0, x1 = p.x1, xm = (x0 + x1) / 2, bl = row.gap * p.b;
-        // the pool, its surface holding the sky
-        c.fillStyle = P.vgrad(c, 0, top(xm) - bl, 0, ry(row, xm) + bl, [[0, mix("#f4c8c0", "#ffd8b8", set)], [.12, "#b4e6e8"], [.6, "#3cbcd0"], [1, "#8ae6ea"]]);
-        c.beginPath(); c.moveTo(x0 - ov, ry(row, x0)); c.quadraticCurveTo(x0 - ov * 1.6, (top(x0) + ry(row, x0)) / 2, x0 + ov * .4, top(x0));
-        c.quadraticCurveTo(xm, top(xm) - bl * .6, x1 - ov * .4, top(x1)); c.quadraticCurveTo(x1 + ov * 1.6, (top(x1) + ry(row, x1)) / 2, x1 + ov, ry(row, x1));
-        c.quadraticCurveTo(xm, ry(row, xm) + bl * 2, x0 - ov, ry(row, x0)); c.closePath(); c.fill();
-        // the curtain of stone hanging from the lip
-        const ch = nxt * .75;
-        c.fillStyle = P.vgrad(c, 0, ry(row, xm), 0, ry(row, xm) + ch, [[0, "#fffaf4"], [.35, mix("#f8e0d8", "#ffd8c0", set)], [1, "#a890a8"]]);
-        c.beginPath(); c.moveTo(x0, ry(row, x0)); c.quadraticCurveTo(xm, ry(row, xm) + bl * 2, x1, ry(row, x1));
-        c.lineTo(x1 - ov * .6, ry(row, x1) + ch); c.quadraticCurveTo(xm, ry(row, xm) + ch + bl, x0 + ov * .6, ry(row, x0) + ch); c.closePath(); c.fill();
-        c.fillStyle = "rgba(120,90,120,.18)"; c.beginPath(); c.moveTo(x1, ry(row, x1)); c.quadraticCurveTo(x1 - ov * 1.5, ry(row, x1) + ch * .5, x1 - ov * .6, ry(row, x1) + ch); c.lineTo(x1 - ov * 2.5, ry(row, x1) + ch); c.quadraticCurveTo(x1 - ov * 2.5, ry(row, x1) + ch * .4, x1 - ov * 1.2, ry(row, x1) + bl * .3); c.fill();
-        c.strokeStyle = "rgba(255,255,255,.9)"; c.lineWidth = 1.2 + row.r * .35; c.beginPath(); c.moveTo(x0, ry(row, x0)); c.quadraticCurveTo(xm, ry(row, xm) + bl * 2, x1, ry(row, x1)); c.stroke();
-      }
-      // flowstone streaks on this row's curtains
-      c.strokeStyle = "rgba(140,110,140,.22)"; c.lineWidth = .8 + row.r * .25; c.beginPath();
-      for (const p of row.pools) for (const f of p.st) {
-        const X = lerp(p.x0, p.x1, f), v = (X - p.x0) / (p.x1 - p.x0), Y = ry(row, X) + (1 - Math.pow(v * 2 - 1, 2)) * row.gap * p.b * 2 * .5;
-        c.moveTo(X, Y + 2); c.quadraticCurveTo(X + 2, Y + nxt * .3, X - 1, Y + nxt * (.4 + .3 * f));
-      }
-      c.stroke();
-      // sun glints sliding over the water
-      c.globalCompositeOperation = "lighter"; c.fillStyle = "rgba(255,236,210,.35)"; c.beginPath();
-      for (const p of row.pools) { const X = lerp(p.x0, p.x1, .5 + .3 * Math.sin(t * .3 + p.ph)), Y = (top(X) + ry(row, X)) / 2; c.rect(X - 30 - row.r * 6, Y, 60 + row.r * 12, .8 + row.r * .3); }
+      const row = rows[i], prev = rows[i - 1], top = (X) => prev ? cb(prev, X) : row.y - row.g * .4;
+      const y0 = prev ? prev.y + prev.ch : row.y - row.g * .4, y1 = row.y + row.b * 1.2;
+      // the water: the curtain above mirrored pale at the back, then the sunset sky, turquoise over the white floor, bright where shallow
+      c.fillStyle = P.vgrad(c, 0, y0, 0, y1, [[0, "#eadadc"], [.18, mix(skyLow, "#86ccd6", .55)], [.45, "#66c2d0"], [.85, "#36aec4"], [1, "#a4e6e8"]]);
+      c.beginPath(); c.moveTo(V.l, top(V.l));
+      for (let X = V.l; X <= V.r; X += st(row)) c.lineTo(X, top(X));
+      for (let X = V.r; X >= V.l; X -= st(row)) c.lineTo(X, lip(row, X));
+      c.closePath(); c.fill();
+      // the sun's long reflection, and a few slow ripples
+      c.globalCompositeOperation = "lighter";
+      const ry0 = (y0 + y1) / 2;
+      c.save(); c.translate(sx, ry0); c.scale(1, .16);
+      const sg = c.createRadialGradient(0, 0, 0, 0, 0, row.g * 1.6); sg.addColorStop(0, "rgba(255,236,190,.55)"); sg.addColorStop(1, "rgba(255,236,190,0)");
+      c.fillStyle = sg; c.fillRect(-row.g * 1.6, -row.g * 1.6, row.g * 3.2, row.g * 3.2); c.restore();
+      c.fillStyle = "rgba(255,240,220,.25)"; c.beginPath();
+      for (let k = 0; k < 5; k++) { const X = V.l + ((k * 271 + row.r * 113 + t * 6) % (V.r - V.l)), Y = lerp(y0, y1, .45 + .1 * k % .4); c.rect(X, Y, row.g * .9, Math.max(.8, row.g * .012)); }
       c.fill(); c.globalCompositeOperation = op;
+      // the curtain of the row above dripping into this pool
+      if (prev) {
+        c.fillStyle = "rgba(255,250,244,.22)"; c.beginPath();
+        for (let X = V.l; X <= V.r; X += st(prev)) c.lineTo(X, cb(prev, X) + 1);
+        for (let X = V.r; X >= V.l; X -= st(prev)) c.lineTo(X, cb(prev, X) + drip(prev, X) * .1 + prev.g * .02);
+        c.fill();
+      }
+      // this row's curtain: white stone hanging from the rim in soft fringes
+      c.fillStyle = P.vgrad(c, 0, row.y, 0, row.y + row.b + row.ch * 1.3, [[0, "#fffcf6"], [.4, mix("#fbe8e0", "#ffe0cc", set)], [1, "#b8a2b6"]]);
+      c.beginPath(); c.moveTo(V.l, lip(row, V.l));
+      for (let X = V.l; X <= V.r; X += st(row)) c.lineTo(X, lip(row, X));
+      for (let X = V.r; X >= V.l; X -= st(row) * .5) c.lineTo(X, cb(row, X));
+      c.closePath(); c.fill();
+      c.strokeStyle = "rgba(150,120,150,.09)"; c.lineWidth = Math.max(.8, row.g * .025); c.beginPath();
+      for (let X = V.l + (row.r * 37 % 23), k = 0; X < V.r; X += row.g * (.18 + .2 * ((k * 7) % 5) / 5), k++) { const y = lip(row, X); c.moveTo(X, y + row.ch * .15); c.lineTo(X + 1, y + drip(row, X) * (.5 + .45 * ((k * 3) % 4) / 4)); }
+      c.stroke();
+      // the rim catching the low sun
+      c.strokeStyle = "rgba(255,255,255,.95)"; c.lineWidth = Math.max(1.2, row.g * .05); c.beginPath();
+      for (let X = V.l; X <= V.r; X += st(row)) X === V.l ? c.moveTo(X, lip(row, X)) : c.lineTo(X, lip(row, X));
+      c.stroke();
+      c.strokeStyle = rgba("#ffd0a8", .5); c.lineWidth = Math.max(.8, row.g * .02); c.stroke();
     }
-    // drops running down the stone
-    c.fillStyle = "rgba(255,255,255,.75)"; c.beginPath();
-    for (const row of rows) for (const p of row.pools) { const v = (t * .3 + p.ph) % 1, X = lerp(p.x0, p.x1, .3 + .4 * (p.ph % 1)); c.rect(X, ry(row, X) + 4 + v * row.gap * .5, 1.4, 2 + row.r * .5); }
-    c.fill();
+    motes(c, m.mo, t, "#fff0d8", .35);
   };
 
   /* 6. Antalya: turquoise sea, warm cliffs, the old harbour */
@@ -930,38 +965,39 @@
     motes(c, m.mo, t, "#fff0d8", .55);
     // the courtyard paving catches it all
     c.fillStyle = "rgba(255,240,215,.08)"; c.beginPath(); c.ellipse(wx, hz + 100, 220, 24, 0, 0, 7); c.fill();
-    x.full(); P.reflections(c, [{ x: x.sx(wx), c: "#fff2d8", a: .35, w: 60 * x.k }, { x: x.sx(X), c: "#3ad8b8", a: .3, w: 60 * x.k }], x.sy(hz + 10), H, t, W);
+    x.full(); P.glow(c, x.sx(wx), x.sy(hz + 110), 260 * x.k, "#fff2d8", .14); P.glow(c, x.sx(X), x.sy(hz + 60), 300 * x.k, "#3ad8b8", .08);
   };
 
-  // A whirling bell of light: ribbons flaring from a single point, a rippling hem, turning.
+  // A whirling skirt of light: layered translucent panels of glow turning around a single point,
+  // added light only, no outlines. Nobody inside it.
   function whirl(c, X, Y, R, Hh, rot, a) {
     const op = c.globalCompositeOperation; c.globalCompositeOperation = "lighter";
-    P.glow(c, X, Y + Hh * .7, R * 2.3, "#fff2d8", .16 * a);
-    const hemY = Y + Hh, bg = c.createLinearGradient(0, Y, 0, hemY);
-    bg.addColorStop(0, rgba("#fff6e8", .02 * a)); bg.addColorStop(1, rgba("#fff6e8", .16 * a));
-    c.fillStyle = bg; c.beginPath(); c.moveTo(X, Y); c.lineTo(X + R, hemY); c.ellipse(X, hemY, R, R * .22, 0, 0, PI); c.lineTo(X, Y); c.fill();
-    // ribbons of light, fading toward the crown, brighter on the near side of the turn
-    const gF = c.createLinearGradient(0, Y, 0, hemY), gB = c.createLinearGradient(0, Y, 0, hemY);
-    gF.addColorStop(0, rgba("#fff8ec", .05 * a)); gF.addColorStop(.6, rgba("#fff8ec", .3 * a)); gF.addColorStop(1, rgba("#ffffff", .55 * a));
-    gB.addColorStop(0, rgba("#ffd8a8", 0)); gB.addColorStop(1, rgba("#ffd8a8", .16 * a));
-    for (let i = 0; i < 28; i++) {
-      const th = i / 28 * PI * 2 + rot * 1.8, front = Math.sin(th) > 0, lag = th - .9 - .3 * Math.sin(rot + i);
-      const bx = X + Math.cos(th) * R * (1 + .05 * Math.sin(rot * 3 + i)), by = hemY + Math.sin(th) * R * .22;
-      c.strokeStyle = front ? gF : gB; c.lineWidth = front ? 1 + 2.6 * Math.sin(th) : 1;
-      c.beginPath(); c.moveTo(X, Y + 6); c.bezierCurveTo(X + Math.cos(lag) * R * .15, Y + Hh * .3, X + Math.cos(lag) * R * .6, Y + Hh * .7 + Math.sin(lag) * R * .1, bx, by); c.stroke();
-    }
-    // the hem: a soft rippling ring, doubled for depth
-    for (const [w, al, off] of [[7, .14, 0], [2.2, .6, 0], [1.4, .3, 10]]) {
-      c.strokeStyle = rgba("#fff6e6", al * a); c.lineWidth = w; c.beginPath();
-      for (let i = 0; i <= 72; i++) {
-        const th = i / 72 * PI * 2, r = R * (1 + .06 * Math.sin(th * 7 - rot * 6)) - off;
-        const hx = X + Math.cos(th) * r, hy = hemY - off * .3 + Math.sin(th) * R * .22 + Math.sin(th * 5 + rot * 4) * 6;
-        i ? c.lineTo(hx, hy) : c.moveTo(hx, hy);
-      }
-      c.stroke();
-    }
-    P.glow(c, X, Y, R * .8, "#fff0d0", .6 * a);
-    c.fillStyle = rgba("#ffffff", .9 * a); c.beginPath(); c.arc(X, Y, 4, 0, 7); c.fill();
+    P.glow(c, X, Y + Hh * .75, R * 2.4, "#ffe8c8", .16 * a); P.glow(c, X, Y + Hh * .6, R * 1.1, "#fff2dc", .22 * a);
+    const hemY = Y + Hh;
+    const panel = (th0, dth, rr, hy, alpha, col, lag) => {
+      const th1 = th0 + dth, mid = th0 + dth / 2, front = .35 + .65 * Math.max(0, Math.sin(mid));
+      const g = c.createLinearGradient(0, Y, 0, hy + rr * .22);
+      g.addColorStop(0, rgba(col, 0)); g.addColorStop(.55, rgba(col, alpha * .35 * front)); g.addColorStop(1, rgba(col, alpha * front));
+      c.fillStyle = g; c.beginPath(); c.moveTo(X, Y);
+      c.bezierCurveTo(X + Math.cos(th0 - lag) * rr * .2, Y + Hh * .35, X + Math.cos(th0 - lag) * rr * .7, hy - Hh * .2, X + Math.cos(th0) * rr, hy + Math.sin(th0) * rr * .22);
+      for (let k = 1; k <= 6; k++) { const th = th0 + dth * k / 6, w = 1 + .07 * Math.sin(th * 6 - rot * 5); c.lineTo(X + Math.cos(th) * rr * w, hy + Math.sin(th) * rr * .22 + Math.sin(th * 4 + rot * 3) * 6); }
+      c.bezierCurveTo(X + Math.cos(th1 - lag) * rr * .7, hy - Hh * .2, X + Math.cos(th1 - lag) * rr * .2, Y + Hh * .35, X, Y);
+      c.fill();
+    };
+    // an under-layer turning slowly the other way, then the bright outer skirt
+    for (let i = 0; i < 7; i++) panel(i / 7 * PI * 2 - rot * .9, PI * 2 / 7 * .8, R * .78, hemY - 18, .3 * a, "#ffd6a8", -.5);
+    for (let i = 0; i < 9; i++) panel(i / 9 * PI * 2 + rot * 1.7, PI * 2 / 9 * .75, R, hemY, (.4 + .12 * Math.sin(rot * 2 + i)) * a, "#fff4e4", .8);
+    // the hem breathing light
+    c.save(); c.translate(X, hemY); c.scale(1, .22);
+    const hg = c.createRadialGradient(0, 0, R * .7, 0, 0, R * 1.15);
+    hg.addColorStop(0, rgba("#fff6e8", 0)); hg.addColorStop(.6, rgba("#fff6e8", .4 * a * (.8 + .2 * Math.sin(rot * 3)))); hg.addColorStop(1, rgba("#fff6e8", 0));
+    c.fillStyle = hg; c.fillRect(-R * 1.2, -R * 1.2, R * 2.4, R * 2.4); c.restore();
+    // glints shimmering on the turning cloth
+    c.fillStyle = rgba("#ffffff", .7 * a); c.beginPath();
+    for (let i = 0; i < 18; i++) { const th = i * 2.4 + rot * 1.7, v = .35 + .6 * ((i * .37) % 1); if (Math.sin(th) < .2 || Math.sin(rot * 4 + i * 1.3) < .3) continue; const gx = X + Math.cos(th) * R * v, gy = Y + Hh * v + Math.sin(th) * R * .22 * v; c.moveTo(gx + 1.6, gy); c.arc(gx, gy, 1.6, 0, 7); }
+    c.fill();
+    P.glow(c, X, Y, R * .9, "#fff0d0", .55 * a);
+    P.glow(c, X, Y, R * .25, "#ffffff", .6 * a);
     c.globalCompositeOperation = op;
   }
 
@@ -1001,10 +1037,13 @@
     for (let k = 1; k < 5; k++) { c.save(); c.translate(0, k * 16); rimProfile(c, m.v1, rgba(k % 2 ? "#fff0e8" : "#a07088", .22), 5); c.restore(); }
     haze(x, hz + 40, 40, "#ffd8c0", .3);
     x.stage();
+    let hb = 0;
     for (const k of m.ch) {
+      // dusty haze drifts between the rows of chimneys
+      if (hb < 2 && k.d > (hb ? .7 : .38)) { haze(x, hz + 70 + (hb ? .7 : .38) * 160 - 20, 50, "#ffd8c0", .3); x.stage(); hb++; }
       if (k.m) { const base = hz + 70 + k.d * 160, cx = k.x + (k.m - 1) / 2 * k.w; c.fillStyle = P.vgrad(c, cx - k.mw, 0, cx + k.mw, 0, [[0, mix("#8a6a88", "#6a4a68", k.d)], [1, mix("#e8b8a0", "#ffd8b8", day * k.d)]]); c.beginPath(); c.ellipse(cx, base + 2, k.mw * .9 + k.w * .4, k.h * .22, 0, PI, 0); c.fill(); }
       const base = hz + 70 + k.d * 160, lit = mix("#e8b8a0", "#ffd8b8", day * k.d), sh = mix("#8a6a88", "#6a4a68", k.d);
-      chimney(c, k.x, base, k.h, k.w, lit, sh, k.cap ? mix("#6a5060", "#3a2a3a", k.d) : null);
+      chimney(c, k.x, base, k.h, k.w, lit, sh, k.cap ? mix("#6a5060", "#3a2a3a", k.d) : null, { sd: k.x * .01 + k.g, tl: (k.g % 3 - 1) * .12, win: k.d > .55 && k.g % 2 ? 2 + k.g % 3 : 0, rim: .4 + .6 * k.d });
     }
     for (const b of m.b) if (!far(b) && b.d < 1) { const [bx, by] = pos(b); balloon(c, bx, by, b.s, b, t, hzc, .1); }
     // the near rim where we stand, in shadow, two great chimneys
@@ -1012,9 +1051,22 @@
     x.stage();
     c.fillStyle = "#3a2438"; c.beginPath(); c.moveTo(V.l, 340);
     for (let i = 0; i <= 24; i++) c.lineTo(lerp(V.l, V.r, i / 24), 330 - 22 * noise(i * .8 + 4)); c.lineTo(V.r, V.b); c.lineTo(V.l, V.b); c.fill();
-    chimney(c, 420, 360, 420, 110, mix("#d8a090", "#ffc8a8", day), "#4a2e48", "#2a1a2a");
-    chimney(c, 330, 360, 250, 80, mix("#c89088", "#f0b898", day), "#4a2e48", "#2a1a2a");
-    c.fillStyle = "#140a12"; c.beginPath(); archPath(c, 420, 230, 22, 36); archPath(c, 400, 150, 16, 26); archPath(c, 330, 280, 16, 26); c.fill();
+    // eroded tuff folds on the near slope, warm where they face the dawn
+    c.strokeStyle = rgba("#ffc0a0", .12); c.lineWidth = 3; c.beginPath();
+    for (let i = 0; i < 9; i++) { const y = 380 + i * i * 9; if (y > V.b) break; c.moveTo(V.l, y + 10 * Math.sin(i)); for (let X = V.l; X <= V.r; X += 60) c.lineTo(X, y + 14 * noise(X * .006 + i * 3)); }
+    c.stroke();
+    if (V.b > 620) {
+      // in tall frames, a near shoulder of rock with its own chimneys rises from below
+      c.fillStyle = P.vgrad(c, 0, 660, 0, V.b, [[0, mix("#8a5a68", "#b07870", day)], [.35, "#4a2e44"], [1, "#1e121c"]]); c.beginPath(); c.moveTo(V.l, V.b);
+      for (let i = 0; i <= 20; i++) { const X = lerp(V.l, V.r, i / 20); c.lineTo(X, 760 + 50 * noise(i * .5 + 9) - 90 * Math.exp(-Math.pow((X + 230) / 220, 2))); }
+      c.lineTo(V.r, V.b); c.fill();
+      chimney(c, -250, 700, 440, 120, mix("#b88080", "#e8a890", day), "#3a2238", "#22141e", { sd: 5.3, tl: -.08, win: 3, rim: .8 });
+      chimney(c, -80, 740, 260, 80, mix("#a87478", "#d89a88", day), "#3a2238", null, { sd: 9.1, win: 1, rim: .7 });
+      haze(x, 700, 120, "#ffc8b0", .18);
+    }
+    haze(x, 300, 60, "#ffd0b8", .22); x.stage();
+    chimney(c, 420, 360, 420, 110, mix("#d8a090", "#ffc8a8", day), "#4a2e48", "#2a1a2a", { sd: 3.1, tl: .14, win: 4 });
+    chimney(c, 330, 360, 250, 80, mix("#c89088", "#f0b898", day), "#4a2e48", "#2a1a2a", { sd: 7.7, tl: -.1, win: 2 });
     for (const b of m.b) if (b.d === 1) { const [bx, by] = pos(b); balloon(c, bx, by, b.s, b, t, hzc, 0); }
   };
 
@@ -1095,7 +1147,7 @@
     for (let i = 0; i < 4; i++) {
       x.stage();
       fillProfile(c, m.r[i], 2000, P.vgrad(c, 0, hz - 200 + i * 120, 0, hz + 200 + i * 120, [[0, cols[i]], [1, mix(cols[i], "#c8d4c8", .5 - i * .1)]]));
-      if (i === 1) sumela(c, 250, -30, t);
+      if (i === 0) { haze(x, -150, 160, "#dfe4dc", .35); x.stage(); sumela(c, 250, -440, 40, m, t); }
       haze(x, hz + 60 + i * 120, 70, "#e8ece4", .55 - i * .08);
       x.stage(); mist(i);
     }
@@ -1128,33 +1180,60 @@
     P.steam(c, gx, gy - 120, t, .9, 3, .3);
   };
 
-  // Sümela: a cream monastery tucked into a recess of a sheer, forest-topped cliff.
-  function sumela(c, X, Y, t) {
-    const cl = [[X - 230, Y + 300], [X - 200, Y + 80], [X - 170, Y - 120], [X - 150, Y - 260], [X - 90, Y - 330], [X - 20, Y - 345], [X + 60, Y - 330], [X + 130, Y - 300], [X + 170, Y - 200], [X + 200, Y - 40], [X + 250, Y + 300]];
-    const g = c.createLinearGradient(X - 200, 0, X + 220, 0);
-    g.addColorStop(0, "#8a8a7e"); g.addColorStop(.35, "#6a6a5e"); g.addColorStop(.7, "#4a4a40"); g.addColorStop(1, "#2e2e28");
-    c.fillStyle = g; c.beginPath(); cl.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); c.fill();
-    c.strokeStyle = "rgba(30,30,24,.35)"; c.lineWidth = 2.5; c.beginPath();
-    for (let i = 0; i < 16; i++) { const sx = X - 160 + i * 23, top = Y - 320 + Math.abs(i - 7) * 14; c.moveTo(sx, top); c.quadraticCurveTo(sx + (i % 3 - 1) * 10, Y, sx + (i % 2 ? 6 : -4), Y + 260); } c.stroke();
-    c.fillStyle = "rgba(255,255,240,.12)"; c.beginPath(); c.moveTo(X - 170, Y - 120); c.lineTo(X - 150, Y - 260); c.lineTo(X - 135, Y - 250); c.lineTo(X - 150, Y + 100); c.lineTo(X - 200, Y + 80); c.fill();
-    // forest clinging to the top and the ledges
-    c.fillStyle = "#2e5236"; c.beginPath();
-    for (let i = 0; i < 22; i++) { const tx = X - 160 + i * 15, ty = Y - 330 + Math.abs(i - 9) * 7 - (i % 3) * 6; c.moveTo(tx - 7, ty + 8); c.lineTo(tx, ty - 16 - (i % 4) * 5); c.lineTo(tx + 7, ty + 8); }
-    for (let i = 0; i < 8; i++) { const tx = X - 190 + i * 14, ty = Y + 100 + i * 4; c.moveTo(tx - 6, ty + 6); c.lineTo(tx, ty - 14); c.lineTo(tx + 6, ty + 6); }
+  // Sümela: a sheer, vertical rock wall rising out of dark forest; high on it, in a shadowed recess,
+  // a small many-storeyed monastery facade of pale stone and wooden balconies.
+  function sumela(c, X, top, bot, m, t) {
+    if (!m.sum) {
+      const R = rng(404), L = [], Rt = [], tp = [];
+      for (let i = 0; i <= 14; i++) { const v = i / 14; L.push([X - 250 - 30 * noise(i * .9) + v * 40, lerp(bot, top + 40, v)]); Rt.push([X + 250 + 26 * noise(i * .8 + 4) - v * 40, lerp(bot, top + 70, v)]); }
+      for (let i = 0; i <= 18; i++) tp.push([lerp(X - 210, X + 210, i / 18), top + 20 * noise(i * .7 + 2) + (i % 3 ? 0 : 10)]);
+      const cracks = Array.from({ length: 22 }, () => { const x0 = lerp(X - 220, X + 220, R()); return [x0, lerp(top + 20, bot - 120, R()), lerp(60, 260, R()), (R() - .5) * 14]; });
+      const strata = Array.from({ length: 12 }, () => [lerp(X - 220, X + 220, R()), lerp(top + 30, bot - 60, R()), lerp(20, 60, R())]);
+      const trees = Array.from({ length: 40 }, (_, i) => [lerp(X - 210, X + 210, i / 39) + (R() - .5) * 10, R()]);
+      m.sum = { L, Rt, tp, cracks, strata, trees };
+    }
+    const S = m.sum;
+    // the wall, lit flat from the misty sky, darker toward its right edge
+    c.fillStyle = P.vgrad(c, X - 180, 0, X + 200, 0, [[0, "#7a7c74"], [.25, "#8a8a80"], [.6, "#5e6058"], [1, "#3a3c36"]]);
+    c.beginPath(); S.L.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); S.tp.forEach(p => c.lineTo(p[0], p[1])); for (let i = S.Rt.length - 1; i >= 0; i--) c.lineTo(S.Rt[i][0], S.Rt[i][1]); c.closePath(); c.fill();
+    // vertical sheets and cracks of the rock face
+    c.fillStyle = "rgba(255,255,245,.07)"; c.beginPath(); for (const [sx, sy, w] of S.strata) c.rect(sx, sy, w * .4, bot - sy); c.fill();
+    c.strokeStyle = "rgba(24,26,22,.45)"; c.lineWidth = 1.6; c.beginPath();
+    for (const [cx0, cy0, l, d] of S.cracks) { c.moveTo(cx0, cy0); c.quadraticCurveTo(cx0 + d, cy0 + l * .5, cx0 + d * .4, cy0 + l); } c.stroke();
+    c.fillStyle = "rgba(20,22,18,.3)"; c.fillRect(X + 150, top + 70, 90, bot - top);
+    // forest clinging to the top edge
+    c.fillStyle = "#1e3a26"; c.beginPath();
+    for (const [tx, r] of S.trees) { const ty = yAt(S.tp, Math.min(X + 210, Math.max(X - 210, tx))) + 6, h = 22 + r * 30; c.moveTo(tx - 8 - r * 4, ty + 4); c.lineTo(tx, ty - h); c.lineTo(tx + 8 + r * 4, ty + 4); }
     c.fill();
-    // the recess and the monastery inside it
-    const s = .62, mx = X + 20, my = Y + 30;
-    c.fillStyle = "#1a1a14"; c.beginPath(); c.ellipse(mx, my - 70 * s, 150 * s, 120 * s, 0, PI, 0); c.lineTo(mx + 150 * s, my + 20 * s); c.lineTo(mx - 150 * s, my + 20 * s); c.fill();
-    c.fillStyle = P.vgrad(c, mx - 120 * s, 0, mx + 120 * s, 0, [[0, "#fbf3e2"], [1, "#b8ac94"]]); c.fillRect(mx - 120 * s, my - 120 * s, 240 * s, 150 * s);
-    c.fillStyle = "#efe4cc"; c.fillRect(mx - 70 * s, my - 170 * s, 110 * s, 55 * s);
-    c.fillStyle = "#8a4632"; c.fillRect(mx - 128 * s, my - 128 * s, 256 * s, 10 * s); c.fillRect(mx - 76 * s, my - 176 * s, 122 * s, 8 * s);
-    c.fillStyle = "#2a1e16"; c.beginPath();
-    for (let r = 0; r < 3; r++) for (let i = 0; i < 9; i++) archPath(c, mx - 100 * s + i * 25 * s, my - 60 * s + r * 40 * s, 9 * s, 22 * s);
-    for (let i = 0; i < 4; i++) archPath(c, mx - 55 * s + i * 25 * s, my - 128 * s, 8 * s, 20 * s);
+    // the recess: an overhang casting deep shadow
+    const mx = X - 10, my = top + 200, q = .62;
+    c.fillStyle = "#24241d"; c.beginPath(); c.moveTo(mx - 95, my + 34); c.bezierCurveTo(mx - 104, my - 56, mx - 48, my - 96, mx + 8, my - 94); c.bezierCurveTo(mx + 72, my - 94, mx + 112, my - 48, mx + 100, my + 34); c.closePath(); c.fill();
+    c.fillStyle = "rgba(255,250,235,.12)"; c.fillRect(mx - 110, my + 34, 220, 4);
+    // the monastery: storeys of pale walls, rows of small windows, wooden balconies, red-brown roofs
+    const walls = [[-95, 30, 70, 120], [-30, 0, 120, 150], [85, 20, 40, 100]].map(w => w.map(v => v * q));
+    for (const [dx, dy, w, h] of walls) {
+      const x0 = mx + dx, y1 = my + 40 - dy;
+      c.fillStyle = P.vgrad(c, x0, 0, x0 + w, 0, [[0, "#f4ecda"], [1, "#c8bca2"]]); c.fillRect(x0, y1 - h, w, h);
+      c.fillStyle = "#8a4a32"; c.beginPath(); c.moveTo(x0 - 4, y1 - h); c.lineTo(x0 + w * .5, y1 - h - 12); c.lineTo(x0 + w + 4, y1 - h); c.fill();
+      c.fillStyle = "#2a1e16"; c.beginPath();
+      for (let r = 0; r < Math.floor(h / 19); r++) for (let k = 0; k < Math.floor(w / 9); k++) archPath(c, x0 + 5 + k * 9, y1 - 6 - r * 19, 3.4, 8);
+      c.fill();
+      c.fillStyle = "#5a3820"; for (let r = 1; r < Math.floor(h / 19); r++) c.fillRect(x0 - 2, y1 - r * 19 + 2, w + 4, 2);
+    }
+    c.fillStyle = "rgba(0,0,0,.25)"; c.fillRect(mx - 70, my - 70, 150, 26);
+    P.glow(c, mx, my - 40, 120, "#fff4dc", .1);
+    // forested shoulders of the mountain pressing in on both sides
+    c.fillStyle = "#1c3424"; c.beginPath();
+    for (const d of [-1, 1]) {
+      const x0 = X + d * 200, y0 = top + 170; c.moveTo(x0, y0);
+      for (let i = 1; i <= 22; i++) { const xx = x0 + d * i * 20, yy = y0 + i * 13 + 10 * noise(i + d * 3); c.lineTo(xx - d * 10, yy - 26 - (i * 17 % 22)); c.lineTo(xx, yy); }
+      c.lineTo(x0 + d * 440, bot + 600); c.lineTo(x0, bot + 600); c.closePath();
+    }
     c.fill();
-    c.fillStyle = "#6a4028"; for (let r = 0; r < 3; r++) c.fillRect(mx - 112 * s, my - 76 * s + r * 40 * s, 224 * s, 3 * s);
-    c.fillStyle = P.vgrad(c, 0, my + 30 * s, 0, my + 130 * s, [[0, "#b8ac92"], [1, "#5a5a4c"]]); c.fillRect(mx - 110 * s, my + 30 * s, 200 * s, 100 * s);
-    P.glow(c, mx - 30 * s, my - 30 * s, 90, "#fff4d8", .12);
+    // dark conifers crowding the foot of the wall
+    c.fillStyle = "#16301e"; c.beginPath();
+    for (let i = 0; i < 20; i++) { const tx = X - 280 + i * 28 + (i * 37 % 13), ty = bot - 10 - (i * 53 % 40), h = 90 + (i * 29 % 70); c.moveTo(tx - 16, ty + 40); c.lineTo(tx - 9, ty - h * .4); c.lineTo(tx - 13, ty - h * .4); c.lineTo(tx, ty - h); c.lineTo(tx + 13, ty - h * .4); c.lineTo(tx + 9, ty - h * .4); c.lineTo(tx + 16, ty + 40); }
+    c.fill();
   }
 
   /* 11. Erzurum: snow falling at night, the twin minarets, warm windows */
@@ -1341,7 +1420,7 @@
   C.gaziantep = (x) => {
     const { c, W, H, t, u, m } = x, V = view(x), vy = -60;
     if (!m.i) { m.i = 1; m.bk = P.bokehSet(17, 26, [-160, -200, 160, 40], [4, 16], ["#ffb35a", "#ffd59a", "#ff7a3a"]); }
-    x.full(); P.fillAll(c, W, H, [[0, "#0e0806"], [.5, "#1e120a"], [1, "#0a0604"]]);
+    x.full(); P.fillAll(c, W, H, [[0, "#1a0e08"], [.5, "#2e1a0c"], [1, "#140a06"]]);
     x.stage();
     P.glow(c, 0, vy, 520, "#ffa04a", .4);
     P.bokeh(c, m.bk, t, 4);
@@ -1391,7 +1470,46 @@
       c.fillStyle = "#2a1408"; c.fillRect(lx - lr * .5, ly - lr * 1.1, lr, lr * .2); c.fillRect(lx - lr * .4, ly + lr * .9, lr * .8, lr * .2);
     }
     // the near walls beyond the first arch, dark, framing the alley on wide screens
-    c.fillStyle = "#0a0604"; c.fillRect(V.l, V.t, -560 - V.l, V.b - V.t); c.fillRect(560, V.t, V.r - 560, V.b - V.t);
+    // the near walls beyond the first arch: warm stone catching the lantern light, framing the alley on wide screens
+    for (const d of [-1, 1]) {
+      const x0 = d < 0 ? V.l : 560, x1 = d < 0 ? -560 : V.r; if (x1 - x0 < 4) continue;
+      c.fillStyle = P.vgrad(c, d * 560, 0, d * Math.max(600, Math.abs(d < 0 ? V.l : V.r)), 0, [[0, "#6a4228"], [.5, "#3e2616"], [1, "#22140a"]]);
+      c.fillRect(x0, V.t, x1 - x0, V.b - V.t);
+      c.strokeStyle = "rgba(20,10,4,.45)"; c.lineWidth = 2; c.beginPath();
+      for (let y = Math.floor(V.t / 46) * 46, r = 0; y < V.b; y += 46, r++) { c.moveTo(x0, y); c.lineTo(x1, y); for (let X = (d < 0 ? -560 : 560) + d * (r % 2 ? 40 : 90); d < 0 ? X > x0 : X < x1; X += d * 130) { c.moveTo(X, y); c.lineTo(X, y + 46); } }
+      c.stroke();
+      c.strokeStyle = "rgba(255,190,120,.12)"; c.lineWidth = 2; c.beginPath();
+      for (let y = Math.floor(V.t / 46) * 46 + 2; y < V.b; y += 46) { c.moveTo(x0, y); c.lineTo(x1, y); }
+      c.stroke();
+      // lantern bounce on the copper-warm stone
+      P.glow(c, d * 600, -200, 320, "#ffa050", .35); P.glow(c, d * 620, 200, 260, "#ff8a3a", .22);
+    }
+    // copper pots hanging on chains near the camera, swinging gently and catching the lanterns
+    const pots = [[-470, -520, -250, 46], [-400, -520, -120, 30], [470, -520, -230, 42], [410, -520, -90, 30]];
+    if (V.r > 640) pots.push([680, -560, -180, 56], [780, -560, -40, 38], [-690, -560, -160, 52], [-800, -560, -10, 40]);
+    c.strokeStyle = "#2a1408"; c.lineWidth = 2.5; c.beginPath();
+    const pp = pots.map(([px, top, py, r], i) => { const sw = Math.sin(t * .7 + i * 1.7) * .04, bx = px + (py - top) * sw; c.moveTo(px, top); c.lineTo(bx, py - r); return [bx, py, r, sw]; });
+    c.stroke();
+    for (const [bx, py, r, sw] of pp) {
+      c.save(); c.translate(bx, py); c.rotate(-sw);
+      c.fillStyle = P.vgrad(c, -r, 0, r, 0, [[0, "#4a1a06"], [.35, "#b85a24"], [.55, "#f0a060"], [.75, "#a84a1a"], [1, "#3a1404"]]);
+      c.beginPath(); c.moveTo(-r * .5, -r); c.lineTo(r * .5, -r); c.quadraticCurveTo(r * .55, -r * .7, r * .95, -r * .2); c.quadraticCurveTo(r * 1.1, r * .6, 0, r * .8); c.quadraticCurveTo(-r * 1.1, r * .6, -r * .95, -r * .2); c.quadraticCurveTo(-r * .55, -r * .7, -r * .5, -r); c.fill();
+      c.fillStyle = "#3a1406"; c.fillRect(-r * .6, -r * 1.08, r * 1.2, r * .14);
+      c.restore();
+    }
+    const opz = c.globalCompositeOperation; c.globalCompositeOperation = "lighter";
+    c.fillStyle = "rgba(255,226,170,.75)"; c.beginPath();
+    for (const [bx, py, r] of pp) { c.moveTo(bx - r * .1, py - r * .5); c.ellipse(bx - r * .18, py - r * .1, r * .12, r * .42, -.15, 0, 7); }
+    c.fill(); c.globalCompositeOperation = opz;
+    for (const [bx, py, r] of pp) P.glow(c, bx - r * .2, py - r * .1, r * 1.6, "#ffb060", .16);
+    // the near floor: polished flagstones holding the lantern glow (seen in tall frames)
+    if (V.b > 560) {
+      c.fillStyle = P.vgrad(c, 0, 520, 0, V.b, [[0, "#4a2c18"], [.4, "#3a2214"], [1, "#1e1008"]]); c.fillRect(V.l, 535, V.r - V.l, V.b - 535);
+      c.strokeStyle = "rgba(15,6,2,.5)"; c.lineWidth = 2.5; c.beginPath();
+      for (let y = 560, r = 0; y < V.b; y += 40 + r * 14, r++) { c.moveTo(V.l, y); c.lineTo(V.r, y); for (let i = -6; i <= 6; i++) { const X = i * 900 / (r + 4) + (r % 2) * 450 / (r + 4); c.moveTo(X * (1 + r * .25), y); c.lineTo(X * (1 + (r + 1) * .25), y + 40 + r * 14); } }
+      c.stroke();
+      P.glow(c, 0, 640, 420, "#ff9a4a", .22); P.glow(c, -330, 560, 200, "#ff7a3a", .18);
+    }
     // floor reflections of the lanterns
     x.full(); P.reflections(c, [{ x: x.sx(0), c: "#ffb35a", a: .4, w: 60 * x.k }, { x: x.sx(-30), c: "#d83a3a", a: .25, w: 20 * x.k }, { x: x.sx(30), c: "#3a8ad8", a: .25, w: 20 * x.k }], x.sy(140), x.sy(560), t, W);
     // the tray of baklava on a low table, and a glass of tea
@@ -1708,4 +1826,22 @@
       P.petal(c, X, Y, p.r + t * 1.5, p.s * (.3 + k), p.col, Math.min(1, k * 2.5) * .95);
     }
   };
+
+  // A painterly finish for every city: a few soft, slowly drifting blotches of warm light and cool shade,
+  // like uneven layers of glaze. Cached per film, about 7 gradient fills a frame.
+  Object.keys(C).forEach((name, n) => {
+    const f = C[name];
+    C[name] = (x) => {
+      f(x);
+      const { c, W, H, S, t, m } = x;
+      if (!m.glz) { const R = rng(500 + n * 17); m.glz = Array.from({ length: 7 }, (_, i) => ({ x: R(), y: R(), r: lerp(.25, .55, R()), dark: i % 2, ph: R() * 6 })); }
+      x.full();
+      for (const b of m.glz) {
+        const X = (b.x + .03 * Math.sin(t * .05 + b.ph)) * W, Y = (b.y + .02 * Math.cos(t * .04 + b.ph)) * H, r = b.r * S;
+        const g = c.createRadialGradient(X, Y, 0, X, Y, r), col = b.dark ? "#2a1830" : "#fff0d8", a = b.dark ? .07 : .05;
+        g.addColorStop(0, rgba(col, a)); g.addColorStop(.6, rgba(col, a * .5)); g.addColorStop(1, rgba(col, 0));
+        c.fillStyle = g; c.fillRect(X - r, Y - r, r * 2, r * 2);
+      }
+    };
+  });
 })();

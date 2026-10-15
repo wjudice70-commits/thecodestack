@@ -147,6 +147,43 @@
     c.restore();
   }
 
+  // A soft pillow centred at (x, y): pinched corners, a piped seam, light from the upper left;
+  // `dent` presses a hollow where a head has been.
+  function pillow(c, x, y, w, h, rot, dent, seed, tint = "#dfe5f0") {
+    c.save(); c.translate(x, y); c.rotate(rot);
+    const hw = w / 2, hh = h / 2;
+    const shape = () => {
+      c.beginPath(); c.moveTo(-hw, -hh);
+      c.bezierCurveTo(-hw * .4, -hh * .72, hw * .4, -hh * .72, hw, -hh);
+      c.bezierCurveTo(hw * .86, -hh * .3, hw * .86, hh * .3, hw, hh);
+      c.bezierCurveTo(hw * .4, hh * .78, -hw * .4, hh * .78, -hw, hh);
+      c.bezierCurveTo(-hw * .86, hh * .3, -hw * .86, -hh * .3, -hw, -hh); c.closePath();
+    };
+    P.shadow(c, 10, hh * .7, hw * 1.05, hh * .5, .55);
+    const g = c.createRadialGradient(-hw * .3, -hh * .4, 4, 0, 0, hw * 1.1);
+    g.addColorStop(0, mix(tint, "#ffffff", .5)); g.addColorStop(.5, tint); g.addColorStop(1, mix(tint, "#1a2030", .6));
+    c.fillStyle = g; shape(); c.fill();
+    c.save(); shape(); c.clip();
+    // under-curve shade and a few soft creases
+    c.fillStyle = P.vgrad(c, 0, hh * .2, 0, hh, [[0, "rgba(10,16,30,0)"], [1, "rgba(10,16,30,.45)"]]); c.fillRect(-hw, 0, w, hh);
+    const R = rng(seed);
+    c.lineCap = "round";
+    for (let i = 0; i < 4; i++) {
+      const cx = lerp(-hw * .8, hw * .8, R()), cy = lerp(-hh * .5, hh * .5, R()), l = lerp(20, 50, R()), a = R() * 3;
+      c.strokeStyle = "rgba(20,28,50,.18)"; c.lineWidth = 3; c.beginPath(); c.moveTo(cx, cy); c.quadraticCurveTo(cx + Math.cos(a) * l * .5, cy + 8, cx + Math.cos(a) * l, cy + Math.sin(a) * l * .3); c.stroke();
+    }
+    if (dent > 0) {
+      const dg = c.createRadialGradient(hw * .1, -hh * .05, 2, hw * .1, 0, hw * .5);
+      dg.addColorStop(0, `rgba(20,28,50,${.45 * dent})`); dg.addColorStop(1, "rgba(20,28,50,0)");
+      c.fillStyle = dg; c.fillRect(-hw, -hh, w, h);
+      c.strokeStyle = `rgba(255,255,255,${.25 * dent})`; c.lineWidth = 2; c.beginPath(); c.ellipse(hw * .1, 0, hw * .42, hh * .4, 0, 3.4, 5.6); c.stroke();
+    }
+    c.restore();
+    // the piped seam
+    c.strokeStyle = "rgba(255,255,255,.22)"; c.lineWidth = 2; shape(); c.stroke();
+    c.restore();
+  }
+
   // A brass candle dish.
   function brassDish(c, x, y, r = 46) {
     P.shadow(c, x, y + 4, r * 1.6, r * .4, .6);
@@ -1052,73 +1089,210 @@
     c.strokeStyle = "rgba(255,190,140,.2)"; c.lineWidth = 3; c.beginPath(); c.moveTo(-600, 330); c.bezierCurveTo(-300, 260, -100, 360, 100, 300); c.bezierCurveTo(300, 250, 450, 330, 600, 300); c.stroke();
   };
 
-  /* 15. Our fort in the living room */
+  /* 15. Our fort in the living room: sheets over two chairs, glowing from inside */
   S.fort = (x) => {
-    const { c, t } = x;
-    room(x, "#0c0a0e", "#080609", 120, 0, 120, .08);
+    const { c, W, H, t, m } = x;
+    const FL = 300;                                            // floor line
+    const CL = -380, CR = 380, CT = -170;                      // chair backs: x and top
+    room(x, "#0e0b10", "#0a0709", FL, 0, 100, .06, (L) => {
+      const { c } = L;
+      // the dark living room around it: a window with the night, a sofa's arm, a lamp switched off
+      c.fillStyle = P.vgrad(c, 0, -620, 0, -200, [[0, "#060814"], [1, "#121a30"]]); c.fillRect(-760, -620, 300, 400);
+      const R = rng(7); for (let i = 0; i < 24; i++) { c.fillStyle = `rgba(230,236,255,${.2 + R() * .5})`; c.fillRect(-760 + R() * 300, -620 + R() * 300, 1.6, 1.6); }
+      windowFrame(c, -760, -620, 300, 400, "#07060a", 1, "rgba(150,170,230,.08)");
+      c.fillStyle = "#08060a"; c.beginPath(); c.roundRect(560, 20, 400, 300, 40); c.fill();
+      c.fillStyle = "rgba(255,180,120,.06)"; c.fillRect(570, 22, 380, 3);
+      c.fillStyle = "#07060a"; c.fillRect(-640, -60, 8, 360); c.beginPath(); c.moveTo(-690, -60); c.lineTo(-582, -60); c.lineTo(-600, -150); c.lineTo(-672, -150); c.fill();
+      // a rug under the fort
+      c.fillStyle = P.vgrad(c, 0, FL, 0, FL + 300, [[0, "#3a1e18"], [1, "#140a08"]]);
+      c.beginPath(); c.moveTo(-700, FL + 10); c.lineTo(700, FL + 10); c.lineTo(900, FL + 400); c.lineTo(-900, FL + 400); c.fill();
+      c.strokeStyle = "rgba(255,190,140,.08)"; c.lineWidth = 3; c.beginPath(); c.moveTo(-660, FL + 30); c.lineTo(660, FL + 30); c.stroke();
+      // the chairs: real dining chairs, backs to the fort
+      const chair = (cx, sd) => {
+        c.fillStyle = "#0a0607"; c.strokeStyle = "#0a0607"; c.lineCap = "round";
+        c.lineWidth = 16; c.beginPath(); c.moveTo(cx - 70, CT); c.lineTo(cx - 64, FL); c.moveTo(cx + 70, CT); c.lineTo(cx + 64, FL); c.stroke();
+        c.beginPath(); c.roundRect(cx - 80, CT - 14, 160, 30, 12); c.fill();
+        c.lineWidth = 7; for (let k = -1; k <= 1; k++) { c.beginPath(); c.moveTo(cx + k * 34, CT + 10); c.lineTo(cx + k * 30, 60); c.stroke(); }
+        c.fillRect(cx - 74, 56, 148, 22);
+        c.lineWidth = 12; c.beginPath(); c.moveTo(cx + sd * 66, 70); c.lineTo(cx + sd * 120, FL + 10); c.stroke();
+        c.fillStyle = "rgba(255,180,120,.12)"; c.fillRect(cx - 78, CT - 14, 156, 3);
+      };
+      chair(CL, -1); chair(CR, 1);
+    });
     x.stage();
-    const glowA = .85 + .15 * noise(t * 1.2);
-    // chairs left and right
-    const chair = (cx, flip) => { c.fillStyle = "#0a0607"; c.fillRect(cx - 50, -150, 100, 18); c.fillRect(cx - 50, -150, 14, 380); c.fillRect(cx + 36, -150, 14, 380); c.fillRect(cx - 60, 60, 120, 18); };
-    chair(-380, 1); chair(380, -1);
-    // the sheet draped between them, lit from inside
-    const g = c.createRadialGradient(0, 120, 20, 0, 80, 520);
-    g.addColorStop(0, rgba("#ffe6b8", glowA)); g.addColorStop(.5, rgba("#e8a860", .9 * glowA)); g.addColorStop(1, "#5a3420");
-    c.fillStyle = g;
-    c.beginPath(); c.moveTo(-460, 300);
-    c.bezierCurveTo(-470, 60, -420, -150, -380, -160);
-    c.bezierCurveTo(-200, -60, 200, -60, 380, -160);
-    c.bezierCurveTo(420, -150, 470, 60, 460, 300);
-    c.closePath(); c.fill();
-    // folds in the fabric
-    c.strokeStyle = "rgba(90,50,30,.35)"; c.lineWidth = 6;
-    for (let i = -3; i <= 3; i++) { c.beginPath(); c.moveTo(i * 100, -95 + Math.abs(i) * 8); c.quadraticCurveTo(i * 120, 100, i * 140, 300); c.stroke(); }
-    // the opening, with the mattress inside
-    c.fillStyle = "rgba(40,20,10,.55)"; c.beginPath(); c.moveTo(-160, 300); c.quadraticCurveTo(0, 20, 160, 300); c.fill();
-    c.fillStyle = "#f4e6d0"; c.beginPath(); c.moveTo(-140, 300); c.lineTo(-100, 220); c.lineTo(100, 220); c.lineTo(140, 300); c.fill();
-    c.fillStyle = "#ffd8a8"; c.beginPath(); c.ellipse(-50, 228, 40, 14, 0, 0, 7); c.ellipse(50, 228, 40, 14, 0, 0, 7); c.fill();
-    P.stringLights(c, -130, 120, 130, 120, 30, 8, t, "#ffe0a0", 3);
-    P.glow(c, 0, 160, 600, "#ffb35a", .3 * glowA);
-    // the mattress edge spilling out
-    c.fillStyle = "#e8dccb"; c.fillRect(-560, 300, 1120, 40); c.fillStyle = "#cfc0aa"; c.fillRect(-560, 340, 1120, 70);
+    const glowA = .86 + .14 * noise(t * 1.1);
+    // the sheet: draped over both chair backs, sagging between, falling in folds to the floor
+    const sheetPath = () => {
+      c.beginPath(); c.moveTo(CL - 110, FL + 20);
+      c.bezierCurveTo(CL - 120, 100, CL - 96, CT - 10, CL - 60, CT - 26);
+      c.bezierCurveTo(CL + 60, CT + 60, CR - 60, CT + 60, CR + 60, CT - 26);
+      c.bezierCurveTo(CR + 96, CT - 10, CR + 120, 100, CR + 110, FL + 20);
+      c.bezierCurveTo(CR, FL + 40, CL, FL + 40, CL - 110, FL + 20); c.closePath();
+    };
+    const g = c.createRadialGradient(0, 160, 30, 0, 100, 560);
+    g.addColorStop(0, rgba("#ffe6b8", glowA)); g.addColorStop(.45, rgba("#e8a868", .95 * glowA)); g.addColorStop(1, "#4a2a18");
+    c.fillStyle = g; sheetPath(); c.fill();
+    c.save(); sheetPath(); c.clip();
+    // the chair backs showing through the sheet as soft shadows
+    c.fillStyle = "rgba(60,30,14,.25)"; for (const cx of [CL, CR]) { c.fillRect(cx - 74, CT, 12, 400); c.fillRect(cx + 62, CT, 12, 400); }
+    // folds: catenary creases across the top, long falls down the sides
+    for (let i = 0; i < 6; i++) {
+      const sag = 40 + i * 30;
+      c.strokeStyle = `rgba(120,60,28,${(.2 - i * .02).toFixed(3)})`; c.lineWidth = 8 - i;
+      c.beginPath(); c.moveTo(CL - 40, CT - 10 + i * 16); c.bezierCurveTo(CL + 80, CT + sag, CR - 80, CT + sag, CR + 40, CT - 10 + i * 16); c.stroke();
+    }
+    for (let i = 0; i < 14; i++) {
+      const side = i < 7 ? -1 : 1, k = i % 7, fx = side * (300 + k * 26) + side * 20, w = 22;
+      const fg = c.createLinearGradient(fx - w, 0, fx + w, 0);
+      fg.addColorStop(0, "rgba(90,45,20,0)"); fg.addColorStop(.45, "rgba(90,45,20,.35)"); fg.addColorStop(.6, "rgba(255,230,190,.18)"); fg.addColorStop(1, "rgba(90,45,20,0)");
+      c.fillStyle = fg; c.beginPath(); c.moveTo(fx - side * 30 - 4, CT); c.lineTo(fx - side * 30 + 4, CT); c.lineTo(fx + w, FL + 40); c.lineTo(fx - w, FL + 40); c.fill();
+    }
+    // a soft hem shadow at the bottom
+    c.fillStyle = P.vgrad(c, 0, FL - 60, 0, FL + 40, [[0, "rgba(40,20,10,0)"], [1, "rgba(40,20,10,.55)"]]); c.fillRect(-700, FL - 60, 1400, 100);
+    c.restore();
+    // the opening: two flaps pulled back, the warm inside
+    const op = () => { c.beginPath(); c.moveTo(-170, FL + 26); c.bezierCurveTo(-150, 120, -60, 10, 0, 0); c.bezierCurveTo(60, 10, 150, 120, 170, FL + 26); c.closePath(); };
+    c.fillStyle = P.vgrad(c, 0, 0, 0, FL, [[0, "#5a2e14"], [1, "#2a1408"]]); op(); c.fill();
+    c.save(); op(); c.clip();
+    // inside: the mattress, pillows, a blanket, the lights strung along the ceiling
+    c.fillStyle = P.vgrad(c, 0, 200, 0, FL + 30, [[0, "#f4e2c4"], [1, "#b89870"]]); c.beginPath(); c.moveTo(-170, FL + 30); c.lineTo(-120, 190); c.lineTo(120, 190); c.lineTo(170, FL + 30); c.fill();
+    pillow(c, -54, 200, 100, 46, -.08, .3, 3, "#ffe2b8"); pillow(c, 56, 202, 100, 46, .06, .3, 4, "#ffd8a8");
+    c.fillStyle = P.vgrad(c, 0, 230, 0, FL + 30, [[0, "#b8483a"], [1, "#5a1a14"]]); c.beginPath(); c.moveTo(-170, FL + 30); c.bezierCurveTo(-100, 240, 60, 270, 170, 250); c.lineTo(170, FL + 30); c.fill();
+    c.strokeStyle = "rgba(255,200,160,.25)"; c.lineWidth = 2; c.beginPath(); c.moveTo(-170, FL + 30); c.bezierCurveTo(-100, 240, 60, 270, 170, 250); c.stroke();
+    c.restore();
+    P.stringLights(c, -150, 70, 150, 70, 26, 9, t, "#ffe0a0", 3);
+    // flaps tied back, catching the light on their inner edges
+    for (const sd of [-1, 1]) {
+      c.fillStyle = rgba("#f0c088", .9 * glowA);
+      c.beginPath(); c.moveTo(sd * 10, 0); c.bezierCurveTo(sd * 70, 20, sd * 170, 100, sd * 200, FL + 26); c.lineTo(sd * 172, FL + 26); c.bezierCurveTo(sd * 150, 120, sd * 60, 10, sd * 10, 0); c.fill();
+      c.strokeStyle = "rgba(120,60,28,.5)"; c.lineWidth = 3; c.beginPath(); c.moveTo(sd * 186, 160); c.lineTo(sd * 140, 176); c.stroke();
+    }
+    // the fort's glow on the room and the rug, and out of the opening
+    P.glow(c, 0, 160, 700, "#ffb35a", .26 * glowA);
+    P.glow(c, 0, FL + 60, 360, "#ffb35a", .2 * glowA);
+    P.shaft(c, 0, FL - 40, 300, 0, 900, 900, "#ffc890", .1 * glowA);
+    // two mugs by the entrance, steaming
+    for (const [mx, my] of [[-230, FL + 70], [-160, FL + 90]]) {
+      P.shadow(c, mx, my + 4, 30, 6, .6);
+      c.fillStyle = P.vgrad(c, mx - 18, 0, mx + 18, 0, [[0, "#6a3a2a"], [.4, "#e8c8a8"], [1, "#5a2a1a"]]); c.fillRect(mx - 18, my - 40, 36, 40);
+      c.strokeStyle = "#a87a5a"; c.lineWidth = 5; c.beginPath(); c.arc(mx + 20, my - 22, 10, -1.3, 1.3); c.stroke();
+      c.fillStyle = "#2a1408"; c.beginPath(); c.ellipse(mx, my - 40, 18, 4, 0, 0, 7); c.fill();
+      P.steam(c, mx, my - 50, t, .45, mx, .18);
+    }
   };
 
-  /* 16. The jacket */
+  /* 16. The jacket: brown leather, hanging open as if someone is holding it out */
   S.jacket = (x) => {
     const { c, t } = x;
-    room(x, "#0e0a08", "#080605", 400, 0, -100, .05);
+    const HY = -470;                                           // the hook
+    room(x, "#1a110c", "#0c0806", 470, -500, -380, .1, (L) => {
+      const { c } = L;
+      // the window's light laid on the wall, from the left
+      c.save(); c.globalCompositeOperation = "lighter";
+      for (const [x0, w] of [[-700, 150], [-520, 150]]) { c.fillStyle = "rgba(255,190,130,.05)"; c.beginPath(); c.moveTo(x0, -700); c.lineTo(x0 + w, -700); c.lineTo(x0 + w + 420, 470); c.lineTo(x0 + 420, 470); c.fill(); }
+      c.restore();
+      // the hook on the wall
+      c.fillStyle = "#2a1a10"; c.beginPath(); c.roundRect(-30, HY - 40, 60, 36, 6); c.fill();
+      c.strokeStyle = "#b8904a"; c.lineWidth = 7; c.lineCap = "round"; c.beginPath(); c.moveTo(0, HY - 22); c.quadraticCurveTo(0, HY + 10, 18, HY + 4); c.stroke();
+    });
     x.stage();
-    P.glow(c, 0, -60, 560, "#ffc890", .32);
-    const sway = Math.sin(t * .6) * .015;
-    c.save(); c.translate(0, -400); c.rotate(sway);
-    // hanger
-    c.strokeStyle = "#8a6a4a"; c.lineWidth = 6; c.beginPath(); c.arc(0, -10, 18, 3.4, 6.6); c.stroke();
-    c.beginPath(); c.moveTo(0, 8); c.lineTo(-210, 90); c.moveTo(0, 8); c.lineTo(210, 90); c.stroke();
-    const leather = (x0, x1) => P.vgrad(c, x0, 0, x1, 0, [[0, "#2a1408"], [.3, "#7a4220"], [.55, "#a8622e"], [.8, "#6a3818"], [1, "#24100a"]]);
-    // sleeves
-    c.fillStyle = leather(-330, -150);
-    c.beginPath(); c.moveTo(-200, 90); c.bezierCurveTo(-280, 140, -310, 400, -300, 640); c.lineTo(-220, 650); c.bezierCurveTo(-220, 450, -200, 260, -170, 200); c.fill();
-    c.fillStyle = leather(150, 330);
-    c.beginPath(); c.moveTo(200, 90); c.bezierCurveTo(280, 140, 310, 400, 300, 640); c.lineTo(220, 650); c.bezierCurveTo(220, 450, 200, 260, 170, 200); c.fill();
-    // body
-    c.fillStyle = leather(-200, 200);
-    c.beginPath(); c.moveTo(-200, 90); c.lineTo(-60, 40); c.lineTo(0, 120); c.lineTo(60, 40); c.lineTo(200, 90); c.lineTo(190, 620); c.lineTo(-190, 620); c.closePath(); c.fill();
-    // collar
-    c.fillStyle = "#4a2410";
-    c.beginPath(); c.moveTo(-60, 40); c.lineTo(-120, 70); c.lineTo(-20, 230); c.lineTo(0, 120); c.fill();
-    c.beginPath(); c.moveTo(60, 40); c.lineTo(120, 70); c.lineTo(20, 230); c.lineTo(0, 120); c.fill();
-    // zipper and seams
-    c.strokeStyle = "rgba(230,200,150,.75)"; c.lineWidth = 3; c.beginPath(); c.moveTo(0, 230); c.lineTo(0, 620); c.stroke();
-    c.strokeStyle = "rgba(20,8,2,.6)"; c.lineWidth = 2;
-    c.beginPath(); c.moveTo(-180, 250); c.lineTo(-30, 250); c.moveTo(180, 250); c.lineTo(30, 250); c.moveTo(-170, 560); c.lineTo(170, 560); c.stroke();
-    c.fillStyle = "#3a1c0c"; c.fillRect(-150, 330, 90, 22); c.fillRect(60, 330, 90, 22);   // pocket flaps
-    c.fillStyle = "#d8b880"; c.beginPath(); c.arc(-105, 341, 5, 0, 7); c.arc(105, 341, 5, 0, 7); c.fill();
-    // a soft sheen moving across the leather
-    const sh = ((t * .12) % 1.4) - .2;
-    const s = c.createLinearGradient(-260 + sh * 520, 0, -160 + sh * 520, 0);
-    s.addColorStop(0, "rgba(255,220,180,0)"); s.addColorStop(.5, "rgba(255,220,180,.16)"); s.addColorStop(1, "rgba(255,220,180,0)");
-    c.globalCompositeOperation = "lighter"; c.fillStyle = s; c.fillRect(-320, 40, 640, 620); c.globalCompositeOperation = "source-over";
+    const sway = 0;
+    c.save(); c.translate(0, HY); c.rotate(sway);
+    // shadow of the jacket on the wall
+    c.save(); c.globalAlpha = .45; c.fillStyle = "#000000"; c.translate(40, 30); c.beginPath(); c.moveTo(-220, 130); c.lineTo(220, 130); c.lineTo(300, 840); c.lineTo(-260, 840); c.fill(); c.restore();
+    // wooden hanger
+    c.strokeStyle = "#c9a24a"; c.lineWidth = 5; c.beginPath(); c.arc(0, 18, 16, 3.5, 6.5); c.stroke(); c.beginPath(); c.moveTo(0, 6); c.lineTo(0, 34); c.stroke();
+    c.fillStyle = P.vgrad(c, 0, 30, 0, 60, [[0, "#c88a50"], [1, "#6a3a18"]]);
+    c.beginPath(); c.moveTo(-210, 128); c.quadraticCurveTo(0, 6, 210, 128); c.lineTo(200, 142); c.quadraticCurveTo(0, 30, -200, 142); c.fill();
     c.restore();
+    // the leather is painted once and blitted (it is heavy with texture)
+    P.layer(x, "jacket", (L) => {
+      const { c } = L;
+      L.stage(); c.translate(0, HY);
+      const leather = (x0, x1) => P.vgrad(c, x0, 0, x1, 0, [[0, "#1e0e06"], [.25, "#4a2410"], [.5, "#6a3818"], [.75, "#4a2410"], [1, "#160a04"]]);
+      const sheenStroke = (pts, w, a) => {   // a soft highlight lying along a fold of leather
+        c.save(); c.globalCompositeOperation = "lighter"; c.lineCap = "round";
+        for (const [k, al] of [[3, .25], [1.6, .5], [.6, 1]]) {
+          c.strokeStyle = `rgba(255,190,130,${(a * al).toFixed(3)})`; c.lineWidth = w * k;
+          c.beginPath(); c.moveTo(pts[0], pts[1]); c.bezierCurveTo(pts[2], pts[3], pts[4], pts[5], pts[6], pts[7]); c.stroke();
+        }
+        c.restore();
+      };
+      const crease = (x0, y0, x1, y1, bend) => {
+        c.strokeStyle = "rgba(10,4,2,.55)"; c.lineWidth = 2.5; c.beginPath(); c.moveTo(x0, y0); c.quadraticCurveTo((x0 + x1) / 2, (y0 + y1) / 2 + bend, x1, y1); c.stroke();
+        c.strokeStyle = "rgba(255,180,120,.16)"; c.lineWidth = 1.5; c.beginPath(); c.moveTo(x0, y0 + 3); c.quadraticCurveTo((x0 + x1) / 2, (y0 + y1) / 2 + bend + 3, x1, y1 + 3); c.stroke();
+      };
+      const stitch = (x0, y0, x1, y1, cx, cy) => { c.save(); c.setLineDash([5, 5]); c.strokeStyle = "rgba(220,170,110,.45)"; c.lineWidth = 1.5; c.beginPath(); c.moveTo(x0, y0); c.quadraticCurveTo(cx, cy, x1, y1); c.stroke(); c.restore(); };
+      // sleeves, hanging behind the body, a little forward of it
+      for (const sd of [-1, 1]) {
+        c.fillStyle = leather(sd * 330, sd * 150);
+        c.beginPath(); c.moveTo(sd * 196, 132); c.bezierCurveTo(sd * 290, 170, sd * 318, 420, sd * 304, 700); c.lineTo(sd * 214, 712);
+        c.bezierCurveTo(sd * 210, 500, sd * 196, 300, sd * 168, 220); c.closePath(); c.fill();
+        // cuff band and stitching
+        c.fillStyle = "rgba(0,0,0,.35)"; c.beginPath(); c.moveTo(sd * 306, 664); c.lineTo(sd * 214, 676); c.lineTo(sd * 214, 712); c.lineTo(sd * 304, 700); c.fill();
+        stitch(sd * 304, 660, sd * 214, 672, sd * 260, 668);
+        // elbow creases
+        for (let k = 0; k < 4; k++) crease(sd * (230 + k * 8), 420 + k * 22, sd * (296 - k * 2), 410 + k * 24, 10);
+        sheenStroke([sd * 262, 180, sd * 290, 300, sd * 282, 500, sd * 266, 680], 6, sd < 0 ? .3 : .14);
+      }
+      // the lining, seen because the fronts hang open: dark satin with a quilted diamond
+      c.fillStyle = P.vgrad(c, -120, 0, 120, 0, [[0, "#1a0a0a"], [.5, "#3a1a18"], [1, "#120606"]]);
+      c.beginPath(); c.moveTo(-70, 60); c.lineTo(0, 140); c.lineTo(70, 60); c.lineTo(150, 700); c.lineTo(-150, 700); c.fill();
+      c.strokeStyle = "rgba(200,120,100,.12)"; c.lineWidth = 1.5;
+      for (let k = -8; k < 10; k++) { c.beginPath(); c.moveTo(-150 + k * 34, 150); c.lineTo(-150 + k * 34 + 300, 700); c.moveTo(150 - k * 34, 150); c.lineTo(150 - k * 34 - 300, 700); c.stroke(); }
+      P.glow(c, 0, 360, 220, "#ff9a6a", .06);
+      // the two front panels, swung open
+      for (const sd of [-1, 1]) {
+        c.fillStyle = leather(sd * 220, sd * 30);
+        c.beginPath(); c.moveTo(sd * 60, 40); c.lineTo(sd * 200, 92); c.bezierCurveTo(sd * 214, 300, sd * 214, 500, sd * 206, 690);
+        c.bezierCurveTo(sd * 170, 704, sd * 120, 708, sd * 82, 700); c.bezierCurveTo(sd * 96, 520, sd * 90, 320, sd * 30, 210); c.lineTo(sd * 20, 140); c.closePath(); c.fill();
+        // the leather's grain: tiny speckles and a waxy mottle
+        c.save(); c.clip();
+        const R = rng(sd > 0 ? 3 : 4);
+        for (let i = 0; i < 260; i++) { c.fillStyle = R() > .5 ? "rgba(0,0,0,.18)" : "rgba(255,190,140,.05)"; c.fillRect(sd * lerp(20, 214, R()), lerp(40, 708, R()), 2, 2); }
+        P.mottle(c, sd > 0 ? 20 : -214, 40, 194, 670, sd > 0 ? 7 : 8, 16, ["#000000", "#8a5030"], .25, 20, 70);
+        // the hem band
+        c.fillStyle = "rgba(0,0,0,.32)"; c.fillRect(sd > 0 ? 70 : -220, 640, 150, 70);
+        c.restore();
+        // seams, stitching, a welt pocket and its flap
+        stitch(sd * 206, 640, sd * 86, 646, sd * 146, 648);
+        stitch(sd * 198, 250, sd * 56, 260, sd * 130, 250);
+        c.fillStyle = "rgba(0,0,0,.45)"; c.beginPath(); c.moveTo(sd * 110, 430); c.lineTo(sd * 190, 420); c.lineTo(sd * 192, 438); c.lineTo(sd * 112, 448); c.fill();
+        c.fillStyle = leather(sd * 200, sd * 100); c.beginPath(); c.moveTo(sd * 104, 400); c.lineTo(sd * 196, 392); c.lineTo(sd * 196, 424); c.lineTo(sd * 104, 432); c.fill();
+        stitch(sd * 106, 426, sd * 194, 418, sd * 150, 424);
+        // a snap on the flap, polished brass
+        const sx0 = sd * 150, sy0 = 412;
+        c.fillStyle = P.vgrad(c, sx0 - 7, sy0 - 7, sx0 + 7, sy0 + 7, [[0, "#fff0c0"], [.5, "#b8904a"], [1, "#4a3010"]]); c.beginPath(); c.arc(sx0, sy0, 7, 0, 7); c.fill();
+        // the long highlights the light lays along the curve of each panel
+        sheenStroke([sd * 180, 110, sd * 196, 300, sd * 192, 480, sd * 180, 680], 7, sd < 0 ? .34 : .12);
+        sheenStroke([sd * 110, 260, sd * 128, 380, sd * 130, 520, sd * 120, 690], 4, sd < 0 ? .16 : .06);
+        // creases where it hangs from the shoulder
+        crease(sd * 70, 120, sd * 170, 140, -10); crease(sd * 90, 160, sd * 190, 190, -8);
+        // the zip along the open edge: teeth catching the light
+        const zx = (y) => sd * (lerp(36, 86, (y - 220) / 480));
+        for (let y = 230; y < 690; y += 7) { c.fillStyle = (y / 7) % 2 < 1 ? "#d8b878" : "#5a4020"; c.fillRect(zx(y) - 2, y, 4, 4); }
+      }
+      // the big collar, folded over
+      for (const sd of [-1, 1]) {
+        c.fillStyle = leather(sd * 140, sd * 10);
+        c.beginPath(); c.moveTo(sd * 8, 20); c.bezierCurveTo(sd * 60, 0, sd * 120, 20, sd * 150, 64); c.lineTo(sd * 120, 120); c.lineTo(sd * 30, 200); c.lineTo(sd * 20, 120); c.closePath(); c.fill();
+        c.strokeStyle = "rgba(255,190,130,.3)"; c.lineWidth = 2.5; c.beginPath(); c.moveTo(sd * 150, 64); c.lineTo(sd * 120, 120); c.lineTo(sd * 30, 200); c.stroke();
+        stitch(sd * 136, 70, sd * 34, 182, sd * 100, 120);
+      }
+      // the zip pull hanging, a little bright
+      c.fillStyle = P.vgrad(c, -46, 0, -34, 0, [[0, "#fff0c0"], [1, "#6a4a20"]]); c.beginPath(); c.roundRect(-46, 690, 12, 26, 3); c.fill();
+      // a small leather patch at the back of the waistband
+      c.fillStyle = "#8a5a30"; c.fillRect(-150, 668, 40, 22); c.strokeStyle = "rgba(0,0,0,.3)"; c.lineWidth = 1; c.strokeRect(-148, 670, 36, 18);
+    });
+    // a slow sheen sliding across the leather, and the window light breathing
+    x.stage();
+    const sh = ((t * .07) % 1.6) - .3;
+    c.save(); c.globalCompositeOperation = "lighter";
+    const s = c.createLinearGradient(-320 + sh * 640, 0, -200 + sh * 640, 0);
+    s.addColorStop(0, "rgba(255,200,150,0)"); s.addColorStop(.5, "rgba(255,200,150,.07)"); s.addColorStop(1, "rgba(255,200,150,0)");
+    c.fillStyle = s; c.fillRect(-340, HY + 20, 680, 720);
+    c.restore();
+    P.glow(c, -420, -200, 600, "#ffb070", .1 + .03 * noise(t * .4));
   };
 
   /* 17. Birthdays */
@@ -1192,187 +1366,637 @@
   /* 19. That morning: her side of the bed, the phone */
   S.emptybed = (x) => {
     const { c, W, H, t } = x;
-    x.full(); P.fillAll(c, W, H, [[0, "#0a1020"], [1, "#04060c"]]);
+    const NS = 300;                                        // nightstand left edge
+    P.layer(x, "bg", (L) => {
+      const { c } = L;
+      L.full();
+      P.fillAll(c, W, H, [[0, "#070b16"], [.5, "#0d1424"], [1, "#04060c"]]);
+      P.mottle(c, 0, 0, W, H, 8, 40, ["#2a3450", "#000000"], .25, L.S * .04, L.S * .2);
+      L.stage();
+      // the window with its blinds, a pale dawn behind
+      const BX = -560, BY = -560, BW = 420, BH = 420;
+      c.fillStyle = P.vgrad(c, 0, BY, 0, BY + BH, [[0, "#3a4a70"], [1, "#8a98b8"]]); c.fillRect(BX, BY, BW, BH);
+      for (let i = 0; i < 22; i++) {
+        const y = BY + i * (BH / 22);
+        c.fillStyle = P.vgrad(c, 0, y, 0, y + 14, [[0, "#c8d2e8"], [1, "#6a7898"]]); c.fillRect(BX, y, BW, 13);
+        c.fillStyle = "rgba(0,0,0,.25)"; c.fillRect(BX, y + 13, BW, 2);
+      }
+      c.fillStyle = "rgba(20,26,40,.6)"; c.fillRect(BX + BW * .3, BY, 2, BH); c.fillRect(BX + BW * .7, BY, 2, BH);
+      windowFrame(c, BX, BY, BW, BH, "#0a0e18", 0, "rgba(160,190,240,.12)");
+      // headboard, upholstered
+      c.fillStyle = P.vgrad(c, 0, -170, 0, 60, [[0, "#1e2638"], [1, "#0c1018"]]);
+      c.beginPath(); c.roundRect(-640, -170, 900, 260, [30, 30, 0, 0]); c.fill();
+      for (let r = 0; r < 2; r++) for (let i = 0; i < 9; i++) { const bx = -600 + i * 100 + (r % 2) * 50, by = -120 + r * 70; P.shadow(c, bx, by, 16, 10, .5); c.fillStyle = "rgba(160,180,220,.14)"; c.beginPath(); c.arc(bx - 2, by - 2, 3, 0, 7); c.fill(); }
+      c.fillStyle = "rgba(160,190,240,.12)"; c.fillRect(-630, -168, 880, 3);
+      // the mattress body and the duvet hanging over its side
+      c.fillStyle = "#0a0d16"; c.fillRect(-680, 60, 960, 700);
+      // pillows: mine slept on, hers untouched
+      pillow(c, -400, 34, 300, 120, -.04, .55, 1);
+      pillow(c, -60, 22, 310, 128, .03, 0, 2);
+      // the duvet: rumpled and thrown back on my side, smooth and flat on hers
+      const dg = c.createLinearGradient(-640, 0, 280, 0);
+      dg.addColorStop(0, "#8a96b0"); dg.addColorStop(.5, "#b4bed4"); dg.addColorStop(1, "#7a86a0");
+      c.fillStyle = dg;
+      c.beginPath(); c.moveTo(-660, 160); c.bezierCurveTo(-560, 120, -420, 180, -300, 140); c.bezierCurveTo(-220, 112, -160, 110, -90, 116);
+      c.lineTo(250, 112); c.quadraticCurveTo(286, 116, 290, 160); c.lineTo(300, 760); c.lineTo(-680, 760); c.closePath(); c.fill();
+      // turned-back edge on my side
+      c.fillStyle = "#dfe4ee"; c.beginPath(); c.moveTo(-660, 160); c.bezierCurveTo(-560, 120, -420, 180, -300, 140); c.bezierCurveTo(-330, 176, -480, 190, -660, 200); c.fill();
+      c.fillStyle = "rgba(0,0,0,.25)"; c.beginPath(); c.moveTo(-660, 200); c.bezierCurveTo(-480, 190, -330, 176, -300, 140); c.bezierCurveTo(-320, 200, -480, 220, -660, 230); c.fill();
+      // soft folds
+      const R = rng(19);
+      for (let i = 0; i < 9; i++) {
+        const fx = lerp(-640, -120, R()), fy = lerp(200, 420, R()), len = lerp(160, 360, R()), ang = lerp(-.2, .5, R());
+        c.save(); c.translate(fx, fy); c.rotate(ang);
+        const g = c.createLinearGradient(0, -16, 0, 16);
+        g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(.45, "rgba(10,14,30,.35)"); g.addColorStop(.6, "rgba(230,236,255,.18)"); g.addColorStop(1, "rgba(0,0,0,0)");
+        c.fillStyle = g; c.beginPath(); c.ellipse(0, 0, len / 2, 16, 0, 0, 7); c.fill(); c.restore();
+      }
+      // her side: one long gentle fold, nothing more
+      c.save(); c.translate(80, 300); c.rotate(.04);
+      const g2 = c.createLinearGradient(0, -20, 0, 20); g2.addColorStop(0, "rgba(0,0,0,0)"); g2.addColorStop(.5, "rgba(10,14,30,.18)"); g2.addColorStop(1, "rgba(0,0,0,0)");
+      c.fillStyle = g2; c.beginPath(); c.ellipse(0, 0, 220, 20, 0, 0, 7); c.fill(); c.restore();
+      // the rounded edge where the duvet falls over the side of the bed
+      c.fillStyle = P.vgrad(c, 240, 0, 300, 0, [[0, "rgba(0,0,0,0)"], [1, "rgba(0,0,10,.55)"]]); c.fillRect(240, 120, 60, 640);
+      // dawn through the blinds: pale stripes across the bed
+      c.save(); c.globalCompositeOperation = "lighter";
+      for (let i = 0; i < 9; i++) {
+        const y0 = 140 + i * 46;
+        c.fillStyle = "rgba(150,175,230,.07)";
+        c.beginPath(); c.moveTo(-680, y0); c.lineTo(100, y0 - 160); c.lineTo(100, y0 - 140); c.lineTo(-680, y0 + 22); c.fill();
+      }
+      c.restore();
+      // the nightstand, the clock, a glass of water
+      c.fillStyle = P.vgrad(c, NS, 0, NS + 300, 0, [[0, "#151a26"], [1, "#0a0d14"]]); c.fillRect(NS, 60, 300, 700);
+      c.fillStyle = "rgba(160,190,240,.16)"; c.fillRect(NS, 60, 300, 3);
+      c.fillStyle = "rgba(0,0,0,.4)"; c.fillRect(NS + 20, 150, 260, 4);
+      c.fillStyle = "#c9a24a"; c.fillRect(NS + 130, 110, 40, 6);
+      P.shadow(c, NS + 210, 62, 70, 10, .6);
+      c.fillStyle = "#06080c"; c.beginPath(); c.roundRect(NS + 150, -10, 124, 70, 10); c.fill();
+      c.fillStyle = "rgba(255,255,255,.06)"; c.fillRect(NS + 158, -4, 108, 3);
+    });
     x.stage();
-    // blinds letting in blue dawn
-    for (let i = 0; i < 12; i++) { c.fillStyle = `rgba(140,170,220,${.08 + .04 * (i % 2)})`; c.fillRect(-460, -460 + i * 34, 520, 16); }
-    // bed
-    c.fillStyle = "#1a2030"; c.fillRect(-560, 40, 900, 480);
-    c.fillStyle = P.vgrad(c, 0, 40, 0, 300, [[0, "#c8d0e0"], [1, "#6a7488"]]);
-    c.beginPath(); c.moveTo(-560, 120); c.bezierCurveTo(-400, 80, -260, 160, -120, 110); c.bezierCurveTo(40, 60, 200, 150, 340, 100); c.lineTo(340, 520); c.lineTo(-560, 520); c.fill();
-    c.fillStyle = "#dfe4ee"; c.beginPath(); c.ellipse(-370, 50, 150, 54, -.05, 0, 7); c.fill();       // my pillow, slept on
-    c.fillStyle = "#eef1f6"; c.beginPath(); c.ellipse(-30, 30, 160, 58, .03, 0, 7); c.fill();         // hers, untouched
-    c.strokeStyle = "rgba(60,70,90,.35)"; c.lineWidth = 3; for (let i = 0; i < 6; i++) { c.beginPath(); c.moveTo(-500 + i * 140, 200 + (i % 2) * 40); c.quadraticCurveTo(-420 + i * 140, 260, -380 + i * 140, 380); c.stroke(); }
-    // nightstand, clock, phone
-    c.fillStyle = "#10141e"; c.fillRect(360, 60, 200, 460);
-    c.font = "600 54px Inter, system-ui, sans-serif"; c.fillStyle = "#ff4a3a"; c.textAlign = "center"; c.shadowColor = "#ff2a1a"; c.shadowBlur = 18;
-    c.fillText("6:47", 460, 30); c.shadowBlur = 0;
+    // the clock, still counting
+    c.font = "600 46px Inter, system-ui, sans-serif"; c.textAlign = "center"; c.textBaseline = "middle";
+    c.fillStyle = "#ff4a3a"; c.fillText("6:47", NS + 212, 26);
+    P.glow(c, NS + 212, 26, 90, "#ff3a2a", .3);
+    // the phone on the nightstand, lighting up
     const ring = Math.max(0, Math.sin(t * 3)) * smooth(2, 3, t);
-    const jx = ring > .2 ? (Math.random() - .5) * 4 : 0;
-    c.fillStyle = "#05070a"; c.beginPath(); c.roundRect(410 + jx, 34 + 60, 100, 46, 8); c.fill();
+    const jx = ring > .2 ? (noise(t * 40) - .5) * 5 : 0;
+    P.shadow(c, NS + 80 + jx, 64, 60, 8, .6);
+    c.fillStyle = "#05070a"; c.beginPath(); c.roundRect(NS + 34 + jx, 44, 92, 18, 5); c.fill();
     if (t > 2) {
-      c.fillStyle = "#cfe0ff"; c.beginPath(); c.roundRect(416 + jx, 40 + 60, 88, 34, 6); c.fill();
-      P.glow(c, 460, 117, 160, "#9ac0ff", .4 + .3 * ring);
-      c.strokeStyle = `rgba(160,200,255,${.5 * ring})`; c.lineWidth = 3;
-      for (let k = 1; k < 4; k++) { c.beginPath(); c.arc(460, 117, 60 + k * 26 + (t * 40) % 26, -2.4, -.7); c.stroke(); }
+      const on = smooth(2, 2.4, t);
+      c.fillStyle = rgba("#d8e6ff", .9 * on); c.beginPath(); c.roundRect(NS + 38 + jx, 46, 84, 6, 3); c.fill();
+      P.glow(c, NS + 80, 40, 260, "#9ac0ff", (.25 + .25 * ring) * on);
+      P.shaft(c, NS + 80, 44, 80, NS + 80, -420, 520, "#b8d0ff", .08 * on);
+      c.strokeStyle = `rgba(170,205,255,${(.45 * ring).toFixed(3)})`; c.lineWidth = 3;
+      for (let k = 1; k < 4; k++) { c.beginPath(); c.arc(NS + 80, 50, 40 + k * 26 + (t * 40) % 26, -2.5, -.65); c.stroke(); }
     }
+    // the dawn light breathing on the blinds
+    P.glow(c, -350, -350, 520, "#8aa8e8", .12 + .03 * Math.sin(t * .4));
   };
 
-  /* 20. The hospital: the monitor keeps time */
+  /* 20. The hospital: the monitor keeps time, prayer beads on the rail */
   S.hospital = (x) => {
     const { c, W, H, t, m } = x;
-    if (!m.i) { m.i = 1; m.city = P.bokehSet(13, 60, [-460, -380, 120, -40], [3, 10], ["#ffcf8a", "#bcd2ff", "#ff9a6a"]); }
-    x.full(); P.fillAll(c, W, H, [[0, "#06090e"], [1, "#030507"]]);
+    const MX = 200, MY = -430;                              // monitor
+    if (!m.i) { m.i = 1; m.city = P.bokehSet(13, 40, [-600, -470, -40, -120], [3, 9], ["#ffcf8a", "#bcd2ff", "#ff9a6a"]); }
+    P.layer(x, "bg", (L) => {
+      const { c } = L;
+      L.full();
+      P.fillAll(c, W, H, [[0, "#060a10"], [.55, "#0b121a"], [1, "#030507"]]);
+      P.mottle(c, 0, 0, W, H, 21, 36, ["#1a2a34", "#000000"], .3, L.S * .05, L.S * .2);
+      L.stage();
+      // window: the city asleep, half-closed blinds
+      const WX = -620, WY = -500, WW = 600, WH = 400;
+      c.fillStyle = P.vgrad(c, 0, WY, 0, WY + WH, [[0, "#060a18"], [1, "#1a1c30"]]); c.fillRect(WX, WY, WW, WH);
+      c.fillStyle = "#04060c"; let bx = WX; const R = rng(4);
+      c.beginPath(); c.moveTo(WX, WY + WH); while (bx < WX + WW) { const h = lerp(40, 180, R()), w = lerp(40, 100, R()); c.lineTo(bx, WY + WH - h); c.lineTo(bx + w, WY + WH - h); bx += w; } c.lineTo(WX + WW, WY + WH); c.fill();
+      for (let i = 0; i < 9; i++) { const y = WY + i * 20; c.fillStyle = P.vgrad(c, 0, y, 0, y + 16, [[0, "#3a4658"], [1, "#1a222e"]]); c.fillRect(WX, y, WW, 15); }
+      windowFrame(c, WX, WY, WW, WH, "#0a0e14", 0, "rgba(160,190,240,.10)");
+      // monitor on its arm
+      c.strokeStyle = "#1a2028"; c.lineWidth = 12; c.beginPath(); c.moveTo(MX + 300, MY + 120); c.lineTo(MX + 380, MY + 120); c.stroke();
+      c.fillStyle = P.vgrad(c, 0, MY, 0, MY + 220, [[0, "#1a2028"], [1, "#0a0e12"]]); c.beginPath(); c.roundRect(MX, MY, 310, 220, 16); c.fill();
+      c.fillStyle = "rgba(160,190,220,.15)"; c.fillRect(MX + 10, MY + 2, 290, 2);
+      c.fillStyle = "#020806"; c.beginPath(); c.roundRect(MX + 16, MY + 16, 278, 170, 6); c.fill();
+      for (let i = 0; i < 5; i++) { c.fillStyle = i === 2 ? "#3a6a5a" : "#1a2420"; c.beginPath(); c.arc(MX + 40 + i * 24, MY + 202, 5, 0, 7); c.fill(); }
+      // IV stand and bag
+      c.strokeStyle = "#3a4450"; c.lineWidth = 6; c.beginPath(); c.moveTo(120, -260); c.lineTo(120, 640); c.moveTo(70, -260); c.lineTo(170, -260); c.stroke();
+      c.strokeStyle = "rgba(200,220,240,.25)"; c.lineWidth = 2; c.beginPath(); c.moveTo(118, -260); c.lineTo(118, 640); c.stroke();
+      c.fillStyle = "rgba(200,225,245,.22)"; c.beginPath(); c.roundRect(86, -250, 68, 112, 18); c.fill();
+      c.fillStyle = "rgba(200,225,245,.16)"; c.beginPath(); c.roundRect(90, -200, 60, 58, 14); c.fill();
+      c.strokeStyle = "rgba(220,235,250,.4)"; c.lineWidth = 1.5; c.beginPath(); c.roundRect(86, -250, 68, 112, 18); c.stroke();
+      P.spec(c, 96, -238, 96, -160, 3, .45);
+      c.strokeStyle = "rgba(200,220,240,.3)"; c.lineWidth = 2; c.beginPath(); c.moveTo(120, -138); c.bezierCurveTo(120, -40, 60, 40, 20, 140); c.stroke();
+      // the bed: frame, mattress with rounded edges, blanket in soft folds
+      c.fillStyle = "#0c1218"; c.fillRect(-680, 140, 820, 30);
+      c.fillStyle = P.vgrad(c, 0, -60, 0, 140, [[0, "#2a3440"], [1, "#141a22"]]);
+      c.beginPath(); c.roundRect(-700, -60, 40, 230, 12); c.fill();                 // headboard edge
+      // blanket over the mattress
+      c.fillStyle = P.vgrad(c, 0, 20, 0, 420, [[0, "#a8b6c8"], [.35, "#7a889c"], [1, "#2a3340"]]);
+      c.beginPath(); c.moveTo(-680, 40); c.bezierCurveTo(-520, 0, -340, 30, -220, 20); c.bezierCurveTo(-100, 10, 20, 40, 90, 70);
+      c.quadraticCurveTo(140, 90, 140, 150); c.lineTo(150, 640); c.lineTo(-680, 640); c.closePath(); c.fill();
+      // its folds hang down the side of the bed
+      for (let i = 0; i < 8; i++) {
+        const fx = -640 + i * 100 + R() * 40, g = c.createLinearGradient(fx - 30, 0, fx + 30, 0);
+        g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(.45, "rgba(10,16,28,.35)"); g.addColorStop(.6, "rgba(220,235,255,.12)"); g.addColorStop(1, "rgba(0,0,0,0)");
+        c.fillStyle = g; c.beginPath(); c.moveTo(fx - 8, 130); c.lineTo(fx + 8, 130); c.lineTo(fx + 30, 640); c.lineTo(fx - 30, 640); c.fill();
+      }
+      c.fillStyle = "rgba(220,235,255,.25)"; c.beginPath(); c.moveTo(-680, 40); c.bezierCurveTo(-520, 0, -340, 30, -220, 20); c.bezierCurveTo(-100, 10, 20, 40, 90, 70); c.lineTo(90, 76); c.bezierCurveTo(20, 46, -100, 18, -220, 28); c.bezierCurveTo(-340, 38, -520, 8, -680, 48); c.fill();
+      c.fillStyle = P.vgrad(c, 0, 130, 0, 200, [[0, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,.35)"]]); c.fillRect(-680, 130, 830, 70);
+      // the side rail, brushed metal
+      c.fillStyle = P.vgrad(c, 0, 92, 0, 108, [[0, "#c8d4e0"], [.5, "#6a7684"], [1, "#2a323c"]]); c.beginPath(); c.roundRect(-560, 90, 520, 16, 8); c.fill();
+      c.fillStyle = P.vgrad(c, 0, 172, 0, 184, [[0, "#9aa8b6"], [1, "#2a323c"]]); c.beginPath(); c.roundRect(-560, 170, 520, 12, 6); c.fill();
+      for (const px of [-540, -300, -60]) { c.fillStyle = "#4a5664"; c.fillRect(px, 104, 8, 68); }
+      P.spec(c, -540, 94, -100, 94, 2, .5, "#e8f2ff");
+      // the night through the blinds, laid across the blanket
+      c.save(); c.globalCompositeOperation = "lighter";
+      for (let i = 0; i < 6; i++) { const y0 = 200 + i * 50; c.fillStyle = "rgba(140,170,230,.06)"; c.beginPath(); c.moveTo(-680, y0); c.lineTo(140, y0 - 120); c.lineTo(140, y0 - 98); c.lineTo(-680, y0 + 22); c.fill(); }
+      c.restore();
+    });
     x.stage();
-    // window with the city asleep
-    c.fillStyle = P.vgrad(c, 0, -440, 0, -20, [[0, "#070b18"], [1, "#1a1a2e"]]); c.fillRect(-460, -440, 580, 420);
     P.bokeh(c, m.city, t);
-    windowFrame(c, -460, -440, 580, 420, "#0a0e14");
-    // monitor
-    c.fillStyle = "#0b1014"; c.beginPath(); c.roundRect(200, -420, 300, 210, 12); c.fill();
-    c.fillStyle = "#020806"; c.fillRect(216, -404, 268, 178);
-    c.strokeStyle = "#5affb0"; c.lineWidth = 3; c.shadowColor = "#5affb0"; c.shadowBlur = 10; c.beginPath();
-    const head = (t * 110) % 268;
-    for (let i = 0; i <= 268; i += 2) {
-      const ph = ((i / 268) * 2.5 - t * .41) % 1, v = ph < 0 ? ph + 1 : ph;
-      const beat = v > .45 && v < .5 ? -60 * Math.sin((v - .45) / .05 * Math.PI) : v > .5 && v < .53 ? 22 * Math.sin((v - .5) / .03 * Math.PI) : Math.sin(v * 20) * 2;
-      const yy = -300 + beat; i ? c.lineTo(216 + i, yy) : c.moveTo(216 + i, yy);
+    // prayer beads hanging from the rail, swaying a little
+    const sw = Math.sin(t * .8) * .06;
+    c.save(); c.translate(-250, 100); c.rotate(sw);
+    for (let i = 0; i < 25; i++) {
+      const a = i / 24 * Math.PI, bx = Math.cos(a) * 34, by = Math.sin(a) * 110;
+      const g = c.createRadialGradient(bx - 2, by - 2, 0, bx, by, 7);
+      g.addColorStop(0, "#e8b878"); g.addColorStop(.6, "#8a4a1a"); g.addColorStop(1, "#2a1206");
+      c.fillStyle = g; c.beginPath(); c.arc(bx, by, 6.5, 0, 7); c.fill();
     }
-    c.stroke(); c.shadowBlur = 0;
-    c.font = "500 26px Inter, system-ui, sans-serif"; c.fillStyle = "#5affb0"; c.textAlign = "right"; c.fillText(String(72 + Math.round(Math.sin(t * .3) * 3)), 474, -380);
-    P.glow(c, 350, -310, 260, "#5affb0", .1);
-    // IV stand
-    c.strokeStyle = "#2a323c"; c.lineWidth = 6; c.beginPath(); c.moveTo(150, -200); c.lineTo(150, 500); c.moveTo(110, -200); c.lineTo(190, -200); c.stroke();
-    c.fillStyle = "rgba(200,220,240,.35)"; c.beginPath(); c.roundRect(120, -190, 60, 90, 14); c.fill();
-    c.strokeStyle = "rgba(200,220,240,.3)"; c.lineWidth = 2; c.beginPath(); c.moveTo(150, -100); c.bezierCurveTo(150, 60, 40, 80, 0, 200); c.stroke();
-    // bed, blanket in moonlight
-    c.fillStyle = "#1a2230"; c.fillRect(-560, 160, 760, 360);
-    c.fillStyle = P.vgrad(c, 0, 140, 0, 400, [[0, "#9aa8bc"], [1, "#3a4456"]]);
-    c.beginPath(); c.moveTo(-560, 220); c.bezierCurveTo(-300, 150, -100, 230, 120, 180); c.lineTo(200, 520); c.lineTo(-560, 520); c.fill();
-    c.strokeStyle = "#5a6474"; c.lineWidth = 8; c.beginPath(); c.moveTo(-560, 130); c.lineTo(200, 130); c.stroke();
+    c.fillStyle = "#6a3a12"; c.fillRect(-3, 118, 6, 30); c.strokeStyle = "#8a4a1a"; c.lineWidth = 2; c.beginPath(); c.moveTo(0, 148); c.lineTo(-6, 176); c.moveTo(0, 148); c.lineTo(6, 176); c.stroke();
+    c.restore();
+    // the heartbeat
+    const sx0 = MX + 16, sy0 = MY + 100, sw2 = 278;
+    c.strokeStyle = "#5affb0"; c.lineWidth = 3; c.lineJoin = "round"; c.beginPath();
+    for (let i = 0; i <= sw2; i += 3) {
+      const ph = ((i / sw2) * 2.5 - t * .41) % 1, v = ph < 0 ? ph + 1 : ph;
+      const beat = v > .45 && v < .5 ? -54 * Math.sin((v - .45) / .05 * Math.PI) : v > .5 && v < .53 ? 20 * Math.sin((v - .5) / .03 * Math.PI) : Math.sin(v * 20) * 2;
+      i ? c.lineTo(sx0 + i, sy0 + beat) : c.moveTo(sx0 + i, sy0 + beat);
+    }
+    c.stroke();
+    c.font = "500 26px Inter, system-ui, sans-serif"; c.fillStyle = "#5affb0"; c.textAlign = "right"; c.textBaseline = "alphabetic";
+    c.fillText(String(72 + Math.round(Math.sin(t * .3) * 3)), MX + 284, MY + 46);
+    P.glow(c, MX + 155, MY + 100, 300, "#5affb0", .1 + .03 * Math.sin(t * 2.6));
+    // the monitor's green on the rail and the blanket
+    P.glow(c, -100, 90, 380, "#4affa0", .05);
   };
 
   /* 21. "I love you", written on his palm */
   S.palm = (x) => {
-    const { c, t } = x;
-    x.full(); P.fillAll(c, x.W, x.H, [[0, "#0a0605"], [1, "#050303"]]);
-    x.stage();
-    P.glow(c, 0, 60, 640, "#ff9a5a", .24);
-    // an open palm, seen from above
-    const skin = c.createRadialGradient(10, 190, 20, 0, 120, 520);
-    skin.addColorStop(0, "#b8805e"); skin.addColorStop(.35, "#6a3e28"); skin.addColorStop(.7, "#2a160c"); skin.addColorStop(1, "#0c0604");
-    c.fillStyle = skin;
-    // tapered fingers, softly bent, with a warm rim where the candle catches them
-    const finger = (bx, by, len, w, ang) => {
-      c.save(); c.translate(bx, by); c.rotate(ang);
-      c.beginPath(); c.moveTo(-w / 2, 40); c.bezierCurveTo(-w * .55, -len * .4, -w * .42, -len * .85, 0, -len); c.bezierCurveTo(w * .42, -len * .85, w * .55, -len * .4, w / 2, 40); c.closePath(); c.fill();
-      c.strokeStyle = "rgba(255,170,110,.35)"; c.lineWidth = 3; c.beginPath(); c.moveTo(-w * .5, -len * .2); c.bezierCurveTo(-w * .5, -len * .6, -w * .4, -len * .9, 0, -len); c.stroke();
-      c.strokeStyle = "rgba(20,8,4,.4)"; c.lineWidth = 2; for (const k of [.35, .62]) { c.beginPath(); c.moveTo(-w * .3, -len * k); c.quadraticCurveTo(0, -len * k + 6, w * .3, -len * k); c.stroke(); }
+    const { c, W, H, t } = x;
+    const OY = -60;   // the whole hand sits a little high so the words stay clear of the captions
+    // the open hand: palm up, fingers relaxed and slightly spread, thumb resting out to the left
+    const FING = [[-112, -40, 200, 58, -.15], [-40, -62, 238, 62, -.05], [34, -58, 226, 60, .05], [100, -30, 172, 52, .17]];
+    // each part is filled on its own so overlapping parts never cancel out
+    const handPath = (c, dx = 0, dy = 0) => {
+      for (const [bx, by, len, w, a] of FING) {
+        const ca = Math.cos(a), sa = Math.sin(a), P2 = (u, v) => [bx + dx + u * ca - v * sa, by + OY + dy + u * sa + v * ca];
+        // a tapered finger along -v, from its base (v = 40) to a rounded tip (v = -len)
+        const pts = [P2(-w / 2, 40), P2(-w * .5, -len * .45), P2(-w * .42, -len * .82), P2(0, -len), P2(w * .42, -len * .82), P2(w * .5, -len * .45), P2(w / 2, 40)];
+        c.beginPath(); c.moveTo(...pts[0]); c.bezierCurveTo(...pts[1], ...pts[2], ...pts[3]); c.bezierCurveTo(...pts[4], ...pts[5], ...pts[6]); c.closePath(); c.fill();
+      }
+      // thumb, angled out
+      c.save(); c.translate(-150 + dx, 170 + OY + dy); c.rotate(-.95);
+      c.beginPath(); c.moveTo(-40, 40); c.bezierCurveTo(-44, -60, -36, -150, 0, -176); c.bezierCurveTo(34, -150, 44, -60, 40, 40); c.closePath(); c.fill();
       c.restore();
+      // palm and wrist
+      const o = (X, Y) => [X + dx, Y + OY + dy];
+      c.beginPath(); c.moveTo(...o(-150, -40)); c.bezierCurveTo(...o(-60, -70), ...o(80, -66), ...o(140, -20));
+      c.bezierCurveTo(...o(170, 60), ...o(168, 220), ...o(130, 330));
+      c.bezierCurveTo(...o(118, 420), ...o(120, 600), ...o(126, 900));
+      c.lineTo(...o(-140, 900));
+      c.bezierCurveTo(...o(-136, 600), ...o(-130, 420), ...o(-128, 330));
+      c.bezierCurveTo(...o(-190, 240), ...o(-196, 120), ...o(-150, -40)); c.closePath(); c.fill();
     };
-    finger(-150, -40, 260, 80, -.16); finger(-50, -80, 310, 86, -.04); finger(55, -76, 300, 84, .06); finger(150, -30, 240, 76, .18);
-    finger(-230, 170, 230, 92, -1.0);   // thumb
-    c.beginPath(); c.moveTo(-200, -40); c.bezierCurveTo(-230, 120, -220, 300, -120, 460); c.lineTo(200, 460); c.bezierCurveTo(250, 300, 240, 100, 200, -20); c.closePath(); c.fill();
-    // palm lines
-    c.strokeStyle = "rgba(90,40,20,.4)"; c.lineWidth = 3;
-    c.beginPath(); c.moveTo(-190, 60); c.bezierCurveTo(-60, 40, 80, 50, 200, 10); c.stroke();
-    c.beginPath(); c.moveTo(-180, 140); c.bezierCurveTo(-60, 120, 60, 150, 170, 200); c.stroke();
-    c.beginPath(); c.moveTo(-120, 70); c.bezierCurveTo(-170, 200, -110, 340, -60, 440); c.stroke();
-    // her words, traced with one finger
-    const words = YY.lang() === "tr" ? "seni seviyorum" : "I love you";
-    const rev = smooth(1, 5, t);
-    P.script(c, words, 10, 200, YY.lang() === "tr" ? 62 : 78, "rgba(255,236,210,.95)", rev);
-    P.glow(c, 10, 200, 260 * rev, "#ffd9a0", .2 * rev);
+    P.layer(x, "bg", (L) => {
+      const { c } = L;
+      L.full(); P.fillAll(c, W, H, [[0, "#070404"], [1, "#030202"]]);
+      L.stage();
+      // the hospital sheet under his hand, catching a little of the lamp
+      c.fillStyle = P.vgrad(c, 0, -600, 0, 900, [[0, "#0a0808"], [.5, "#1e1816"], [1, "#0a0707"]]); c.fillRect(-1400, -1000, 2800, 2600);
+      const R = rng(66);
+      for (let i = 0; i < 12; i++) {
+        const fx = lerp(-1200, 1200, R()), fy = lerp(-700, 700, R()), len = lerp(300, 800, R()), ang = lerp(-.6, .6, R());
+        c.save(); c.translate(fx, fy); c.rotate(ang);
+        const g = c.createLinearGradient(0, -40, 0, 40);
+        g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(.45, "rgba(0,0,0,.35)"); g.addColorStop(.6, "rgba(255,210,170,.05)"); g.addColorStop(1, "rgba(0,0,0,0)");
+        c.fillStyle = g; c.beginPath(); c.ellipse(0, 0, len / 2, 40, 0, 0, 7); c.fill(); c.restore();
+      }
+      P.glow(c, 120, -40 + OY, 760, "#ff9a5a", .16);
+      // the hand's shadow on the sheet
+      c.save(); c.globalAlpha = .55; c.fillStyle = "#000000"; handPath(c, -40, 46); c.restore();
+    });
+    P.layer(x, "hand", (L) => {
+      const { c } = L;
+      L.stage();
+      // 1. the rim: the whole silhouette in warm light
+      c.fillStyle = "#e08a58"; handPath(c);
+      // 2. the body of the hand in shadow, offset away from the lamp so the lit edge remains
+      c.globalCompositeOperation = "source-atop";
+      c.fillStyle = "#1c0f0a"; handPath(c, -7, 9);
+      // 3. lamp light pooled in the cup of the palm (where the words are)
+      const g = c.createRadialGradient(40, 90 + OY, 10, 30, 110 + OY, 300);
+      g.addColorStop(0, "rgba(196,128,92,.95)"); g.addColorStop(.35, "rgba(140,82,56,.75)"); g.addColorStop(.75, "rgba(60,32,22,.3)"); g.addColorStop(1, "rgba(0,0,0,0)");
+      c.fillStyle = g; c.fillRect(-500, -500 + OY, 1000, 1000);
+      // the fleshy pads at the base of the fingers and the thumb, a touch lighter
+      for (const [px, py, r] of [[-100, 0, 46], [-30, -16, 48], [40, -12, 46], [104, 10, 40], [-120, 190, 80]]) {
+        const pg = c.createRadialGradient(px + 10, py + OY - 10, 0, px, py + OY, r);
+        pg.addColorStop(0, "rgba(220,150,110,.22)"); pg.addColorStop(1, "rgba(220,150,110,0)");
+        c.fillStyle = pg; c.fillRect(px - r, py + OY - r, r * 2, r * 2);
+      }
+      // fingers curl away into shadow towards their tips; the wrist falls into darkness
+      c.fillStyle = P.vgrad(c, 0, -330 + OY, 0, -60 + OY, [[0, "rgba(8,4,2,.75)"], [1, "rgba(8,4,2,0)"]]); c.fillRect(-500, -400 + OY, 1000, 340);
+      c.fillStyle = P.vgrad(c, 0, 280 + OY, 0, 620 + OY, [[0, "rgba(6,3,2,0)"], [1, "rgba(6,3,2,.96)"]]); c.fillRect(-500, 280 + OY, 1000, 700);
+      // the gaps between fingers: a soft occlusion line
+      c.strokeStyle = "rgba(10,5,3,.6)"; c.lineWidth = 6; c.lineCap = "round";
+      for (const [bx] of [[-76], [-3], [68]]) { c.beginPath(); c.moveTo(bx, -40 + OY); c.lineTo(bx + (bx > 0 ? 6 : -4), -110 + OY); c.stroke(); }
+      // finger joint creases
+      c.lineWidth = 2.2;
+      for (const [bx, by, len, w, a] of FING) {
+        for (const k of [.38, .66]) {
+          const ca = Math.cos(a), sa = Math.sin(a), v = -len * k, u0 = -w * .3, u1 = w * .3;
+          c.strokeStyle = "rgba(20,8,4,.5)";
+          c.beginPath(); c.moveTo(bx + u0 * ca - v * sa, by + OY + u0 * sa + v * ca); c.quadraticCurveTo(bx - (v + 5) * sa, by + OY + (v + 5) * ca, bx + u1 * ca - v * sa, by + OY + u1 * sa + v * ca); c.stroke();
+          c.strokeStyle = "rgba(255,190,140,.08)";
+          c.beginPath(); c.moveTo(bx + u0 * ca - (v + 4) * sa, by + OY + u0 * sa + (v + 4) * ca); c.lineTo(bx + u1 * ca - (v + 4) * sa, by + OY + u1 * sa + (v + 4) * ca); c.stroke();
+        }
+      }
+      // palm lines: heart, head, life, each a crease with a lit lip below it
+      const crease = (pts, a) => {
+        c.strokeStyle = `rgba(30,12,6,${a})`; c.lineWidth = 3;
+        c.beginPath(); c.moveTo(pts[0], pts[1] + OY); c.bezierCurveTo(pts[2], pts[3] + OY, pts[4], pts[5] + OY, pts[6], pts[7] + OY); c.stroke();
+        c.strokeStyle = `rgba(255,190,140,${a * .25})`; c.lineWidth = 2;
+        c.beginPath(); c.moveTo(pts[0], pts[1] + OY + 3); c.bezierCurveTo(pts[2], pts[3] + OY + 3, pts[4], pts[5] + OY + 3, pts[6], pts[7] + OY + 3); c.stroke();
+      };
+      crease([150, 40, 60, 20, -40, 40, -110, 20], .55);
+      crease([-150, 70, -60, 80, 40, 110, 120, 150], .45);
+      crease([-120, 40, -150, 150, -120, 260, -60, 330], .55);
+      crease([20, 330, 30, 240, 40, 160, 50, 90], .2);
+      c.globalCompositeOperation = "source-over";
+    });
+    x.stage();
+    // the lamp breathes
+    const br = .9 + .1 * noise(t * .5);
+    P.glow(c, 40, 100 + OY, 380, "#ff9a5a", .12 * br);
+    // her words, traced with one finger, glowing on his palm
+    const tr = YY.lang() === "tr", words = tr ? "seni seviyorum" : "I love you";
+    const rev = smooth(1, 5.5, t);
+    c.save(); c.translate(14, 110 + OY); c.rotate(-.1);
+    P.glow(c, 0, 0, 220 * rev + 1, "#ffd59a", .22 * rev);
+    P.script(c, words, 0, 0, tr ? 50 : 62, `rgba(255,232,196,${(.95 * br).toFixed(3)})`, rev);
+    // the fingertip's trail of warmth, a moment behind the writing
+    const tip = Math.min(1, rev * 1.02), tw = (tr ? 50 * 6.6 : 62 * 4.4) / 2;
+    if (rev > 0 && rev < 1) P.glow(c, -tw + tip * tw * 2, Math.sin(t * 9) * 4, 40, "#fff2d8", .5);
+    c.restore();
   };
 
   /* 22. Night shift in the corner of her room */
   S.nightshift = (x) => {
     const { c, W, H, t, m } = x;
-    if (!m.i) { m.i = 1; m.st = P.starSet(21, 90, .4); }
-    x.full(); P.fillAll(c, W, H, [[0, "#060810"], [1, "#030406"]]);
-    x.stage();
-    // moonlit window
-    c.fillStyle = P.vgrad(c, 0, -460, 0, -100, [[0, "#0a1024"], [1, "#1a2440"]]); c.fillRect(-150, -460, 360, 360);
-    c.save(); c.beginPath(); c.rect(-150, -460, 360, 360); c.clip(); c.setTransform(1, 0, 0, 1, 0, 0); P.stars(c, m.st, W, H, t, .7); x.stage(); c.restore();
-    c.fillStyle = "#e9ecf5"; c.beginPath(); c.arc(120, -380, 22, 0, 7); c.fill(); P.glow(c, 120, -380, 120, "#c9d6ff", .2);
-    windowFrame(c, -150, -460, 360, 360, "#0a0e14");
-    // moonlight across her bed (right)
-    c.fillStyle = "#141a26"; c.fillRect(60, 80, 520, 440);
-    c.fillStyle = P.vgrad(c, 0, 60, 0, 360, [[0, "#8a96ac"], [1, "#2a3240"]]);
-    c.beginPath(); c.moveTo(60, 140); c.bezierCurveTo(200, 80, 380, 150, 580, 110); c.lineTo(580, 520); c.lineTo(60, 520); c.fill();
-    c.fillStyle = "#c8d0de"; c.beginPath(); c.ellipse(420, 80, 140, 46, .05, 0, 7); c.fill();
-    c.fillStyle = "rgba(160,180,220,.12)"; c.beginPath(); c.moveTo(-150, -100); c.lineTo(210, -100); c.lineTo(580, 400); c.lineTo(60, 400); c.fill();
-    // my corner: a chair, a laptop's glow
-    c.fillStyle = "#07090c"; c.fillRect(-520, 120, 300, 26); c.fillRect(-510, 146, 18, 380); c.fillRect(-250, 146, 18, 380);
-    c.fillStyle = "#0c0f14"; c.beginPath(); c.moveTo(-460, 120); c.lineTo(-440, -20); c.lineTo(-300, -20); c.lineTo(-290, 120); c.fill();
-    c.fillStyle = P.vgrad(c, 0, -14, 0, 110, [[0, "#9ac0ff"], [1, "#4a6aa8"]]);
-    c.beginPath(); c.moveTo(-452, 112); c.lineTo(-436, -12); c.lineTo(-304, -12); c.lineTo(-298, 112); c.fill();
-    c.fillStyle = "rgba(255,255,255,.5)"; for (let i = 0; i < 6; i++) c.fillRect(-420, 10 + i * 14, 40 + ((i * 53) % 70), 4);
-    P.glow(c, -370, 50, 340, "#7aa8ff", .24 + .03 * Math.sin(t));
-    // a cup of coffee gone cold beside it
-    c.fillStyle = "#e8e4dc"; c.fillRect(-250, 92, 34, 30);
-  };
-
-  /* 23. Three flights home */
-  S.stairs = (x) => {
-    const { c, W, H, t } = x;
-    x.full(); P.fillAll(c, W, H, [[0, "#140e0c"], [1, "#060404"]]);
-    x.stage();
-    // light from our door at the top
-    P.glow(c, 260, -440, 640, "#ffc27a", .4);
-    c.fillStyle = "#ffd59a"; c.fillRect(200, -480, 120, 120);
-    // three flights, switching back
-    const flight = (x0, y0, dir, n) => {
-      for (let i = 0; i < n; i++) {
-        const sx = x0 + dir * i * 34, sy = y0 - i * 26;
-        c.fillStyle = mix("#3a2a22", "#140c0a", i / n); c.fillRect(Math.min(sx, sx + dir * 34), sy - 26, 34, 26);
-        c.fillStyle = "rgba(255,200,140,.18)"; c.fillRect(Math.min(sx, sx + dir * 34), sy - 26, 34, 3);
-      }
-      c.strokeStyle = "rgba(255,210,160,.16)"; c.lineWidth = 3;
-      c.beginPath(); c.moveTo(x0, y0 - 90); c.lineTo(x0 + dir * n * 34, y0 - n * 26 - 90); c.stroke();
-    };
-    flight(-420, 470, 1, 10); flight(-80, 210, -1, 10); flight(-420, -50, 1, 10); flight(-80, -310, 1, 0);
-    c.fillStyle = "#1a120e"; c.fillRect(-90, 200, 180, 14); c.fillRect(-440, -60, 180, 14); c.fillRect(-90, -320, 420, 14);
-    // her wheelchair waiting on the first landing, ready to go up
-    const wx = 130, wy = 470, s = 1;
-    c.strokeStyle = "rgba(220,200,180,.8)"; c.lineWidth = 5;
-    c.beginPath(); c.arc(wx, wy - 60, 60, 0, 7); c.stroke();
-    c.beginPath(); c.arc(wx, wy - 60, 50, 0, 7); c.strokeStyle = "rgba(220,200,180,.35)"; c.stroke();
-    c.strokeStyle = "rgba(220,200,180,.8)";
-    c.beginPath(); c.moveTo(wx - 30, wy - 120); c.lineTo(wx + 60, wy - 120); c.lineTo(wx + 70, wy - 60); c.moveTo(wx - 30, wy - 120); c.lineTo(wx - 40, wy - 230); c.lineTo(wx - 70, wy - 240); c.stroke();
-    c.beginPath(); c.arc(wx + 80, wy - 14, 14, 0, 7); c.stroke();
-    P.glow(c, wx, wy - 80, 200, "#ffb35a", .15);
-  };
-
-  /* 24. Now: dawn over the lake, the rose on the sill */
-  S.dawn = (x) => {
-    const { c, W, H, t, u } = x;
-    x.full();
-    const hz = x.sy(120);
-    const rise = smooth(0, 1, u);
-    P.fillAll(c, W, H, [[0, mix("#141a36", "#3a4a7a", rise)], [hz / H * .6, mix("#3a2a4a", "#e88a7a", rise)], [hz / H, mix("#6a3a4a", "#ffd0a0", rise)], [Math.min(1, hz / H + .001), "#140c14"], [1, "#05040a"]]);
-    const sunY = lerp(hz + x.S * .05, hz - x.S * .12, rise), sx = x.sx(80);
-    P.glow(c, sx, sunY, x.S * .9, "#ffb37a", .4 * rise + .1);
-    c.fillStyle = mix("#ff9a6a", "#fff0d0", rise); c.beginPath(); c.arc(sx, sunY, x.S * .05, 0, 7); c.fill();
-    c.fillStyle = "#140c14"; c.fillRect(0, hz - 3, W, H - hz + 3);
-    P.reflections(c, [{ x: sx, c: "#ffd0a0", a: .8, w: x.S * .08 }], hz, H, t, W);
-    x.stage();
-    // the window frame we look through
-    c.fillStyle = "#07050a";
-    c.fillRect(-620, -620, 120, 1240); c.fillRect(500, -620, 120, 1240); c.fillRect(-620, -620, 1240, 90);
-    c.fillRect(-620, 300, 1240, 320);
-    c.fillStyle = "rgba(255,190,140,.12)"; c.fillRect(-500, 300, 1000, 4);
-    // the black rose in a slim vase on the sill
-    c.fillStyle = "rgba(220,230,240,.18)"; c.beginPath(); c.moveTo(-250, 300); c.lineTo(-262, 160); c.lineTo(-238, 160); c.lineTo(-226, 300); c.fill();
-    c.strokeStyle = "#1a2a12"; c.lineWidth = 6; c.beginPath(); c.moveTo(-244, 220); c.bezierCurveTo(-246, 80, -236, 0, -240, -60); c.stroke();
-    c.fillStyle = "#14200e"; c.beginPath(); c.ellipse(-218, 60, 30, 12, -.6, 0, 7); c.fill();
-    for (let i = 0; i < 9; i++) {
-      const a = i * 2.4, r = 36 - i * 2.6;
-      c.save(); c.translate(-240, -90); c.rotate(a);
-      c.fillStyle = mix("#0a0204", "#3a0810", i / 9); c.beginPath(); c.ellipse(0, -r * .4, r * .7, r, 0, 0, 7); c.fill();
-      c.strokeStyle = rgba("#ff8a96", .3 + .4 * rise); c.lineWidth = 1.5; c.beginPath(); c.ellipse(0, -r * .4, r * .7, r, 0, 3.6, 5.8); c.stroke();
+    const LX = -330, LY = 40;                                // the laptop on the tray table
+    if (!m.i) { m.i = 1; m.st = P.starSet(21, 70, .4); }
+    P.layer(x, "bg", (L) => {
+      const { c } = L;
+      L.full();
+      P.fillAll(c, W, H, [[0, "#05070d"], [.5, "#0a0e18"], [1, "#030406"]]);
+      P.mottle(c, 0, 0, W, H, 31, 36, ["#1a2234", "#000000"], .3, L.S * .05, L.S * .2);
+      L.stage(); c.translate(110, 0);
+      // tall window, the moon
+      const WX = -90, WY = -560, WW = 330, WH = 420;
+      c.fillStyle = P.vgrad(c, 0, WY, 0, WY + WH, [[0, "#070c20"], [1, "#1c2644"]]); c.fillRect(WX, WY, WW, WH);
+      c.save(); c.beginPath(); c.rect(WX, WY, WW, WH); c.clip();
+      const R = rng(9);
+      for (let i = 0; i < 40; i++) { c.fillStyle = `rgba(230,236,255,${.2 + R() * .6})`; c.fillRect(WX + R() * WW, WY + R() * WH * .7, 1.6, 1.6); }
+      P.glow(c, 170, -480, 160, "#c9d6ff", .25);
+      c.fillStyle = "#eef0f8"; c.beginPath(); c.arc(170, -480, 24, 0, 7); c.fill();
       c.restore();
-    }
-    P.glow(c, -240, -90, 120, "#ff5a6b", .2 * rise);
+      // sheer curtains
+      for (const sd of [0, 1]) {
+        const cx0 = sd ? WX + WW - 70 : WX - 40;
+        for (let k = 0; k < 5; k++) { const fx = cx0 + k * 22; const g = c.createLinearGradient(fx, 0, fx + 22, 0); g.addColorStop(0, "rgba(150,170,220,.04)"); g.addColorStop(.5, "rgba(170,190,240,.16)"); g.addColorStop(1, "rgba(150,170,220,.04)"); c.fillStyle = g; c.fillRect(fx, WY - 20, 22, WH + 60); }
+      }
+      windowFrame(c, WX, WY, WW, WH, "#0a0e14", 1, "rgba(160,190,240,.12)");
+      // her bed on the right, in moonlight
+      c.fillStyle = "#0c1018"; c.fillRect(40, 110, 900, 700);
+      c.fillStyle = P.vgrad(c, 0, -80, 0, 110, [[0, "#1e2636"], [1, "#0e121a"]]); c.beginPath(); c.roundRect(560, -80, 360, 220, 20); c.fill();
+      pillow(c, 470, 70, 280, 110, .06, .2, 6, "#b8c2d6");
+      c.fillStyle = P.vgrad(c, 0, 100, 0, 520, [[0, "#9aa6bc"], [.4, "#5a667c"], [1, "#1a2030"]]);
+      c.beginPath(); c.moveTo(40, 180); c.bezierCurveTo(150, 120, 300, 150, 400, 130); c.bezierCurveTo(500, 112, 600, 140, 900, 120); c.lineTo(900, 800); c.lineTo(40, 800); c.fill();
+      for (let i = 0; i < 6; i++) {
+        const fx = 80 + i * 130 + R() * 40, g = c.createLinearGradient(fx - 30, 0, fx + 30, 0);
+        g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(.45, "rgba(10,16,28,.3)"); g.addColorStop(.6, "rgba(220,235,255,.1)"); g.addColorStop(1, "rgba(0,0,0,0)");
+        c.fillStyle = g; c.beginPath(); c.moveTo(fx - 6, 170); c.lineTo(fx + 6, 170); c.lineTo(fx + 40, 800); c.lineTo(fx - 40, 800); c.fill();
+      }
+      c.fillStyle = "rgba(210,225,255,.3)"; c.beginPath(); c.moveTo(40, 180); c.bezierCurveTo(150, 120, 300, 150, 400, 130); c.bezierCurveTo(500, 112, 600, 140, 900, 120); c.lineTo(900, 128); c.bezierCurveTo(600, 148, 500, 120, 400, 138); c.bezierCurveTo(300, 158, 150, 128, 40, 188); c.fill();
+      // my corner: a chair, a tray table, the laptop
+      c.fillStyle = "#06070a";
+      c.beginPath(); c.roundRect(-640, -140, 190, 300, 18); c.fill();                       // chair back
+      c.fillRect(-660, 140, 260, 40); c.fillRect(-650, 180, 16, 400); c.fillRect(-420, 180, 16, 400);
+      // my jacket over the back of the chair
+      c.fillStyle = P.vgrad(c, -640, 0, -450, 0, [[0, "#1a1210"], [1, "#2a1c16"]]);
+      c.beginPath(); c.moveTo(-650, -130); c.quadraticCurveTo(-545, -160, -450, -130); c.lineTo(-440, 80); c.quadraticCurveTo(-540, 100, -660, 70); c.fill();
+      c.fillStyle = "rgba(120,160,255,.1)"; c.fillRect(-452, -128, 4, 200);
+      // tray table
+      c.fillStyle = P.vgrad(c, 0, LY + 60, 0, LY + 80, [[0, "#2a3040"], [1, "#12161e"]]); c.fillRect(-500, LY + 60, 380, 18);
+      c.fillStyle = "#0e1118"; c.fillRect(-320, LY + 78, 16, 520); c.fillRect(-420, LY + 580, 220, 14);
+      // laptop base
+      c.fillStyle = P.vgrad(c, 0, LY + 44, 0, LY + 62, [[0, "#3a4252"], [1, "#1a1e28"]]);
+      c.beginPath(); c.moveTo(LX - 110, LY + 62); c.lineTo(LX + 110, LY + 62); c.lineTo(LX + 92, LY + 44); c.lineTo(LX - 92, LY + 44); c.fill();
+      // laptop lid
+      c.fillStyle = "#0c0f16"; c.beginPath(); c.moveTo(LX - 96, LY + 44); c.lineTo(LX - 84, LY - 104); c.lineTo(LX + 84, LY - 104); c.lineTo(LX + 96, LY + 44); c.fill();
+      // a mug of coffee gone cold, a notebook
+      P.shadow(c, -170, LY + 62, 40, 6, .6);
+      c.fillStyle = P.vgrad(c, -196, 0, -144, 0, [[0, "#6a7080"], [.4, "#e8eaf0"], [1, "#5a6070"]]); c.fillRect(-196, LY + 4, 52, 58);
+      c.strokeStyle = "#a8aeba"; c.lineWidth = 7; c.beginPath(); c.arc(-140, LY + 32, 16, -1.3, 1.3); c.stroke();
+      c.fillStyle = "#1a0e08"; c.beginPath(); c.ellipse(-170, LY + 6, 25, 5, 0, 0, 7); c.fill();
+      c.fillStyle = "#d8d0c0"; c.save(); c.translate(-470, LY + 52); c.rotate(-.06); c.fillRect(0, 0, 90, 10); c.restore();
+    });
+    x.stage(); c.translate(110, 0);
+    // the moon's light laid across the room and onto her bed
+    P.shaft(c, 75, -140, 330, 420, 600, 900, "#a8bce8", .09 + .015 * Math.sin(t * .3));
+    // her blanket rising and falling, slowly
+    const br = Math.sin(t * 1.1) * 4;
+    c.save(); c.globalCompositeOperation = "lighter";
+    c.fillStyle = "rgba(190,205,240,.05)"; c.beginPath(); c.ellipse(420, 260 - br, 300, 70 + br, -.05, 0, 7); c.fill();
+    c.restore();
+    // the laptop screen and its cold light on the corner
+    const fl = .92 + .08 * noise(t * .8);
+    c.fillStyle = P.vgrad(c, 0, LY - 96, 0, LY + 36, [[0, rgba("#bcd4ff", fl)], [1, rgba("#5a7ac0", fl)]]);
+    c.beginPath(); c.moveTo(LX - 86, LY + 36); c.lineTo(LX - 76, LY - 96); c.lineTo(LX + 76, LY - 96); c.lineTo(LX + 86, LY + 36); c.fill();
+    c.fillStyle = "rgba(20,30,60,.55)"; for (let i = 0; i < 7; i++) c.fillRect(LX - 60, LY - 76 + i * 15, 30 + ((i * 53) % 80), 4);
+    const cur = (t % 1.1) < .55; if (cur) { c.fillStyle = "rgba(20,30,60,.8)"; c.fillRect(LX - 60 + 30 + ((6 * 53) % 80) + 4, LY + 14, 3, 8); }
+    P.glow(c, LX, LY - 30, 420, "#7aa8ff", .2 * fl);
+    P.glow(c, LX, LY + 50, 160, "#9ac0ff", .14 * fl);
+    // the monitor's small green pulse by her bed, far right
+    const beat = Math.pow(Math.max(0, Math.sin(t * 2.4)), 12);
+    P.glow(c, 640, -150, 60, "#5affb0", .2 + .4 * beat);
+    c.fillStyle = rgba("#5affb0", .6 + .4 * beat); c.beginPath(); c.arc(640, -150, 4, 0, 7); c.fill();
   };
+
+  /* 23. Three flights home: the last flight, our door open at the top, her wheelchair waiting in its light */
+  S.stairs = (x) => {
+    const { c, W, H, t, m } = x;
+    // a small camera: eye 2m up, looking along the stairs
+    const F = 900, Z0 = 1.6, EYE = 2.0, VX = 40, VY = -220, N = 10, RUN = .3, RISE = .18, HW = .62;
+    const px = (xw, z) => VX + xw * F / z, py = (h, z) => VY + (EYE - h) * F / z;
+    const ZL = Z0 + N * RUN, ZD = ZL + .8, HL = N * RISE;   // landing depth, door wall depth, landing height
+    const D0 = px(-.25, ZD), D1 = px(.65, ZD), DT = py(HL + 2.05, ZD), DB = py(HL, ZD);
+    if (!m.i) { m.i = 1; m.mote = P.starSet(23, 50, 1); }
+    P.layer(x, "bg", (L) => {
+      const { c } = L;
+      L.full(); P.fillAll(c, W, H, [[0, "#0c0807"], [1, "#050303"]]);
+      L.stage();
+      // left wall: plaster, warmer towards the door
+      c.fillStyle = P.vgrad(c, -900, 0, px(-HW - .05, ZD), 0, [[0, "#140c09"], [1, "#3a2416"]]);
+      c.beginPath(); c.moveTo(-1400, -1000); c.lineTo(px(-HW - .05, ZD), -1000); c.lineTo(px(-HW - .05, ZD), py(HL, ZD)); c.lineTo(-1400, 1600); c.fill();
+      P.mottle(c, -1400, -1000, 1400 + px(-HW, ZD), 2600, 41, 30, ["#5a3a26", "#000000"], .2, 40, 160);
+      // a wall lamp on the half landing, off; its brass catching the door
+      c.fillStyle = "#2a1a10"; c.fillRect(px(-HW - .05, 3.0) - 6, py(2.9, 3.0), 12, 30);
+      // back wall around the door
+      c.fillStyle = "#4a2e1c"; c.fillRect(px(-HW - .05, ZD), -1000, px(HW + .6, ZD) - px(-HW - .05, ZD), py(HL, ZD) + 1000);
+      // the stairwell void and rail on the right
+      c.fillStyle = "#060403"; c.beginPath(); c.moveTo(px(HW, Z0 - .4), 1600); c.lineTo(px(HW, ZL), py(HL, ZL)); c.lineTo(px(HW + .6, ZD), py(HL, ZD)); c.lineTo(px(HW + .6, ZD), -1000); c.lineTo(1400, -1000); c.lineTo(1400, 1600); c.fill();
+      // the landing floor
+      c.fillStyle = P.vgrad(c, 0, py(HL, ZD), 0, py(HL, ZL), [[0, "#6a4026"], [1, "#4a2c1a"]]);
+      c.beginPath(); c.moveTo(px(-HW - .05, ZD), py(HL, ZD)); c.lineTo(px(HW + .6, ZD), py(HL, ZD)); c.lineTo(px(HW + .6, ZL), py(HL, ZL)); c.lineTo(px(-HW - .05, ZL), py(HL, ZL)); c.fill();
+      // the steps, far to near: warm light on every tread, risers in shadow, a lit nosing
+      for (let i = N - 1; i >= 0; i--) {
+        const z = Z0 + i * RUN, h = (i + 1) * RISE, warm = .35 + .65 * (i / N);
+        // tread
+        c.fillStyle = P.vgrad(c, 0, py(h, z + RUN), 0, py(h, z), [[0, mix("#3a2214", "#c07a44", warm)], [1, mix("#2a180e", "#8a5430", warm)]]);
+        c.beginPath(); c.moveTo(px(-HW, z), py(h, z)); c.lineTo(px(HW, z), py(h, z)); c.lineTo(px(HW, z + RUN), py(h, z + RUN)); c.lineTo(px(-HW, z + RUN), py(h, z + RUN)); c.fill();
+        // a worn path up the middle of the treads
+        c.fillStyle = rgba("#ffcf9a", .06 * warm); c.beginPath(); c.moveTo(px(-.25, z), py(h, z)); c.lineTo(px(.25, z), py(h, z)); c.lineTo(px(.25, z + RUN), py(h, z + RUN)); c.lineTo(px(-.25, z + RUN), py(h, z + RUN)); c.fill();
+        // riser
+        c.fillStyle = mix("#100906", "#3a2214", warm * .6);
+        c.beginPath(); c.moveTo(px(-HW, z), py(h - RISE, z)); c.lineTo(px(HW, z), py(h - RISE, z)); c.lineTo(px(HW, z), py(h, z)); c.lineTo(px(-HW, z), py(h, z)); c.fill();
+        // nosing highlight
+        c.fillStyle = rgba("#ffc890", .35 * warm); c.fillRect(px(-HW, z), py(h, z) - 1, px(HW, z) - px(-HW, z), Math.max(2, 6 / z));
+        // the stringer against the wall
+        c.fillStyle = "#1a0f09"; c.beginPath(); c.moveTo(px(-HW - .06, z), py(h + .12, z)); c.lineTo(px(-HW, z), py(h + .12, z)); c.lineTo(px(-HW, z), py(h - RISE - .1, z)); c.lineTo(px(-HW - .06, z), py(h - RISE - .1, z)); c.fill();
+      }
+      // the floor at the bottom, where we stand
+      c.fillStyle = P.vgrad(c, 0, py(0, Z0), 0, 1600, [[0, "#1a0f09"], [1, "#050302"]]); c.fillRect(-1400, py(0, Z0), 2800, 1600);
+      // banister: balusters, rail, newel post
+      for (let i = 0; i < N; i++) {
+        const z = Z0 + i * RUN + RUN / 2, h = (i + 1) * RISE, warm = .3 + .7 * (i / N);
+        c.strokeStyle = mix("#0e0806", "#4a2c18", warm * .6); c.lineWidth = Math.max(2, 22 / z);
+        c.beginPath(); c.moveTo(px(HW, z), py(h, z)); c.lineTo(px(HW, z), py(h + .9, z)); c.stroke();
+      }
+      c.strokeStyle = "#2a1810"; c.lineCap = "round";
+      c.lineWidth = 34 / Z0; c.beginPath(); c.moveTo(px(HW, Z0 - .2), py(1.05, Z0 - .2)); c.lineTo(px(HW, ZL), py(HL + .9, ZL)); c.lineTo(px(HW + .6, ZD - .05), py(HL + .9, ZD - .05)); c.stroke();
+      c.strokeStyle = "rgba(255,200,140,.45)"; c.lineWidth = 3; c.beginPath(); c.moveTo(px(HW, Z0 - .2), py(1.05, Z0 - .2) - 8); c.lineTo(px(HW, ZL), py(HL + .9, ZL) - 2); c.stroke();
+      const nx = px(HW, Z0 - .2), nw = 70 / Z0;
+      c.fillStyle = P.vgrad(c, nx - nw / 2, 0, nx + nw / 2, 0, [[0, "#3a2214"], [.4, "#6a4026"], [1, "#140a06"]]); c.fillRect(nx - nw / 2, py(1.15, Z0 - .2), nw, 1600);
+      c.fillStyle = "#4a2c18"; c.beginPath(); c.ellipse(nx, py(1.15, Z0 - .2), nw * .7, nw * .25, 0, 0, 7); c.fill();
+      // the door frame and the open door leaf
+      c.fillStyle = "#1a0f09"; c.fillRect(D0 - 12, DT - 12, D1 - D0 + 24, 12); c.fillRect(D0 - 12, DT, 12, DB - DT); c.fillRect(D1, DT, 12, DB - DT);
+      // a mat and a pot plant by the door: someone lives here
+      c.fillStyle = "#3a1a14"; c.beginPath(); c.moveTo(D0 + 6, DB + 4); c.lineTo(D1 - 6, DB + 4); c.lineTo(D1 + 6, DB + 18); c.lineTo(D0 - 6, DB + 18); c.fill();
+      const pp = px(-.5, ZD - .2);
+      c.fillStyle = "#2a160c"; c.beginPath(); c.moveTo(pp - 14, py(HL + .35, ZD - .2)); c.lineTo(pp + 14, py(HL + .35, ZD - .2)); c.lineTo(pp + 10, py(HL, ZD - .2)); c.lineTo(pp - 10, py(HL, ZD - .2)); c.fill();
+      c.fillStyle = "#14200e"; for (let k = 0; k < 7; k++) { c.beginPath(); c.ellipse(pp + Math.cos(k) * 12, py(HL + .45, ZD - .2) - k * 4, 6, 16, Math.cos(k * 1.7) * .8, 0, 7); c.fill(); }
+    });
+    x.stage();
+    const br = .9 + .1 * noise(t * .6);
+    // home: the room beyond the open door, warm and bright
+    c.fillStyle = P.vgrad(c, 0, DT, 0, DB, [[0, rgba("#ffd8a0", br)], [1, rgba("#ff9a4a", br)]]); c.fillRect(D0, DT, D1 - D0, DB - DT);
+    // inside: a lamp and the edge of a sofa
+    c.fillStyle = "rgba(140,70,30,.55)"; c.fillRect(D0, DB - (DB - DT) * .28, (D1 - D0) * .7, (DB - DT) * .28);
+    P.glow(c, D1 - 30, DT + 80, 70, "#fff4dc", .7 * br);
+    // the door leaf swung inward, edge-on
+    c.fillStyle = "#1a0f09"; c.beginPath(); c.moveTo(D1 - 4, DT); c.lineTo(D1 - 24, DT + 14); c.lineTo(D1 - 24, DB - 6); c.lineTo(D1 - 4, DB); c.fill();
+    // the light pouring out and down the stairs
+    P.glow(c, (D0 + D1) / 2, (DT + DB) / 2, 620, "#ffb35a", .3 * br);
+    P.shaft(c, (D0 + D1) / 2, DB, D1 - D0, (D0 + D1) / 2 - 40, 700, 900, "#ffc88a", .22 * br);
+    // motes in the light
+    c.save(); c.globalCompositeOperation = "lighter";
+    for (const d of m.mote) { const v = (d.y + t * .01) % 1, y = lerp(DB, 600, v), sp = lerp(80, 420, v); c.fillStyle = `rgba(255,225,180,${(.35 * d.s / 1.5 * Math.sin(v * Math.PI)).toFixed(3)})`; c.fillRect((D0 + D1) / 2 + (d.x - .5) * 2 * sp, y + Math.sin(t * .3 + d.ph) * 10, 2.5, 2.5); }
+    c.restore();
+    // her wheelchair on the landing, waiting in the doorway light
+    const z = ZD - .45, gx = px(.12, z), gy = py(HL, z), s = F / z / 100;   // s: pixels per 10cm
+    P.shadow(c, gx + 1 * s, gy, 5 * s, .8 * s, .7);
+    c.save(); c.translate(gx, gy);
+    c.strokeStyle = "#0a0605"; c.fillStyle = "#0a0605"; c.lineCap = "round"; c.lineJoin = "round";
+    const R = 3.0 * s;                                          // big wheel radius
+    c.lineWidth = .35 * s; c.beginPath(); c.arc(-.4 * s, -R, R, 0, 7); c.stroke();
+    c.lineWidth = .12 * s; for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI; c.beginPath(); c.moveTo(-.4 * s + Math.cos(a) * R, -R + Math.sin(a) * R); c.lineTo(-.4 * s - Math.cos(a) * R, -R - Math.sin(a) * R); c.stroke(); }
+    c.lineWidth = .3 * s;
+    c.beginPath(); c.moveTo(-1.6 * s, -9.5 * s); c.lineTo(-1.4 * s, -4.2 * s); c.lineTo(3.0 * s, -4.4 * s); c.lineTo(3.8 * s, -1.2 * s); c.stroke();        // back post, seat, front frame
+    c.beginPath(); c.moveTo(-1.6 * s, -9.5 * s); c.lineTo(-2.6 * s, -9.7 * s); c.stroke();                                                          // push handle
+    c.beginPath(); c.moveTo(3.8 * s, -1.2 * s); c.lineTo(4.8 * s, -1.0 * s); c.stroke();                                                            // footrest
+    c.fillRect(-1.5 * s, -9 * s, .4 * s, 4.6 * s);
+    c.beginPath(); c.roundRect(-1.5 * s, -9 * s, .9 * s, 4.8 * s, .3 * s); c.fill();                                                            // backrest
+    c.beginPath(); c.roundRect(-1.4 * s, -4.9 * s, 4.4 * s, .7 * s, .3 * s); c.fill();                                                           // seat
+    c.beginPath(); c.arc(3.6 * s, -.6 * s, .6 * s, 0, 7); c.stroke();                                                                           // caster
+    // warm rim from the doorway behind it
+    c.strokeStyle = rgba("#ffcf8a", .7 * br); c.lineWidth = .1 * s;
+    c.beginPath(); c.arc(-.4 * s, -R, R + .2 * s, -1.9, -.2); c.stroke();
+    c.beginPath(); c.moveTo(-1.35 * s, -9.4 * s); c.lineTo(-1.2 * s, -4.4 * s); c.lineTo(2.9 * s, -4.6 * s); c.stroke();
+    c.restore();
+  };
+
+  /* 24. Now: dawn over the lake, a single dark rose in a slim glass vase on the sill */
+  S.dawn = (x) => {
+    const { c, W, H, t, u, m } = x;
+    const HZ = 60, SUNX = 90, SILL = 250, VX = -90;          // horizon, sun, sill top, vase
+    const rise = smooth(0, 1, u), sunY = lerp(HZ + 30, HZ - 120, rise);
+    if (!m.i) {
+      m.i = 1; const R = rng(88);
+      m.glit = Array.from({ length: 80 }, () => ({ v: Math.pow(R(), 1.4), o: R() - .5, ph: R() * 6, sp: lerp(1, 2.6, R()) }));
+      m.birds = [[-420, -300, 1], [-380, -330, .8], [-340, -290, .7]];
+    }
+    // ---- the sky and the lake: live, because the sun is rising ----
+    x.full();
+    const hz = x.sy(HZ);
+    P.fillAll(c, W, H, [[0, mix("#10142e", "#3a4a7a", rise)], [Math.max(.01, hz / H * .55), mix("#3a2a4e", "#d88a8a", rise)], [hz / H * .93, mix("#7a4a5a", "#ffc49a", rise)], [hz / H, mix("#a86a62", "#ffe2b8", rise)], [Math.min(1, hz / H + .001), "#2a1a28"], [1, "#0a0710"]]);
+    const sx = x.sx(SUNX), sy = x.sy(sunY);
+    P.glow(c, sx, sy, x.S * 1.3, "#ff9a6a", .28 + .3 * rise);
+    P.glow(c, sx, sy, x.S * .35, "#ffd8a8", .4 + .3 * rise);
+    x.stage();
+    P.layer(x, "far", (L) => {
+      const { c } = L;
+      // long clouds, lit from beneath
+      const R = rng(5);
+      c.save(); c.globalCompositeOperation = "lighter"; L.stage();
+      for (let i = 0; i < 12; i++) {
+        const cx = lerp(-1300, 800, R()), cy = lerp(-760, -60, R()), w = lerp(200, 600, R()), h = lerp(10, 26, R());
+        c.save(); c.translate(cx, cy); c.scale(w / h, 1);
+        const g = c.createRadialGradient(0, 0, 0, 0, 0, h); g.addColorStop(0, `rgba(255,170,150,${.12 + R() * .12})`); g.addColorStop(1, "rgba(255,170,150,0)");
+        c.fillStyle = g; c.beginPath(); c.arc(0, 0, h, 0, 7); c.fill(); c.restore();
+      }
+      c.restore();
+      L.full();
+      P.ridge(c, W, L.sy(HZ) - L.S * .004, L.S * .07, 3.1, "rgba(70,40,70,.85)", 2);
+      P.ridge(c, W, L.sy(HZ) + 1, L.S * .035, 7.7, "#24162a", 3);
+    });
+    // the sun itself, then the water
+    c.fillStyle = mix("#ff8a5a", "#fff2d8", rise); c.beginPath(); c.arc(SUNX, sunY, 46, 0, 7); c.fill();
+    x.full();
+    c.fillStyle = P.vgrad(c, 0, hz, 0, H, [[0, mix("#5a3a4a", "#c88a7a", rise)], [.15, mix("#2a1a2a", "#6a4a5a", rise)], [1, "#08060c"]]); c.fillRect(0, hz + 1, W, H - hz);
+    x.stage();
+    // the sun's path on the water, glittering
+    c.save(); c.globalCompositeOperation = "lighter";
+    c.translate(SUNX, HZ); c.scale(.16, 1);
+    const sp = c.createRadialGradient(0, 0, 0, 0, 0, 800); sp.addColorStop(0, rgba("#ffd0a0", .5 * (.4 + rise))); sp.addColorStop(1, "rgba(255,200,150,0)");
+    c.fillStyle = sp; c.fillRect(-800, 0, 1600, 800);
+    c.setTransform(1, 0, 0, 1, 0, 0); x.stage();
+    for (const g of m.glit) {
+      const y = HZ + 4 + g.v * 520, spr = 8 + g.v * 120, gx = SUNX + g.o * spr * 2;
+      const a = Math.pow(Math.max(0, Math.sin(t * g.sp + g.ph)), 2) * (1 - g.v * .7) * .8 * (.4 + rise);
+      if (a < .04) continue;
+      const w = 6 + g.v * 30;
+      c.fillStyle = `rgba(255,226,190,${a.toFixed(3)})`; c.fillRect(gx - w / 2, y, w, 1 + g.v * 1.5);
+    }
+    c.restore();
+    // morning mist on the lake
+    const dr = Math.sin(t * .12) * 50;
+    P.haze(c, -1400 + dr, 1400, HZ + 14, 26, "#ffd0c0", .14 + .08 * rise);
+    P.haze(c, -1400 - dr, 1400, HZ - 6, 18, "#ffc0b0", .1);
+    // three birds crossing, far off
+    c.strokeStyle = "rgba(40,20,30,.7)"; c.lineWidth = 2.5; c.lineCap = "round";
+    for (const [bx, by, s] of m.birds) {
+      const fx = bx + t * 14 * s, fy = by + Math.sin(t * .6 + bx) * 6, fl = Math.sin(t * 5 * s + bx) * 5 * s;
+      c.beginPath(); c.moveTo(fx - 10 * s, fy - fl); c.quadraticCurveTo(fx - 4 * s, fy - 4 * s, fx, fy); c.quadraticCurveTo(fx + 4 * s, fy - 4 * s, fx + 10 * s, fy - fl); c.stroke();
+    }
+    // ---- the window, the sill, the vase and the rose: painted once ----
+    P.layer(x, "near", (L) => {
+      const { c } = L;
+      L.stage();
+      // the window frame we look through, in silhouette
+      c.fillStyle = "#0a0608";
+      c.fillRect(-1400, -1000, 820, 2600); c.fillRect(560, -1000, 900, 2600); c.fillRect(-1400, -1000, 2800, 330);
+      c.fillStyle = "rgba(255,190,150,.16)"; c.fillRect(-580, -670, 3, SILL + 670); c.fillRect(557, -670, 3, SILL + 670);
+      c.fillStyle = "#0a0608"; c.fillRect(-14, -670, 28, SILL + 670);
+      c.fillStyle = "rgba(255,200,160,.22)"; c.fillRect(11, -670, 3, SILL + 670);
+      // the sill: painted wood, raking light across it
+      c.fillStyle = P.vgrad(c, 0, SILL, 0, SILL + 80, [[0, "#6a4a40"], [.2, "#3a2622"], [1, "#160c0c"]]); c.fillRect(-1400, SILL, 2800, 80);
+      c.fillStyle = "rgba(255,210,170,.5)"; c.fillRect(-1400, SILL, 2800, 2);
+      c.fillStyle = "#0a0608"; c.fillRect(-1400, SILL + 80, 2800, 1600);
+      c.fillStyle = P.vgrad(c, 0, SILL + 80, 0, SILL + 130, [[0, "rgba(0,0,0,.6)"], [1, "rgba(0,0,0,0)"]]); c.fillRect(-1400, SILL + 80, 2800, 50);
+      // the vase's shadow and the caustic it throws, falling towards us
+      P.shadow(c, VX - 20, SILL + 30, 70, 14, .6);
+      c.save(); c.globalCompositeOperation = "lighter"; c.translate(VX - 14, SILL + 34); c.scale(1, .22);
+      const cg = c.createRadialGradient(0, 0, 0, 0, 0, 40); cg.addColorStop(0, "rgba(255,200,150,.55)"); cg.addColorStop(1, "rgba(255,160,120,0)");
+      c.fillStyle = cg; c.beginPath(); c.arc(0, 0, 40, 0, 7); c.fill(); c.restore();
+      // ---- the slim glass vase ----
+      const vase = () => {
+        c.beginPath(); c.moveTo(VX - 14, SILL - 230); c.bezierCurveTo(VX - 12, SILL - 140, VX - 14, SILL - 120, VX - 34, SILL - 70);
+        c.bezierCurveTo(VX - 48, SILL - 34, VX - 40, SILL - 2, VX - 30, SILL); c.lineTo(VX + 30, SILL);
+        c.bezierCurveTo(VX + 40, SILL - 2, VX + 48, SILL - 34, VX + 34, SILL - 70); c.bezierCurveTo(VX + 14, SILL - 120, VX + 12, SILL - 140, VX + 14, SILL - 230); c.closePath();
+      };
+      c.save(); vase(); c.clip();
+      c.fillStyle = "rgba(255,210,180,.07)"; c.fillRect(VX - 60, SILL - 240, 120, 240);
+      // water, glowing where the sun comes through it
+      c.fillStyle = P.vgrad(c, VX - 50, 0, VX + 50, 0, [[0, "rgba(255,160,120,.10)"], [.6, "rgba(255,200,160,.32)"], [1, "rgba(255,170,130,.12)"]]);
+      c.fillRect(VX - 60, SILL - 130, 120, 130);
+      c.fillStyle = "rgba(255,230,200,.55)"; c.fillRect(VX - 20, SILL - 131, 40, 2);
+      // the stem, bent by the water
+      c.strokeStyle = "rgba(40,60,30,.85)"; c.lineWidth = 6;
+      c.beginPath(); c.moveTo(VX + 4, SILL - 6); c.lineTo(VX + 7, SILL - 129); c.stroke();
+      c.beginPath(); c.moveTo(VX + 2, SILL - 131); c.lineTo(VX, SILL - 240); c.stroke();
+      c.restore();
+      // glass edges and highlights
+      c.strokeStyle = "rgba(255,225,200,.4)"; c.lineWidth = 2; vase(); c.stroke();
+      c.strokeStyle = "rgba(255,240,225,.55)"; c.lineWidth = 2; c.beginPath(); c.ellipse(VX, SILL - 230, 14, 3.5, 0, 0, 7); c.stroke();
+      P.spec(c, VX + 9, SILL - 220, VX + 8, SILL - 140, 2.5, .6, "#fff0e0");
+      P.spec(c, VX + 30, SILL - 64, VX + 26, SILL - 16, 3, .55, "#ffe8d0");
+      P.spec(c, VX - 34, SILL - 50, VX - 30, SILL - 18, 1.5, .25, "#ffe8d0");
+      // ---- the rose: stem, two leaves, and a dark bloom backlit by the sun ----
+      const RX = VX + 6, RY = -150;
+      c.strokeStyle = "#1a2410"; c.lineWidth = 6; c.lineCap = "round";
+      c.beginPath(); c.moveTo(VX, SILL - 232); c.bezierCurveTo(VX - 2, SILL - 320, RX + 6, RY + 160, RX, RY + 40); c.stroke();
+      c.strokeStyle = "rgba(255,150,110,.35)"; c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(VX + 3, SILL - 232); c.bezierCurveTo(VX + 1, SILL - 320, RX + 9, RY + 160, RX + 3, RY + 40); c.stroke();
+      // a thorn or two
+      c.fillStyle = "#1a2410"; c.beginPath(); c.moveTo(VX - 2, 40); c.lineTo(VX - 12, 34); c.lineTo(VX - 2, 30); c.fill();
+      c.beginPath(); c.moveTo(RX + 4, -20); c.lineTo(RX + 14, -26); c.lineTo(RX + 4, -30); c.fill();
+      const leaf = (lx, ly, ang, s) => {
+        c.save(); c.translate(lx, ly); c.rotate(ang); c.scale(s, s);
+        c.fillStyle = P.vgrad(c, 0, -20, 0, 20, [[0, "#22301a"], [1, "#0c140a"]]);
+        c.beginPath(); c.moveTo(0, 0); c.bezierCurveTo(20, -24, 60, -22, 84, 0); c.bezierCurveTo(60, 20, 20, 20, 0, 0); c.fill();
+        c.strokeStyle = "rgba(255,170,120,.45)"; c.lineWidth = 1.5; c.beginPath(); c.moveTo(0, 0); c.bezierCurveTo(20, -24, 60, -22, 84, 0); c.stroke();
+        c.strokeStyle = "rgba(0,0,0,.4)"; c.lineWidth = 1.5; c.beginPath(); c.moveTo(4, 0); c.lineTo(78, -1); c.stroke();
+        c.restore();
+      };
+      leaf(VX + 2, 20, -.5, 1); leaf(RX - 2, -40, Math.PI + .45, .85);
+      // sepals
+      c.fillStyle = "#1a2410";
+      for (const a of [-.9, -.3, .4, 1.0]) { c.save(); c.translate(RX, RY + 44); c.rotate(a); c.beginPath(); c.moveTo(-5, 0); c.quadraticCurveTo(0, 30, 4, 44); c.quadraticCurveTo(6, 20, 5, 0); c.fill(); c.restore(); }
+      // petals: back to front. Each is near-black crimson, its thin edge glowing where the sun shines through
+      const petal = (pts, base, edge, rim) => {
+        const [x0, y0, c1x, c1y, c2x, c2y, x1, y1, c3x, c3y, c4x, c4y] = pts;
+        const g = c.createLinearGradient(RX, RY + 50, RX + (x1 - RX) * .3, y1);
+        g.addColorStop(0, base); g.addColorStop(1, edge);
+        c.fillStyle = g;
+        c.beginPath(); c.moveTo(x0, y0); c.bezierCurveTo(c1x, c1y, c2x, c2y, x1, y1); c.bezierCurveTo(c3x, c3y, c4x, c4y, x0, y0); c.fill();
+        if (rim) { c.strokeStyle = rim; c.lineWidth = 2.5; c.beginPath(); c.moveTo(c2x, c2y); c.quadraticCurveTo(x1, y1 - 2, c3x, c3y); c.stroke(); }
+      };
+      const r = (dx, dy) => [RX + dx, RY + dy];
+      // outer back petals, spread wide
+      petal([...r(-10, 40), ...r(-90, 20), ...r(-96, -60), ...r(-40, -74), ...r(-10, -50), ...r(-6, 0)], "#140206", "#5a0a14", "rgba(255,90,90,.7)");
+      petal([...r(10, 40), ...r(90, 24), ...r(100, -56), ...r(46, -76), ...r(14, -50), ...r(6, 0)], "#140206", "#6a0c16", "rgba(255,120,100,.85)");
+      petal([...r(0, 30), ...r(-50, -20), ...r(-20, -92), ...r(16, -88), ...r(50, -70), ...r(40, -10)], "#1a0308", "#7a1018", "rgba(255,140,110,.9)");
+      // the cup: overlapping inner petals curling closed
+      petal([...r(-60, 30), ...r(-74, -20), ...r(-50, -60), ...r(-4, -56), ...r(-20, -10), ...r(-10, 40)], "#0c0104", "#4a0810", "rgba(255,100,90,.55)");
+      petal([...r(56, 30), ...r(76, -18), ...r(52, -62), ...r(6, -54), ...r(24, -8), ...r(10, 40)], "#0c0104", "#560a12", "rgba(255,120,100,.7)");
+      // the spiral heart
+      c.strokeStyle = "rgba(255,90,90,.45)"; c.lineWidth = 2;
+      c.beginPath(); c.moveTo(RX - 26, RY - 44); c.bezierCurveTo(RX - 14, RY - 60, RX + 20, RY - 58, RX + 22, RY - 40); c.bezierCurveTo(RX + 20, RY - 28, RX - 6, RY - 26, RX - 8, RY - 40); c.bezierCurveTo(RX - 6, RY - 48, RX + 8, RY - 48, RX + 8, RY - 40); c.stroke();
+      // the front lip that rolls outward
+      petal([...r(-66, 26), ...r(-50, 4), ...r(40, 0), ...r(64, 22), ...r(20, 60), ...r(-30, 60)], "#0a0103", "#3a060c", "rgba(255,110,90,.5)");
+      c.strokeStyle = "rgba(255,170,140,.5)"; c.lineWidth = 2; c.beginPath(); c.moveTo(RX - 66, RY + 26); c.bezierCurveTo(RX - 50, RY + 4, RX + 40, RY, RX + 64, RY + 22); c.stroke();
+    });
+    // the sun through the petals: a breathing crimson glow behind the bloom
+    x.stage();
+    const br = .85 + .15 * Math.sin(t * .7);
+    P.glow(c, VX + 30, -190, 220, "#ff3a4a", (.18 + .22 * rise) * br);
+    P.glow(c, VX + 50, -200, 90, "#ffb08a", (.12 + .2 * rise) * br);
+    // light raking along the sill, and through the glass
+    P.glow(c, VX + 10, SILL - 70, 90, "#ffc8a0", .14 + .14 * rise);
+    sheen(c, 80, SILL + 6, 420, 14, "#ffb88a", .25 + .25 * rise);
+  };
+
 })();
