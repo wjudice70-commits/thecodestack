@@ -199,6 +199,7 @@
     const HZ = 60, MX = -300, MY = -400;           // horizon and moon, in stage units
     const FL = (i) => 430 - (i - 1) * 200;            // base of floor i (1 = ground)
     const COLS = [200, 345, 490];
+    const BT = (c) => { if (x.portrait) { c.translate(-30, 430); c.scale(1.4, 1.4); c.translate(-100, -430); } };
     if (!m.i) {
       m.i = 1;
       const R = rng(44);
@@ -249,6 +250,7 @@
       c.fillStyle = mp; c.fillRect(-900, 0, 1800, 900); c.restore();
       c.save(); c.globalCompositeOperation = "lighter";
       for (const p of m.town) {
+      if (x.portrait && p.x > -40) continue;   // hidden behind the nearer building
         c.save(); c.translate(p.x, HZ + 34); c.scale(.06, 1);
         const rg = c.createRadialGradient(0, 0, 0, 0, 0, 60);
         rg.addColorStop(0, rgba(p.c, .22 * p.a)); rg.addColorStop(1, rgba(p.c, 0));
@@ -259,7 +261,8 @@
       c.strokeStyle = "rgba(150,165,220,.05)"; c.lineWidth = 1.5;
       for (let i = 0; i < 40; i++) { const y = HZ + 8 + Math.pow(i / 40, 1.8) * 1300, w = 200 + i * 40, x0 = lerp(-1300, 300, R()); c.beginPath(); c.moveTo(x0, y); c.lineTo(x0 + w, y); c.stroke(); }
 
-      // ---- the building ----
+      // ---- the building (larger on a phone, where it is the subject) ----
+      c.save(); BT(c);
       const top = FL(7), bot = 1500;
       // side face with the stairwell: we climbed those stairs
       c.fillStyle = P.vgrad(c, 100, 0, 170, 0, [[0, "#0b0c16"], [1, "#07070d"]]);
@@ -302,6 +305,7 @@
           for (let b = 0; b < 44; b++) c.fillRect(186 + b * 16, yb - 60, 3, 54);
         }
       }
+      c.restore();
       // branches of a willow overhanging from the near shore, top left
       c.fillStyle = "#020205"; c.strokeStyle = "#020205"; c.lineCap = "round";
       const T = rng(31);
@@ -333,6 +337,7 @@
     c.save(); c.globalCompositeOperation = "lighter";
     // the shore lights and their long trembling reflections
     for (const p of m.town) {
+      if (x.portrait && p.x > -40) continue;   // hidden behind the nearer building
       const a = p.a * (.75 + .25 * Math.sin(t * 2 + p.ph));
       c.fillStyle = rgba(p.c, a); c.fillRect(p.x - 1.5, p.y - 1.5, 3, 3);
       const k = (t * .8 + p.ph) % 1, yy = HZ + 8 + k * 50;
@@ -355,6 +360,7 @@
     P.haze(c, -1400 - drift, 1400, HZ + 120, 50, "#4a4a6a", .08);
     c.restore();
     // the third floor, lit: our window
+    c.save(); BT(c);
     const yb = FL(3), wy = yb - 160;
     for (let ci = 0; ci < 2; ci++) {
       const wx = COLS[ci], fl = .88 + .12 * noise(t * .8 + ci * 3);
@@ -381,6 +387,7 @@
     c.fillStyle = rgba("#ffb36a", .35 * fl); c.fillRect(182, yb - 62, 340, 3);
     c.fillStyle = rgba("#ffb36a", .22 * fl); for (let b = 0; b < 21; b++) c.fillRect(186 + b * 16, yb - 60, 3, 54);
     P.glow(c, 330, yb + 20, 220, "#ff9a4a", .14 * fl);
+    c.restore();
   };
 
   /* 2. Two candles leaning together while the night turns to morning */
@@ -482,24 +489,19 @@
       c.fillStyle = "#2a1006"; c.fillRect(lx - 13, ly - 38, 26, 7); c.fillRect(lx - 13, ly + 31, 26, 7);
       c.strokeStyle = "#d8a040"; c.lineWidth = 2; c.beginPath(); c.moveTo(lx, ly + 38); c.lineTo(lx + Math.sin(t + i) * 2, ly + 66); c.stroke();
     }
-    // a glowing silk dragon arcing over the field: ribbed body segments, a proud head
-    for (let i = 25; i >= 0; i--) {
-      const v = i / 25, dx = lerp(-560, 560, v), dy = -230 - Math.sin(v * Math.PI) * 120 + Math.sin(v * 9 + t * 1.2) * 18;
-      const r = 30 * (1 - v * .55);
-      P.glow(c, dx, dy, r * 3, "#ff9a3a", .16);
-      const col = mix("#ffd08a", "#ff5a2a", v);
-      const g = c.createRadialGradient(dx - r * .3, dy - r * .4, 1, dx, dy, r);
-      g.addColorStop(0, mix(col, "#ffffff", .5)); g.addColorStop(.7, col); g.addColorStop(1, mix(col, "#5a1a08", .6));
-      c.fillStyle = g; c.beginPath(); c.ellipse(dx, dy, r * .8, r, 0, 0, 7); c.fill();
-      c.strokeStyle = "rgba(120,40,10,.35)"; c.lineWidth = 1.5; c.beginPath(); c.moveTo(dx, dy - r); c.lineTo(dx, dy + r); c.stroke();
-    }
-    { // the head
-      const hx = -590, hy = -236 + Math.sin(t * 1.2) * 18;
-      P.glow(c, hx, hy, 140, "#ffb35a", .35);
-      c.fillStyle = P.vgrad(c, hx - 60, hy - 40, hx + 30, hy + 40, [[0, "#fff0c0"], [1, "#ff8a3a"]]);
-      c.beginPath(); c.moveTo(hx + 30, hy - 30); c.quadraticCurveTo(hx - 40, hy - 50, hx - 80, hy - 6); c.lineTo(hx - 60, hy + 14); c.quadraticCurveTo(hx - 20, hy + 40, hx + 30, hy + 30); c.fill();
-      c.strokeStyle = "#ffe0a0"; c.lineWidth = 4; c.lineCap = "round"; c.beginPath(); c.moveTo(hx, hy - 34); c.quadraticCurveTo(hx + 20, hy - 80, hx + 50, hy - 86); c.moveTo(hx - 70, hy + 6); c.quadraticCurveTo(hx - 100, hy + 30, hx - 110, hy + 60); c.stroke();
-      c.fillStyle = "#3a0a04"; c.beginPath(); c.arc(hx - 30, hy - 14, 5, 0, 7); c.fill();
+    // a second string, farther off, sweeping down across the field behind the lotus:
+    // smaller lanterns in amber and gold, softened by the distance
+    c.strokeStyle = "rgba(20,8,6,.6)"; c.lineWidth = 1.2; c.beginPath();
+    for (let k = 0; k <= 30; k++) { const v = k / 30, sx = lerp(-1050, 1000, v), sy = lerp(-330, -290, v) + Math.sin(v * Math.PI) * 150; k ? c.lineTo(sx, sy) : c.moveTo(sx, sy); }
+    c.stroke();
+    for (let i = 0; i < 17; i++) {
+      const v = (i + .5) / 17, lx = lerp(-1050, 1000, v), ly = lerp(-330, -290, v) + Math.sin(v * Math.PI) * 150 + 26 + Math.sin(t * .9 + i * 1.7) * 2;
+      const col = ["#ffb35a", "#ffd08a", "#ff8a3a", "#ffc86a"][i % 4], fl = .85 + .15 * noise(t * 1.5 + i * 4), r = 17;
+      P.glow(c, lx, ly, 70, col, .22 * fl);
+      const g = c.createRadialGradient(lx - 4, ly - 5, 1, lx, ly, r);
+      g.addColorStop(0, "#fff2d0"); g.addColorStop(.5, rgba(col, fl)); g.addColorStop(1, mix(col, "#4a1206", .65));
+      c.fillStyle = g; c.beginPath(); c.ellipse(lx, ly, r * .82, r, 0, 0, 7); c.fill();
+      c.fillStyle = "#2a1006"; c.fillRect(lx - 7, ly - r - 3, 14, 4); c.fillRect(lx - 7, ly + r - 1, 14, 4);
     }
     // a great lotus lantern, glowing through silk
     const pb = Math.sin(t * .8) * 4;
@@ -1915,133 +1917,107 @@
     P.glow(c, -100, 90, 380, "#4affa0", .05);
   };
 
-  /* 21. "I love you", written on his palm */
+  /* 21. "I love you", traced in light on his palm */
   S.palm = (x) => {
-    const { c, W, H, t } = x;
-    const OY = -60;   // the whole hand sits a little high so the words stay clear of the captions
-    // the open hand: palm up, fingers relaxed and slightly spread, thumb resting out to the left
-    const FING = [[-112, -40, 200, 58, -.15], [-40, -62, 238, 62, -.05], [34, -58, 226, 60, .05], [100, -30, 172, 52, .17]];
-    // a tapered finger along -v, from its base (v = 40) to a rounded tip (v = -len)
-    const fingerShape = (c, bx, by, len, w, a) => {
-      const ca = Math.cos(a), sa = Math.sin(a), P2 = (u, v) => [bx + u * ca - v * sa, by + OY + u * sa + v * ca];
-      const pts = [P2(-w / 2, 40), P2(-w * .5, -len * .45), P2(-w * .42, -len * .82), P2(0, -len), P2(w * .42, -len * .82), P2(w * .5, -len * .45), P2(w / 2, 40)];
-      c.beginPath(); c.moveTo(...pts[0]); c.bezierCurveTo(...pts[1], ...pts[2], ...pts[3]); c.bezierCurveTo(...pts[4], ...pts[5], ...pts[6]); c.closePath();
-    };
-    // each part is filled on its own so overlapping parts never cancel out
-    const handPath = (c, dx = 0, dy = 0) => {
-      for (const [bx, by, len, w, a] of FING) {
-        fingerShape(c, bx + dx, by + dy, len, w, a); c.fill();
+    const { c, W, H, t, m } = x;
+    const tr = YY.lang() === "tr", words = tr ? "seni seviyorum" : "I love you";
+    const TX = 120, TY = -70, SIZE = tr ? 118 : 140, ROT = -.07;     // where the words lie, in stage units
+    const fontOK = !document.fonts || document.fonts.check(`italic 500 ${SIZE}px Cormorant`);
+    // the words, written once into their own canvas; plus, for every column, where the ink sits,
+    // so the fingertip can ride the strokes as it writes
+    if (!m.w || m.w.words !== words || (fontOK && !m.w.fontOK)) {
+      const PX = 2, oc = document.createElement("canvas"), o = oc.getContext("2d");
+      o.font = `italic 500 ${SIZE}px Cormorant, "Cormorant Garamond", Georgia, serif`;
+      const tw = Math.ceil(o.measureText(words).width) + SIZE, th = Math.ceil(SIZE * 1.8);
+      oc.width = tw * PX; oc.height = th * PX;
+      o.scale(PX, PX);
+      P.script(o, words, tw / 2, th / 2, SIZE, "#ffe8c8", 1);
+      o.font = `italic 500 ${SIZE}px Cormorant, "Cormorant Garamond", Georgia, serif`;
+      const inkW = o.measureText(words).width;
+      // per-column centre of the ink (sampled every 4 stage units)
+      const data = o.getImageData(0, 0, oc.width, oc.height).data, cols = [];
+      for (let sx = 0; sx < tw; sx += 4) {
+        let sum = 0, n = 0; const px = Math.min(oc.width - 1, sx * PX);
+        for (let py = 0; py < oc.height; py += 2) if (data[(py * oc.width + px) * 4 + 3] > 150) { sum += py / PX; n++; }
+        cols.push(n ? sum / n : null);
       }
-      // thumb, angled out
-      c.save(); c.translate(-150 + dx, 170 + OY + dy); c.rotate(-.95);
-      c.beginPath(); c.moveTo(-40, 40); c.bezierCurveTo(-44, -60, -36, -150, 0, -176); c.bezierCurveTo(34, -150, 44, -60, 40, 40); c.closePath(); c.fill();
-      c.restore();
-      // palm and wrist
-      const o = (X, Y) => [X + dx, Y + OY + dy];
-      c.beginPath(); c.moveTo(...o(-150, -40)); c.bezierCurveTo(...o(-60, -70), ...o(80, -66), ...o(140, -20));
-      c.bezierCurveTo(...o(170, 60), ...o(168, 220), ...o(130, 330));
-      c.bezierCurveTo(...o(118, 420), ...o(120, 600), ...o(126, 900));
-      c.lineTo(...o(-140, 900));
-      c.bezierCurveTo(...o(-136, 600), ...o(-130, 420), ...o(-128, 330));
-      c.bezierCurveTo(...o(-190, 240), ...o(-196, 120), ...o(-150, -40)); c.closePath(); c.fill();
-    };
-    const tilt = (c) => { c.translate(0, 140 + OY); c.rotate(-.32); c.translate(0, -140 - OY); };
+      m.w = { oc, tw, th, inkW, cols, words, fontOK, x0: tw / 2 - inkW / 2 };
+    }
+    const Wd = m.w;
+    // ---- deep warm darkness: a soft surface far out of focus, warmed by a candle we cannot see ----
     P.layer(x, "bg", (L) => {
       const { c } = L;
-      L.full(); P.fillAll(c, W, H, [[0, "#070404"], [1, "#030202"]]);
+      L.full(); P.fillAll(c, W, H, [[0, "#050202"], [.5, "#0a0504"], [1, "#030101"]]);
       L.stage();
-      // the hospital sheet under his hand, catching a little of the lamp
-      c.fillStyle = P.vgrad(c, 0, -600, 0, 900, [[0, "#0a0808"], [.5, "#1e1816"], [1, "#0a0707"]]); c.fillRect(-1400, -1000, 2800, 2600);
+      // the surface: skin-toned warmth, rising and falling in long soft forms
       const R = rng(66);
-      for (let i = 0; i < 12; i++) {
-        const fx = lerp(-1200, 1200, R()), fy = lerp(-700, 700, R()), len = lerp(300, 800, R()), ang = lerp(-.6, .6, R());
-        c.save(); c.translate(fx, fy); c.rotate(ang);
-        const g = c.createLinearGradient(0, -40, 0, 40);
-        g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(.45, "rgba(0,0,0,.16)"); g.addColorStop(.6, "rgba(255,210,170,.03)"); g.addColorStop(1, "rgba(0,0,0,0)");
-        c.fillStyle = g; c.scale(1, 1); c.beginPath(); c.ellipse(0, 0, len / 2, 40, 0, 0, 7); c.fill(); c.restore();
+      for (let i = 0; i < 9; i++) {
+        const fx = lerp(-500, 700, R()), fy = lerp(-420, 260, R()), rx = lerp(260, 620, R()), ry = rx * lerp(.35, .6, R());
+        c.save(); c.translate(fx, fy); c.rotate(lerp(-.6, .2, R())); c.scale(1, ry / rx);
+        const g = c.createRadialGradient(0, 0, 0, 0, 0, rx);
+        g.addColorStop(0, `rgba(170,94,60,${(.12 + R() * .1).toFixed(3)})`); g.addColorStop(.6, "rgba(110,54,32,.06)"); g.addColorStop(1, "rgba(60,26,14,0)");
+        c.fillStyle = g; c.beginPath(); c.arc(0, 0, rx, 0, 7); c.fill(); c.restore();
       }
-      P.glow(c, 120, -40 + OY, 760, "#ff9a5a", .16);
-      // the hand's shadow on the sheet
-      c.save(); tilt(c); c.globalAlpha = .4; c.fillStyle = "#000000"; handPath(c, -40, 46); c.restore();
-    });
-    P.layer(x, "hand", (L) => {
-      const { c } = L;
-      L.stage(); tilt(c);
-      // 1. the rim: the whole silhouette in warm light
-      c.fillStyle = "#a8684a"; handPath(c);
-      // 2. the body of the hand in shadow, offset away from the lamp so the lit edge remains
-      c.globalCompositeOperation = "source-atop";
-      c.fillStyle = "#170c08"; handPath(c, -3, 7);
-      // 3. lamp light pooled in the cup of the palm (where the words are)
-      const g = c.createRadialGradient(40, 100 + OY, 10, 30, 110 + OY, 250);
-      g.addColorStop(0, "rgba(196,128,92,.85)"); g.addColorStop(.35, "rgba(130,76,52,.6)"); g.addColorStop(.75, "rgba(60,32,22,.3)"); g.addColorStop(1, "rgba(0,0,0,0)");
-      c.fillStyle = g; c.fillRect(-500, -500 + OY, 1000, 1000);
-      // the fleshy pads at the base of the fingers and the thumb, a touch lighter
-      for (const [px, py, r] of [[-100, 0, 46], [-30, -16, 48], [40, -12, 46], [104, 10, 40], [-120, 190, 80]]) {
-        const pg = c.createRadialGradient(px + 10, py + OY - 10, 0, px, py + OY, r);
-        pg.addColorStop(0, "rgba(220,150,110,.22)"); pg.addColorStop(1, "rgba(220,150,110,0)");
-        c.fillStyle = pg; c.fillRect(px - r, py + OY - r, r * 2, r * 2);
+      // a long soft fold of shadow running through it, and a soft lit lip beside it
+      c.save(); c.translate(80, -40); c.rotate(-.42);
+      for (const [oy, col, a, h] of [[0, "0,0,0", .35, 70], [-60, "200,120,80", .06, 50], [150, "0,0,0", .22, 110]]) {
+        const g = c.createLinearGradient(0, oy - h, 0, oy + h);
+        g.addColorStop(0, `rgba(${col},0)`); g.addColorStop(.5, `rgba(${col},${a})`); g.addColorStop(1, `rgba(${col},0)`);
+        c.fillStyle = g; c.fillRect(-1100, oy - h, 2200, h * 2);
       }
-      // each finger is round: lit along its centre, falling off at its sides
-      for (const [bx, by, len, w, a] of FING) {
-        c.save(); fingerShape(c, bx, by, len, w, a); c.clip(); c.translate(bx, by + OY); c.rotate(a);
-        const fg = c.createLinearGradient(-w / 2, 0, w / 2, 0);
-        fg.addColorStop(0, "rgba(10,5,3,.5)"); fg.addColorStop(.4, "rgba(150,90,60,.26)"); fg.addColorStop(.6, "rgba(180,112,78,.32)"); fg.addColorStop(1, "rgba(10,5,3,.45)");
-        c.fillStyle = fg; c.fillRect(-w / 2, -len, w, len - 10);
-        c.restore();
+      c.restore();
+      // the candle itself, far off and blurred into a few discs of light
+      for (const [bx, by, r, a] of [[460, -430, 120, .12], [520, -380, 60, .1], [380, -470, 40, .08], [-420, 300, 160, .05]]) {
+        const g = c.createRadialGradient(bx, by, 0, bx, by, r);
+        g.addColorStop(0, `rgba(255,170,90,${a})`); g.addColorStop(.75, `rgba(255,150,80,${a * .8})`); g.addColorStop(1, "rgba(255,150,80,0)");
+        c.fillStyle = g; c.beginPath(); c.arc(bx, by, r, 0, 7); c.fill();
       }
-      c.save(); c.translate(-150, 170 + OY); c.rotate(-.95);
-      const tg = c.createLinearGradient(-40, 0, 40, 0); tg.addColorStop(0, "rgba(10,5,3,.5)"); tg.addColorStop(.6, "rgba(190,120,84,.3)"); tg.addColorStop(1, "rgba(10,5,3,.4)");
-      c.fillStyle = tg; c.fillRect(-40, -180, 80, 220); c.restore();
-      // fingers curl away into shadow towards their tips; the wrist falls into darkness
-      c.fillStyle = P.vgrad(c, 0, -330 + OY, 0, -60 + OY, [[0, "rgba(8,4,2,.5)"], [1, "rgba(8,4,2,0)"]]); c.fillRect(-500, -400 + OY, 1000, 340);
-      c.fillStyle = P.vgrad(c, 0, 280 + OY, 0, 620 + OY, [[0, "rgba(6,3,2,0)"], [1, "rgba(6,3,2,.96)"]]); c.fillRect(-500, 280 + OY, 1000, 700);
-      // the gaps between fingers: a soft occlusion line
-      c.strokeStyle = "rgba(10,5,3,.6)"; c.lineWidth = 6; c.lineCap = "round";
-      for (const [bx] of [[-76], [-3], [68]]) { c.beginPath(); c.moveTo(bx, -40 + OY); c.lineTo(bx + (bx > 0 ? 6 : -4), -110 + OY); c.stroke(); }
-      // finger joint creases
-      c.lineWidth = 2.2;
-      for (const [bx, by, len, w, a] of FING) {
-        for (const k of [.38, .66]) {
-          const ca = Math.cos(a), sa = Math.sin(a), v = -len * k, u0 = -w * .3, u1 = w * .3;
-          c.strokeStyle = "rgba(20,8,4,.22)";
-          c.beginPath(); c.moveTo(bx + u0 * ca - v * sa, by + OY + u0 * sa + v * ca); c.quadraticCurveTo(bx - (v + 5) * sa, by + OY + (v + 5) * ca, bx + u1 * ca - v * sa, by + OY + u1 * sa + v * ca); c.stroke();
-          c.strokeStyle = "rgba(255,190,140,.0)";
-          c.beginPath(); c.moveTo(bx + u0 * ca - (v + 4) * sa, by + OY + u0 * sa + (v + 4) * ca); c.lineTo(bx + u1 * ca - (v + 4) * sa, by + OY + u1 * sa + (v + 4) * ca); c.stroke();
-        }
-      }
-      // palm lines: heart, head, life, each a crease with a lit lip below it
-      const crease = (pts, a) => {
-        c.strokeStyle = `rgba(30,12,6,${a * .6})`; c.lineWidth = 2.5;
-        c.beginPath(); c.moveTo(pts[0], pts[1] + OY); c.bezierCurveTo(pts[2], pts[3] + OY, pts[4], pts[5] + OY, pts[6], pts[7] + OY); c.stroke();
-        c.strokeStyle = `rgba(255,190,140,${a * .25})`; c.lineWidth = 2;
-        c.beginPath(); c.moveTo(pts[0], pts[1] + OY + 3); c.bezierCurveTo(pts[2], pts[3] + OY + 3, pts[4], pts[5] + OY + 3, pts[6], pts[7] + OY + 3); c.stroke();
-      };
-      crease([150, 40, 60, 20, -40, 40, -110, 20], .55);
-      crease([-150, 70, -60, 80, 40, 110, 120, 150], .45);
-      crease([-120, 40, -150, 150, -120, 260, -60, 330], .55);
-      crease([20, 330, 30, 240, 40, 160, 50, 90], .2);
-      c.globalCompositeOperation = "source-over";
-      // the cuff of a dark knit sleeve at the wrist
-      c.fillStyle = "#0c0807"; c.beginPath(); c.moveTo(-170, 400 + OY); c.bezierCurveTo(-60, 380 + OY, 80, 380 + OY, 170, 396 + OY); c.lineTo(190, 1000); c.lineTo(-190, 1000); c.fill();
-      c.strokeStyle = "rgba(255,170,120,.18)"; c.lineWidth = 2.5; c.beginPath(); c.moveTo(-170, 400 + OY); c.bezierCurveTo(-60, 380 + OY, 80, 380 + OY, 170, 396 + OY); c.stroke();
-      c.strokeStyle = "rgba(0,0,0,.5)"; c.lineWidth = 2; for (let k = 0; k < 14; k++) { c.beginPath(); c.moveTo(-150 + k * 24, 400 + OY); c.lineTo(-156 + k * 25, 470 + OY); c.stroke(); }
+      // falloff to black at the edges
+      L.full();
+      const v = c.createRadialGradient(L.sx(TX), L.sy(TY), L.S * .1, L.sx(TX), L.sy(TY), Math.max(W, H) * .8);
+      v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, "rgba(0,0,0,.75)");
+      c.fillStyle = v; c.fillRect(0, 0, W, H);
     });
     x.stage();
-    // the lamp breathes
-    const br = .9 + .1 * noise(t * .5);
-    c.save(); tilt(c);
-    P.glow(c, 40, 100 + OY, 380, "#ff9a5a", .12 * br);
-    // her words, traced with one finger, glowing on his palm
-    const tr = YY.lang() === "tr", words = tr ? "seni seviyorum" : "I love you";
-    const rev = smooth(1, 5.5, t);
-    c.save(); c.translate(14, 110 + OY); c.rotate(-.06);
-    P.glow(c, 0, 0, 220 * rev + 1, "#ffd59a", .22 * rev);
-    P.script(c, words, 0, 0, tr ? 50 : 62, `rgba(255,232,196,${(.95 * br).toFixed(3)})`, rev);
-    // the fingertip's trail of warmth, a moment behind the writing
-    const tip = Math.min(1, rev * 1.02), tw = (tr ? 50 * 6.6 : 62 * 4.4) / 2;
-    if (rev > 0 && rev < 1) P.glow(c, -tw + tip * tw * 2, Math.sin(t * 9) * 4, 40, "#fff2d8", .5);
-    c.restore(); c.restore();
+    // the candle breathes
+    const br = .85 + .15 * noise(t * .7);
+    P.glow(c, 470, -420, 340, "#ff9a4a", .07 * br);
+    P.glow(c, TX, TY + 10, 620, "#c86a3a", .16 * br);
+    P.glow(c, TX - 40, TY + 60, 300, "#e08a5a", .08 * br);
+    // ---- the words, traced slowly by a fingertip of light ----
+    const rev = smooth(.8, 6.3, t);                      // how much has been written
+    const ink = Wd.x0 + Wd.inkW * rev;                   // the pen, in text-canvas units
+    c.save(); c.translate(TX, TY); c.rotate(ROT); c.translate(-Wd.tw / 2, -Wd.th / 2);
+    const blit = (x0, x1, a) => {
+      if (x1 <= x0 || a <= 0) return;
+      c.save(); c.beginPath(); c.rect(x0, 0, x1 - x0, Wd.th); c.clip();
+      c.globalAlpha = a; c.drawImage(Wd.oc, 0, 0, Wd.tw, Wd.th); c.restore();
+    };
+    // what has been written settles into a warm, breathing glow
+    blit(0, ink, .8 + .2 * br);
+    // the trail: brightest just behind the fingertip, fading back into the settled glow
+    c.save(); c.globalCompositeOperation = "lighter";
+    for (let k = 0; k < 6; k++) blit(ink - (k + 1) * 12, ink - k * 12, .55 * (1 - k / 6));
+    c.restore();
+    if (rev > 0 && rev < 1) {
+      // the fingertip: a small bright point at the end of the stroke, riding the ink
+      const ci = Math.max(0, Math.min(Wd.cols.length - 1, Math.round(ink / 4)));
+      let cy = null; for (let d = 0; d < 6 && cy === null; d++) cy = Wd.cols[ci - d] ?? Wd.cols[ci + d] ?? null;
+      const py = (cy === null ? Wd.th / 2 : cy) + Math.sin(t * 7) * 2;
+      c.save(); c.globalCompositeOperation = "lighter";
+      P.glow(c, ink, py, 120, "#ff9a5a", .22);
+      P.glow(c, ink, py, 36, "#ffe0b0", .7);
+      P.glow(c, ink, py, 10, "#ffffff", .95);
+      // a few warm sparks lifting off where it has just been
+      for (let k = 0; k < 5; k++) {
+        const ph = (t * .9 + k * .2) % 1, sx2 = ink - ph * 50 - k * 6, sy2 = py - ph * 40 + Math.sin(k * 3 + t) * 8;
+        c.fillStyle = `rgba(255,214,160,${(.5 * (1 - ph)).toFixed(3)})`; c.fillRect(sx2, sy2, 2.5, 2.5);
+      }
+      c.restore();
+    }
+    c.restore();
+    // once it is all written, the words keep a faint halo of warmth
+    if (rev >= 1) P.glow(c, TX, TY, 420, "#ffb070", .08 * br);
   };
 
   /* 22. Night shift in the corner of her room */
@@ -2085,13 +2061,27 @@
       c.fillStyle = P.vgrad(c, 0, 250, 0, 700, [[0, "rgba(4,6,14,0)"], [1, "rgba(4,6,14,.85)"]]); c.fillRect(40, 250, 900, 560);
       c.fillStyle = "rgba(210,225,255,.3)"; c.beginPath(); c.moveTo(40, 180); c.bezierCurveTo(150, 120, 300, 150, 400, 130); c.bezierCurveTo(500, 112, 600, 140, 900, 120); c.lineTo(900, 128); c.bezierCurveTo(600, 148, 500, 120, 400, 138); c.bezierCurveTo(300, 158, 150, 128, 40, 188); c.fill();
       // my corner: a chair, a tray table, the laptop
-      c.fillStyle = "#06070a";
-      c.beginPath(); c.roundRect(-640, -140, 190, 300, 18); c.fill();                       // chair back
+      // the chair: a tall back, its far edge caught by the screen's cold light
+      c.fillStyle = P.vgrad(c, -640, 0, -450, 0, [[0, "#05060a"], [.8, "#0c0f18"], [1, "#141a28"]]);
+      c.beginPath(); c.roundRect(-640, -200, 190, 360, 18); c.fill();
       c.fillRect(-660, 140, 260, 40); c.fillRect(-650, 180, 16, 400); c.fillRect(-420, 180, 16, 400);
-      // my jacket over the back of the chair
-      c.fillStyle = P.vgrad(c, -640, 0, -450, 0, [[0, "#1a1210"], [1, "#2a1c16"]]);
-      c.beginPath(); c.moveTo(-650, -130); c.quadraticCurveTo(-545, -160, -450, -130); c.lineTo(-440, 80); c.quadraticCurveTo(-540, 100, -660, 70); c.fill();
-      c.fillStyle = "rgba(120,160,255,.1)"; c.fillRect(-452, -128, 4, 200);
+      c.strokeStyle = "rgba(122,168,255,.45)"; c.lineWidth = 3; c.lineCap = "round";
+      c.beginPath(); c.moveTo(-600, -199); c.lineTo(-470, -199); c.quadraticCurveTo(-451, -199, -451, -180); c.lineTo(-451, 140); c.stroke();
+      c.strokeStyle = "rgba(122,168,255,.3)"; c.lineWidth = 2;
+      c.beginPath(); c.moveTo(-660, 141); c.lineTo(-400, 141); c.moveTo(-405, 180); c.lineTo(-405, 580); c.stroke();
+      // my jacket hung over its back, lower and to the left, a dark gap between the two
+      c.fillStyle = "rgba(0,0,0,.6)"; c.beginPath(); c.moveTo(-652, -150); c.quadraticCurveTo(-560, -172, -488, -146); c.lineTo(-476, 96); c.quadraticCurveTo(-560, 112, -664, 86); c.fill();
+      c.fillStyle = P.vgrad(c, -660, 0, -490, 0, [[0, "#0e0908"], [.65, "#1e140f"], [1, "#2c1e16"]]);
+      c.beginPath(); c.moveTo(-660, -156); c.quadraticCurveTo(-570, -180, -496, -152); c.quadraticCurveTo(-488, -40, -486, 84); c.quadraticCurveTo(-570, 102, -672, 76); c.quadraticCurveTo(-664, -40, -660, -156); c.fill();
+      // its folds and the collar turned over the top
+      c.strokeStyle = "rgba(0,0,0,.22)"; c.lineWidth = 7;
+      for (const fx of [-615, -548]) { c.beginPath(); c.moveTo(fx, -140); c.quadraticCurveTo(fx + 8, -30, fx - 4, 88); c.stroke(); }
+      c.fillStyle = "#0e0907"; c.beginPath(); c.moveTo(-660, -156); c.quadraticCurveTo(-570, -180, -496, -152); c.lineTo(-500, -118); c.quadraticCurveTo(-575, -138, -658, -120); c.fill();
+      // the screen's light along the jacket's own edge: warm brown lit cold
+      c.strokeStyle = "rgba(150,180,240,.35)"; c.lineWidth = 2.5;
+      c.beginPath(); c.moveTo(-498, -150); c.quadraticCurveTo(-490, -40, -488, 82); c.stroke();
+      c.strokeStyle = "rgba(200,170,140,.18)"; c.lineWidth = 2;
+      c.beginPath(); c.moveTo(-656, -158); c.quadraticCurveTo(-570, -182, -498, -154); c.stroke();
       // tray table
       c.fillStyle = P.vgrad(c, 0, LY + 60, 0, LY + 80, [[0, "#2a3040"], [1, "#12161e"]]); c.fillRect(-500, LY + 60, 380, 18);
       c.fillStyle = "#0e1118"; c.fillRect(-320, LY + 78, 16, 520); c.fillRect(-420, LY + 580, 220, 14);
@@ -2131,7 +2121,7 @@
   S.stairs = (x) => {
     const { c, W, H, t, m } = x;
     // a small camera: eye 2m up, looking along the stairs
-    const F = 900, Z0 = 1.6, EYE = 2.0, VX = 40, VY = -175, N = 10, RUN = .3, RISE = .18, HW = .62;
+    const F = 900, Z0 = 1.6, EYE = 2.0, VX = 40, VY = -105, N = 10, RUN = .3, RISE = .18, HW = .62;
     const px = (xw, z) => VX + xw * F / z, py = (h, z) => VY + (EYE - h) * F / z;
     const ZL = Z0 + N * RUN, ZD = ZL + .8, HL = N * RISE;   // landing depth, door wall depth, landing height
     const D0 = px(-.25, ZD), D1 = px(.65, ZD), DT = py(HL + 2.05, ZD), DB = py(HL, ZD);
@@ -2296,6 +2286,41 @@
     // the sun behind the bloom: a breathing warm halo the rose stands against
     const br = .85 + .15 * Math.sin(t * .7);
     P.glow(c, VX + 40, -190, 260, "#ff7a6a", (.14 + .18 * rise) * br);
+    // the rose, built once from YY.Rose.petalPath like js/rose.js: golden-angle petals, dark hearts, lit lips
+    const roseCanvas = () => {
+      if (m.rose) return m.rose;
+      const PX = 3, oc = document.createElement("canvas"); oc.width = oc.height = 200 * PX;
+      const o = oc.getContext("2d"); o.setTransform(PX, 0, 0, PX, 100 * PX, 100 * PX);
+      const R = rng(11), N = 30, GOLDEN = 137.508 * Math.PI / 180, LIGHT = -2.3;
+      // a dim crimson halo the bloom sits in
+      const hg = o.createRadialGradient(0, 0, 0, 0, 0, 96); hg.addColorStop(0, "rgba(91,13,27,.5)"); hg.addColorStop(.6, "rgba(42,5,16,.2)"); hg.addColorStop(1, "rgba(0,0,0,0)");
+      o.fillStyle = hg; o.fillRect(-100, -100, 200, 200);
+      for (let i = 0; i < N; i++) {
+        const tt = i / (N - 1), r = lerp(60, 6, Math.pow(tt, .7)) * lerp(.94, 1.06, R()), w = r * lerp(1, 1.75, tt);
+        const base = r * lerp(.2, .02, tt), ang = i * GOLDEN + (R() - .5) * .2;
+        const facing = Math.pow(.5 + .5 * Math.cos(ang - LIGHT), 1.4), lit = facing * lerp(.7, 1, tt);
+        const path = new Path2D(YY.Rose.petalPath(r, w, 1 - tt));
+        o.save(); o.rotate(ang); o.translate(0, -base);
+        // soft shadow cast on the petals beneath
+        o.save(); o.translate(0, 3); o.scale(1.05, 1.05); o.fillStyle = "rgba(0,0,0,.55)"; o.fill(path); o.restore();
+        const g = o.createRadialGradient(0, r * .1, 0, 0, r * .1, r * 1.12);
+        g.addColorStop(0, "#010001"); g.addColorStop(.5, "#060103"); g.addColorStop(.8, mix("#0d0205", "#2a0510", lit)); g.addColorStop(1, mix("#1c0309", "#6e1426", lit));
+        o.fillStyle = g; o.fill(path);
+        const rg = o.createLinearGradient(0, -r * 1.05, 0, r * .1);
+        rg.addColorStop(0, rgba(mix("#4a0a16", "#f08a96", lit), .35 + .65 * lit)); rg.addColorStop(.3, "rgba(74,10,22,.15)"); rg.addColorStop(.5, "rgba(0,0,0,0)");
+        o.strokeStyle = rg; o.lineWidth = lerp(.7, 1.1, lit); o.stroke(path);
+        o.restore();
+      }
+      // the heart: a tight spiral
+      o.strokeStyle = "rgba(74,12,23,.9)"; o.lineWidth = 1.2; o.lineCap = "round"; o.beginPath();
+      for (let a = 0; a < Math.PI * 5; a += .15) { const rr = (2 + a * 2.1) * .3; o.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+      o.stroke();
+      // a faint rim of light from the upper left over the whole bloom
+      o.globalCompositeOperation = "lighter";
+      const rim = o.createRadialGradient(-10, -14, 0, -10, -14, 90); rim.addColorStop(0, "rgba(255,122,132,.12)"); rim.addColorStop(.5, "rgba(122,16,32,.05)"); rim.addColorStop(1, "rgba(0,0,0,0)");
+      o.fillStyle = rim; o.beginPath(); o.arc(0, 0, 70, 0, 7); o.fill();
+      return (m.rose = oc);
+    };
     // ---- the window, the sill, the vase and the rose: painted once ----
     P.layer(x, "near", (L) => {
       const { c } = L;
@@ -2357,41 +2382,19 @@
         c.restore();
       };
       leaf(VX + 2, 20, -.5, 1); leaf(RX - 2, -40, Math.PI + .45, .85);
-      // sepals
+      // sepals, curling down from under the bloom
       c.fillStyle = "#1a2410";
-      for (const a of [-.9, -.3, .4, 1.0]) { c.save(); c.translate(RX, RY + 44); c.rotate(a); c.beginPath(); c.moveTo(-5, 0); c.quadraticCurveTo(0, 30, 4, 44); c.quadraticCurveTo(6, 20, 5, 0); c.fill(); c.restore(); }
-      // the bloom, back to front: rounded petals of near-black crimson, their thin edges lit through by the sun
-      const petal = (bx, by, w, h, ang, base, edge, rim, rimA) => {
-        c.save(); c.translate(RX + bx, RY + by); c.rotate(ang);
-        const g = c.createLinearGradient(0, 0, 0, -h);
-        g.addColorStop(0, base); g.addColorStop(.75, edge); g.addColorStop(1, mix(edge, "#c8203a", .3));
-        c.fillStyle = g;
-        c.beginPath(); c.moveTo(0, 0); c.bezierCurveTo(-w * .62, -h * .18, -w * .62, -h * .92, -w * .1, -h); c.quadraticCurveTo(0, -h * 1.03, w * .1, -h);
-        c.bezierCurveTo(w * .62, -h * .92, w * .62, -h * .18, 0, 0); c.fill();
-        // the rolled lip at the top of the petal, glowing
-        c.strokeStyle = rgba(rim, rimA * .8); c.lineWidth = 1.6; c.lineCap = "round";
-        c.beginPath(); c.moveTo(-w * .5, -h * .78); c.bezierCurveTo(-w * .4, -h * 1.0, w * .4, -h * 1.0, w * .5, -h * .78); c.stroke();
-        c.strokeStyle = rgba(rim, rimA * .18); c.lineWidth = 4;
-        c.beginPath(); c.moveTo(-w * .42, -h * .84); c.bezierCurveTo(-w * .3, -h * .98, w * .3, -h * .98, w * .42, -h * .84); c.stroke();
-        c.restore();
-      };
-      const B = "#090103";
-      // translucency: the bloom faintly lit from behind
-      const tg = c.createRadialGradient(RX + 10, RY - 40, 0, RX, RY - 30, 90);
-      tg.addColorStop(0, "rgba(160,20,30,.5)"); tg.addColorStop(1, "rgba(160,20,30,0)");
-      c.fillStyle = tg; c.fillRect(RX - 100, RY - 130, 200, 200);
-      petal(-16, 36, 74, 104, -.5, B, "#22030a", "#ff5a50", .5);
-      petal(18, 36, 74, 106, .52, B, "#2a040b", "#ff8a6a", .75);
-      petal(-8, 30, 72, 118, -.16, B, "#26040a", "#ff6a5a", .6);
-      petal(10, 30, 72, 116, .18, B, "#30050c", "#ff9a7a", .8);
-      // the tight heart of the bud
-      petal(0, 8, 40, 84, .05, "#050101", "#1a0206", "#ff7a6a", .55);
-      c.strokeStyle = "rgba(255,90,80,.28)"; c.lineWidth = 1.5;
-      c.beginPath(); c.moveTo(RX - 12, RY - 60); c.bezierCurveTo(RX - 4, RY - 74, RX + 14, RY - 70, RX + 12, RY - 56); c.stroke();
-      // cupped front petals wrapping the heart
-      petal(-18, 46, 66, 86, -.3, "#040101", "#1c0306", "#ff6a5a", .5);
-      petal(20, 46, 66, 84, .32, "#040101", "#220308", "#ff9a7a", .7);
-      petal(0, 54, 96, 62, 0, "#030101", "#160205", "#ff8a6a", .55);
+      for (const a of [-1.1, -.4, .35, 1.05]) { c.save(); c.translate(RX, RY + 22); c.rotate(a); c.beginPath(); c.moveTo(-5, 0); c.quadraticCurveTo(0, 30, 4, 46); c.quadraticCurveTo(6, 20, 5, 0); c.fill(); c.restore(); }
+      // the bloom: the app's own black rose, seen at three-quarter view on its stem
+      const RC = roseCanvas();
+      c.save(); c.translate(RX, RY - 30); c.rotate(-.14); c.scale(1.3, 1.3 * .8);
+      c.drawImage(RC, -100, -100, 200, 200);
+      c.restore();
+      // the sun coming through the thin outer petals on the far side
+      c.save(); c.globalCompositeOperation = "lighter";
+      const bg = c.createRadialGradient(RX + 50, RY - 80, 0, RX + 30, RY - 50, 110);
+      bg.addColorStop(0, "rgba(255,90,70,.22)"); bg.addColorStop(1, "rgba(255,60,50,0)");
+      c.fillStyle = bg; c.fillRect(RX - 120, RY - 170, 260, 240); c.restore();
     });
     x.stage();
     // light raking along the sill, and through the glass

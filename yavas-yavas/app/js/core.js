@@ -46,7 +46,7 @@
   YY.save = () => { try { localStorage.setItem(KEY, JSON.stringify(YY.state)); } catch { /* private mode: progress lives for this visit only */ } };
 
   YY.today = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  YY.preview = new URLSearchParams(location.search).has("preview");
+  YY.preview = new URLSearchParams(location.search).has("preview") || !!window.YY_PREVIEW;
 
   /* ---------------- Language ---------------- */
   YY.ui = {

@@ -1,5 +1,5 @@
 /* Offline: cache every file on install, serve from cache first. Bump VERSION whenever any file changes. */
-const VERSION = "yy-2026-10-15-1";
+const VERSION = "yy-2026-10-15-2";
 const FILES = [
   "./", "index.html", "manifest.webmanifest", "css/app.css",
   "js/core.js", "js/paint.js", "js/rose.js", "js/story.js", "js/cities.js", "js/map.js", "js/main.js",
