@@ -179,11 +179,11 @@
   // browser blocks it, it plays muted instead of stalling. Any failure plays the poster shot instead.
   function leaveVideo() {
     const v = $("#film-video"), f = $("#film");
-    clearTimeout(vidTimer); v.onended = v.onerror = v.onplaying = null;
+    clearTimeout(vidTimer); clearTimeout(vidNext); vidNext = 0; v.onended = v.onerror = v.onplaying = null; v.loop = false;
     v.pause(); v.hidden = true; v.removeAttribute("src"); v.load();
     f.classList.remove("is-video", "vid-ended");
   }
-  let vidTimer = 0;
+  let vidTimer = 0, vidNext = 0;
   function playVideoShot(s) {
     const v = $("#film-video"), f = $("#film");
     cancelAnimationFrame(tickRaf); film.stop();
@@ -194,10 +194,12 @@
     $$("#ticks li").forEach((li, i) => { li.classList.toggle("done", i < shot); li.querySelector("i").style.width = i < shot ? "100%" : "0"; });
     f.classList.remove("is-playing"); void f.offsetWidth; f.classList.add("is-playing");
     const fail = (why) => { console.warn("video shot unavailable, showing the poster", why); leaveVideo(); reel[shot] = { ...s, video: null }; showShot(); };
-    v.hidden = false; v.muted = false; v.src = s.video;
+    v.hidden = false; v.muted = false; v.loop = !!s.loop; v.src = s.video;
     v.onerror = () => fail(v.error);
     v.onended = () => f.classList.add("vid-ended");
-    v.onplaying = () => clearTimeout(vidTimer);
+    // A story chapter's clip loops with its words showing from the start, and moves on after reading time (or on tap).
+    if (s.loop) f.classList.add("vid-ended");
+    v.onplaying = () => { clearTimeout(vidTimer); if (s.loop && !s.cta && !YY.reduceMotion && !vidNext) vidNext = setTimeout(next, readTime(s) * 1000); };
     vidTimer = setTimeout(() => fail("no playback after 10s"), 10000);
     v.play().catch(() => { v.muted = true; return v.play(); }).catch(fail);
   }
@@ -253,6 +255,7 @@
       painter: YY.storyScenes[s.scene] || YY.storyScenes.lake,
       kicker: `${t("story")} · ${i + 1} / ${scenes.length}`, title: L(s.title), text: L(s.text),
       cta: i === last ? (state.storySeen ? t("done") : t("startJourney")) : null,
+      video: s.video || null, loop: true,   // optional per-chapter clip (data/story.json "video"); the painted scene is the fallback
     }));
     playReel(shots, start, () => {
       const first = !state.storySeen;
