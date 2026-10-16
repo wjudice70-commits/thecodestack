@@ -65,6 +65,7 @@ export class Cine {
       end: q(".cine-end"), endKick: q(".cine-end .kicker"), prov: q(".cine-proverb"), trans: q(".cine-trans"), endBtn: q(".cine-end .cta"),
       chip: q(".cine-mode .chip"), modes: q(".cine-modes") };
     this.canvas = q(".cine-canvas");
+    this.canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); if (this.resolve) this.fail(new Error("WebGL context lost")); });
     const phone = Math.min(innerWidth, innerHeight) < 600;
     this.phone = phone;
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: false, powerPreference: "high-performance", preserveDrawingBuffer: !!window.YY_SHOT });
@@ -128,7 +129,8 @@ export class Cine {
     this.opts = opts;
     this.el.hidden = false; document.body.classList.add("in-cine"); this.el.classList.remove("is-in"); requestAnimationFrame(() => this.el.classList.add("is-in"));
     this.resize();
-    this.film = build({ THREE, renderer: this.renderer, mode: opts.mode, lang: opts.lang, text: opts.text, phone: this.phone, post: this.post, size: this.size });
+    try { this.film = build({ THREE, renderer: this.renderer, mode: opts.mode, lang: opts.lang, text: opts.text, phone: this.phone, post: this.post, size: this.size }); }
+    catch (err) { this.el.hidden = true; document.body.classList.remove("in-cine"); throw err; }   // never leave a black cinema over the app
     this.film.camera.aspect = this.size.w / this.size.h; this.film.camera.updateProjectionMatrix();
     this.beats = this.film.beats; let acc = 0;
     for (const b of this.beats) { b.start = acc; acc += b.dur; }
@@ -140,7 +142,16 @@ export class Cine {
     this.t = 0; this.cur = -1; this.paused = !!opts.hold; this.last = performance.now();
     this.ui.end.classList.remove("is-on");
     if (YYreduce()) { this.t = this.stillOf(0); this.paused = true; }
-    return new Promise((res) => { this.resolve = res; this.raf = requestAnimationFrame(this.loop); });
+    return new Promise((res, rej) => { this.resolve = res; this.reject = rej; this.raf = requestAnimationFrame(this.loop); });
+  }
+  // A render error or a lost WebGL context ends the film and rejects, so the caller can play the painted one.
+  fail(err) {
+    cancelAnimationFrame(this.raf);
+    const rej = this.reject; this.resolve = this.reject = null;
+    this.el.hidden = true; document.body.classList.remove("in-cine", "in-film"); this.el.classList.remove("is-in");
+    try { this.film?.dispose?.(); } catch { /* already broken */ }
+    this.film = null; this.beats = null;
+    rej?.(err);
   }
   stillOf(i) { const b = this.beats[i]; return b.start + (b.still ?? b.dur * .62); }
 
@@ -149,7 +160,7 @@ export class Cine {
     if (this.paused && window.YY_SHOT) { this.raf = requestAnimationFrame(this.loop); return; }  // screenshots render on seek only
     if (!this.paused) this.t += dt;
     if (this.t >= this.total) { this.t = this.total - .001; this.paused = true; }
-    this.frame(this.paused ? 0 : dt);
+    try { this.frame(this.paused ? 0 : dt); } catch (err) { return this.fail(err); }
     this.raf = requestAnimationFrame(this.loop);
   };
 

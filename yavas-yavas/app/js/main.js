@@ -156,12 +156,62 @@
     });
   }
 
+  // Character scenes (rigged William and Nesrin). Same rules as the city films: only with WebGL 2, and any
+  // failure (no WebGL, missing model, render error) plays the poster shot instead. Unlocking never waits on this.
+  const hasScene = webgl && !new URLSearchParams(location.search).has("nocine");
+  async function playScene(id, extra = {}) {
+    const mod = await import("./film3d/index.js");
+    return mod.playScene(id, { lang: YY.lang(), mode: "walk", hold: extra.hold });
+  }
+  // A still for the painted player: cover-fit image, slow push-in.
+  function posterPainter(src) {
+    const img = new Image(); img.src = src;
+    return (x) => {
+      const { c, W, H, u } = x; x.full(); c.fillStyle = "#050405"; c.fillRect(0, 0, W, H);
+      if (!img.complete || !img.naturalWidth) return;
+      const k = Math.max(W / img.naturalWidth, H / img.naturalHeight) * (1 + .05 * u), w = img.naturalWidth * k, h = img.naturalHeight * k;
+      c.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+    };
+  }
+
+  /* ---------------- Video shots ---------------- */
+  // A video clip fills the film player. Silent clips autoplay anywhere; if a clip ever has sound and the
+  // browser blocks it, it plays muted instead of stalling. Any failure plays the poster shot instead.
+  function leaveVideo() {
+    const v = $("#film-video"), f = $("#film");
+    clearTimeout(vidTimer); clearTimeout(vidNext); vidNext = 0; v.onended = v.onerror = v.onplaying = null; v.loop = false;
+    v.pause(); v.hidden = true; v.removeAttribute("src"); v.load();
+    f.classList.remove("is-video", "vid-ended");
+  }
+  let vidTimer = 0, vidNext = 0;
+  function playVideoShot(s) {
+    const v = $("#film-video"), f = $("#film");
+    cancelAnimationFrame(tickRaf); film.stop();
+    f.classList.add("is-video"); f.classList.remove("vid-ended");
+    $("#f-kicker").textContent = s.kicker || ""; $("#f-title").textContent = s.title || ""; $("#f-text").textContent = s.text || "";
+    const cta = $("#f-cta"); cta.hidden = !s.cta; if (s.cta) cta.textContent = s.cta;
+    $("#f-hint").textContent = "";
+    $$("#ticks li").forEach((li, i) => { li.classList.toggle("done", i < shot); li.querySelector("i").style.width = i < shot ? "100%" : "0"; });
+    f.classList.remove("is-playing"); void f.offsetWidth; f.classList.add("is-playing");
+    const fail = (why) => { console.warn("video shot unavailable, showing the poster", why); leaveVideo(); reel[shot] = { ...s, video: null }; showShot(); };
+    v.hidden = false; v.muted = false; v.loop = !!s.loop; v.src = s.video;
+    v.onerror = () => fail(v.error);
+    v.onended = () => f.classList.add("vid-ended");
+    // A story chapter's clip loops with its words showing from the start, and moves on after reading time (or on tap).
+    if (s.loop) f.classList.add("vid-ended");
+    v.onplaying = () => { clearTimeout(vidTimer); if (s.loop && !s.cta && !YY.reduceMotion && !vidNext) vidNext = setTimeout(next, readTime(s) * 1000); };
+    vidTimer = setTimeout(() => fail("no playback after 10s"), 10000);
+    v.play().catch(() => { v.muted = true; return v.play(); }).catch(fail);
+  }
+
   function showShot() {
     const s = reel[shot], f = $("#film");
-    if (s.cine != null) {
+    leaveVideo();
+    if (s.video) return playVideoShot(s);
+    if (s.cine != null || s.scene) {
       cancelAnimationFrame(tickRaf); film.stop(); f.classList.add("is-cine");
-      playCine(s.cine).then((r) => { f.classList.remove("is-cine"); film.start(); r === "closed" ? endReel() : next(); })
-        .catch((err) => { console.warn("3D film unavailable, playing the painted one", err); f.classList.remove("is-cine"); film.start(); reel[shot] = { ...s, cine: null }; showShot(); });
+      (s.scene ? playScene(s.scene) : playCine(s.cine)).then((r) => { f.classList.remove("is-cine"); film.start(); r === "closed" ? endReel() : next(); })
+        .catch((err) => { console.warn("3D film unavailable, playing the painted one", err); f.classList.remove("is-cine"); film.start(); reel[shot] = { ...s, cine: null, scene: null }; showShot(); });
       return;
     }
     film.show(s.painter, s.dur || readTime(s));
@@ -189,7 +239,7 @@
   function next() { if (shot < reel.length - 1) { shot++; showShot(); } else endReel(); }
   function back() { if (shot > 0) { shot--; showShot(); } else showShot(); }
   function endReel() {
-    cancelAnimationFrame(tickRaf);
+    cancelAnimationFrame(tickRaf); leaveVideo();
     const f = $("#film"); f.classList.remove("is-in");
     const cb = onReelEnd; onReelEnd = null;
     setTimeout(() => {
@@ -205,6 +255,7 @@
       painter: YY.storyScenes[s.scene] || YY.storyScenes.lake,
       kicker: `${t("story")} · ${i + 1} / ${scenes.length}`, title: L(s.title), text: L(s.text),
       cta: i === last ? (state.storySeen ? t("done") : t("startJourney")) : null,
+      video: s.video || null, loop: true,   // optional per-chapter clip (data/story.json "video"); the painted scene is the fallback
     }));
     playReel(shots, start, () => {
       const first = !state.storySeen;
@@ -226,6 +277,12 @@
       kicker: `${i === stops.length - 1 ? t("home") : t("arrived")} · ${t("stop", i + 1, stops.length)}`,
       title: s.name, text: L(s.line), cta: t("close"),
     });
+    // İstanbul ends with the bench clip (Michael sits, Nesrin rests her head on his shoulder), after the whole film.
+    if (s.id === "istanbul") shots.push({
+      video: "videos/istanbul-bench.mp4",
+      painter: posterPainter("videos/istanbul-bench-poster.jpg"),
+      kicker: "İstanbul", title: L({ tr: "Yan yana", en: "Side by side" }), text: L({ tr: "Yavaş yavaş, biz olduk.", en: "Slowly, slowly, it became us." }), cta: t("close"),
+    });
     return shots;
   }
 
@@ -239,7 +296,7 @@
     if (!$("#film").hidden) { reel = shots; shot = 0; onReelEnd = null; $("#ticks").innerHTML = shots.length > 1 ? shots.map(() => "<li><i></i></li>").join("") : ""; $("#film").classList.add("is-in"); showShot(); }
     else playReel(shots);
   }
-  function endIfOpen() { if (!$("#film").hidden) { $("#film").hidden = true; film.stop(); document.body.classList.remove("in-film"); $("#tabs").classList.add("is-on"); $("#lang").classList.add("is-on"); } }
+  function endIfOpen() { if (!$("#film").hidden) { leaveVideo(); $("#film").hidden = true; film.stop(); document.body.classList.remove("in-film"); $("#tabs").classList.add("is-on"); $("#lang").classList.add("is-on"); } }
 
   /* ---------------- Home ---------------- */
   function setHomeCta() {
@@ -300,10 +357,12 @@
     });
 
     if (YY.preview) {
-      window.YYdebug = { playStory, playReel, arrivalShots, go, addSteps, progress, playCine };
+      window.YYdebug = { playStory, playReel, arrivalShots, go, addSteps, progress, playCine, playScene };
       // ?preview&cine=istanbul&mode=run opens a city's 3D film straight away.
       const qs = new URLSearchParams(location.search), cid = qs.get("cine");
-      if (cid) { const i = D.stops.stops.findIndex(x => x.id === cid); if (i >= 0) { state.storySeen = true; state.seenStop = Math.max(state.seenStop, D.stops.stops.length); playCine(i, { mode: qs.get("mode"), hold: qs.has("hold") }); } }
+      // ?preview&cine=istanbul-bench opens the bench scene straight away (add &hold to pause on the first frame).
+      if (cid === "istanbul-bench") { state.storySeen = true; state.seenStop = Math.max(state.seenStop, D.stops.stops.length); playScene(cid, { hold: qs.has("hold") }).catch((e) => console.warn("bench scene failed", e)); }
+      else if (cid) { const i = D.stops.stops.findIndex(x => x.id === cid); if (i >= 0) { state.storySeen = true; state.seenStop = Math.max(state.seenStop, D.stops.stops.length); playCine(i, { mode: qs.get("mode"), hold: qs.has("hold") }); } }
       const bar = $("#preview-bar"); bar.hidden = false;
       bar.addEventListener("click", (e) => {
         const b = e.target.closest("button"); if (!b) return;
