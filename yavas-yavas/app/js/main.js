@@ -174,8 +174,38 @@
     };
   }
 
+  /* ---------------- Video shots ---------------- */
+  // A video clip fills the film player. Silent clips autoplay anywhere; if a clip ever has sound and the
+  // browser blocks it, it plays muted instead of stalling. Any failure plays the poster shot instead.
+  function leaveVideo() {
+    const v = $("#film-video"), f = $("#film");
+    clearTimeout(vidTimer); v.onended = v.onerror = v.onplaying = null;
+    v.pause(); v.hidden = true; v.removeAttribute("src"); v.load();
+    f.classList.remove("is-video", "vid-ended");
+  }
+  let vidTimer = 0;
+  function playVideoShot(s) {
+    const v = $("#film-video"), f = $("#film");
+    cancelAnimationFrame(tickRaf); film.stop();
+    f.classList.add("is-video"); f.classList.remove("vid-ended");
+    $("#f-kicker").textContent = s.kicker || ""; $("#f-title").textContent = s.title || ""; $("#f-text").textContent = s.text || "";
+    const cta = $("#f-cta"); cta.hidden = !s.cta; if (s.cta) cta.textContent = s.cta;
+    $("#f-hint").textContent = "";
+    $$("#ticks li").forEach((li, i) => { li.classList.toggle("done", i < shot); li.querySelector("i").style.width = i < shot ? "100%" : "0"; });
+    f.classList.remove("is-playing"); void f.offsetWidth; f.classList.add("is-playing");
+    const fail = (why) => { console.warn("video shot unavailable, showing the poster", why); leaveVideo(); reel[shot] = { ...s, video: null }; showShot(); };
+    v.hidden = false; v.muted = false; v.src = s.video;
+    v.onerror = () => fail(v.error);
+    v.onended = () => f.classList.add("vid-ended");
+    v.onplaying = () => clearTimeout(vidTimer);
+    vidTimer = setTimeout(() => fail("no playback after 10s"), 10000);
+    v.play().catch(() => { v.muted = true; return v.play(); }).catch(fail);
+  }
+
   function showShot() {
     const s = reel[shot], f = $("#film");
+    leaveVideo();
+    if (s.video) return playVideoShot(s);
     if (s.cine != null || s.scene) {
       cancelAnimationFrame(tickRaf); film.stop(); f.classList.add("is-cine");
       (s.scene ? playScene(s.scene) : playCine(s.cine)).then((r) => { f.classList.remove("is-cine"); film.start(); r === "closed" ? endReel() : next(); })
@@ -207,7 +237,7 @@
   function next() { if (shot < reel.length - 1) { shot++; showShot(); } else endReel(); }
   function back() { if (shot > 0) { shot--; showShot(); } else showShot(); }
   function endReel() {
-    cancelAnimationFrame(tickRaf);
+    cancelAnimationFrame(tickRaf); leaveVideo();
     const f = $("#film"); f.classList.remove("is-in");
     const cb = onReelEnd; onReelEnd = null;
     setTimeout(() => {
@@ -244,10 +274,10 @@
       kicker: `${i === stops.length - 1 ? t("home") : t("arrived")} · ${t("stop", i + 1, stops.length)}`,
       title: s.name, text: L(s.line), cta: t("close"),
     });
-    // Trial: İstanbul also gets the bench scene with the 3D William and Nesrin.
+    // İstanbul ends with the bench clip (Michael sits, Nesrin rests her head on his shoulder), after the whole film.
     if (s.id === "istanbul") shots.push({
-      scene: hasScene ? "istanbul-bench" : null,
-      painter: posterPainter("models/istanbul-bench-poster.jpg"),
+      video: "videos/istanbul-bench.mp4",
+      painter: posterPainter("videos/istanbul-bench-poster.jpg"),
       kicker: "İstanbul", title: L({ tr: "Yan yana", en: "Side by side" }), text: L({ tr: "Yavaş yavaş, biz olduk.", en: "Slowly, slowly, it became us." }), cta: t("close"),
     });
     return shots;
@@ -263,7 +293,7 @@
     if (!$("#film").hidden) { reel = shots; shot = 0; onReelEnd = null; $("#ticks").innerHTML = shots.length > 1 ? shots.map(() => "<li><i></i></li>").join("") : ""; $("#film").classList.add("is-in"); showShot(); }
     else playReel(shots);
   }
-  function endIfOpen() { if (!$("#film").hidden) { $("#film").hidden = true; film.stop(); document.body.classList.remove("in-film"); $("#tabs").classList.add("is-on"); $("#lang").classList.add("is-on"); } }
+  function endIfOpen() { if (!$("#film").hidden) { leaveVideo(); $("#film").hidden = true; film.stop(); document.body.classList.remove("in-film"); $("#tabs").classList.add("is-on"); $("#lang").classList.add("is-on"); } }
 
   /* ---------------- Home ---------------- */
   function setHomeCta() {

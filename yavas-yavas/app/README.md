@@ -31,3 +31,9 @@ It's a static folder: drag `app/` onto Netlify (or point a Netlify site at `yava
 - It plays as an extra shot after the İstanbul arrival film. Unlocking İstanbul never waits on it: if WebGL 2 is missing, a model fails to load, or rendering errors, the poster `models/istanbul-bench-poster.jpg` shows instead.
 - Open it straight away: `?preview&cine=istanbul-bench` (add `&hold` to pause on the first frame). `?nocine` forces the poster.
 - Replace the poster whenever the scene changes. It is a screenshot of the scene with the captions hidden.
+
+## İstanbul bench clip (video)
+- `videos/istanbul-bench.mp4` is two Kling clips joined (Michael sits, Nesrin rests her head on his shoulder), 720 wide, about 1.2 MB, no audio track. It plays after the whole İstanbul film. Nothing in the film was removed.
+- It autoplays with no tap (silent video is always allowed). If a clip ever has sound and the browser blocks it, it plays muted. If the file is missing or won't play, `videos/istanbul-bench-poster.jpg` shows instead; unlocking never depends on it.
+- To make more: encode with `ffmpeg -i in.mp4 -an -vf scale=720:-2 -c:v libx264 -crf 25 -movflags +faststart out.mp4` (the `faststart` flag lets it start playing before it finishes loading). Cropping the bottom 6% removes the Kling watermark. Add the files to `sw.js` and bump `VERSION`.
+- `sw.js` answers byte-range requests from the cache, which Safari needs to play cached video.
