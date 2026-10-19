@@ -1,3 +1,3 @@
-William's real photos for the polaroids on the park bench at the end of each city film.
-Name them <city>-1.jpg, <city>-2.jpg, <city>-3.jpg (for example istanbul-1.jpg). Square crops look best, about 800x800.
-Until a photo is here, its polaroid shows the black rose instead. After adding photos, bump VERSION in sw.js.
+Photos for the letters (see HOW-TO-UPDATE.md). The storybook city films don't use photos any more:
+each city's bench scene is the clip in films/bench-<city>.mp4.
+After adding photos, bump VERSION in sw.js.

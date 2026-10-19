@@ -261,3 +261,9 @@ svg { display: block; }
 .cine-end .cta { margin-top: 22px; }
 @media (prefers-reduced-motion: reduce) { .cine, .cine-end, .cine-scrap { transition: none; } .cine-cap.is-on > * { animation: none; opacity: 1; translate: 0 0; } }
 body.in-cine .preview-bar { display: none !important; }
+/* Storybook films: the bench clip is portrait. On a phone it fills the screen; on wider screens it stands
+   in the middle with its edges dissolving into the painted night behind it. */
+.book { overflow: hidden; }
+.book-video { position: absolute; top: 0; left: 50%; height: 100%; width: auto; aspect-ratio: 9 / 16; translate: -50% 0; object-fit: cover; z-index: 0; opacity: 0; pointer-events: none; display: none; }
+.book.is-video .book-video { display: block; }
+@media (min-aspect-ratio: 9/16) { .book-video { -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); } }

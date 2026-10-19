@@ -19,7 +19,7 @@ A gift for Nesrin: an offline web app (plain HTML, CSS and JS, no build step) th
 
 ## Files
 - `data/*.json`: every word in the app (story, stops, letters, notes, wins). See HOW-TO-UPDATE.md.
-- `js/rose.js` the rose, `js/story.js` story paintings, `js/cities.js` city and milestone films, `js/map.js` the map, `js/paint.js` the painting kit and film player, `js/main.js` wiring.
+- `js/rose.js` the rose, `js/story.js` story paintings, `js/cities.js` city and milestone films, `js/map.js` the map, `js/paint.js` the painting kit and film player, `js/main.js` wiring. `js/storybook/` the watercolor city films (the painter, the 15 city recipes, Nesrin's silhouette and the player), `films/` the bench clip for each city (rebuild with `../tools/bench`).
 - `sw.js` caches every file for offline use. **Bump `VERSION` in sw.js whenever you change any file**, or her phone keeps the old copy.
 
 ## Deploying

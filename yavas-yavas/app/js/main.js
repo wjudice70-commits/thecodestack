@@ -137,10 +137,9 @@
     showShot();
   }
 
-  /* ---------------- 3D city films ---------------- */
-  // Loaded only when needed. Without WebGL 2 the painted film plays instead.
-  const webgl = (() => { try { return !!document.createElement("canvas").getContext("webgl2"); } catch { return false; } })();
-  const hasCine = (id) => webgl && !!D.films?.[id]?.text && !new URLSearchParams(location.search).has("nocine");
+  /* ---------------- Storybook city films ---------------- */
+  // Watercolor films with the bench clip, loaded only when needed. ?nocine plays the painted film instead.
+  const hasCine = (id) => !!D.films?.[id]?.text && !new URLSearchParams(location.search).has("nocine");
   const STAGE_MODE = { wheelchair: "wheelchair", walker: "walker", crutches: "crutches", free: "run" };
   function cineMode(i) {
     const stage = D.stops.stops[i].stage, m = state.mobility;
@@ -148,7 +147,7 @@
   }
   async function playCine(i, extra = {}) {
     const s = D.stops.stops[i], md = D.films.modes;
-    const mod = await import("./film3d/index.js");
+    const mod = await import("./storybook/index.js");
     return mod.play(s.id, {
       lang: YY.lang(), mode: extra.mode || cineMode(i), name: s.name, stopNo: i + 1, stops: D.stops.stops.length, data: D.films[s.id], hold: extra.hold,
       modes: { label: L(md.label), names: Object.fromEntries(Object.entries(md.names).map(([k, v]) => [k, L(v)])) },
@@ -161,7 +160,7 @@
     if (s.cine != null) {
       cancelAnimationFrame(tickRaf); film.stop(); f.classList.add("is-cine");
       playCine(s.cine).then((r) => { f.classList.remove("is-cine"); film.start(); r === "closed" ? endReel() : next(); })
-        .catch((err) => { console.warn("3D film unavailable, playing the painted one", err); f.classList.remove("is-cine"); film.start(); reel[shot] = { ...s, cine: null }; showShot(); });
+        .catch((err) => { console.warn("Storybook film unavailable, playing the painted one", err); f.classList.remove("is-cine"); film.start(); reel[shot] = { ...s, cine: null }; showShot(); });
       return;
     }
     film.show(s.painter, s.dur || readTime(s));
@@ -301,7 +300,7 @@
 
     if (YY.preview) {
       window.YYdebug = { playStory, playReel, arrivalShots, go, addSteps, progress, playCine };
-      // ?preview&cine=istanbul&mode=run opens a city's 3D film straight away.
+      // ?preview&cine=istanbul&mode=run opens a city's storybook film straight away.
       const qs = new URLSearchParams(location.search), cid = qs.get("cine");
       if (cid) { const i = D.stops.stops.findIndex(x => x.id === cid); if (i >= 0) { state.storySeen = true; state.seenStop = Math.max(state.seenStop, D.stops.stops.length); playCine(i, { mode: qs.get("mode"), hold: qs.has("hold") }); } }
       const bar = $("#preview-bar"); bar.hidden = false;

@@ -1,0 +1,23 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0;background:#000">
+<canvas id="c"></canvas>
+<script src="../app/js/core.js"></script>
+<script type="module">
+import { buildLayers, buildBench, W, H } from "../app/js/storybook/scene.js";
+import { CITIES } from "../app/js/storybook/cities.js";
+const q = new URLSearchParams(location.search), id = q.get("city") || "istanbul", mode = q.get("mode") || "pano";
+const cv = document.getElementById("c"), c = cv.getContext("2d");
+const t0 = performance.now();
+if (mode === "bench") {
+  const b = buildBench(CITIES[id], 720, 1280); cv.width = 720; cv.height = 1280; c.drawImage(b, 0, 0);
+} else {
+  const k = +(q.get("k") || .6), L = buildLayers(CITIES[id], k);
+  cv.width = W * k; cv.height = H * k;
+  for (const n of ["sky", "far", "mid", "near"]) c.drawImage(L[n], 0, 0);
+}
+document.title = "done " + Math.round(performance.now() - t0);
+</script>
+<script type="module">
+// paper over the finished frame, as the film does
+import { paper } from "../app/js/storybook/wash.js";
+setTimeout(() => { const c = document.getElementById("c").getContext("2d"); c.save(); c.globalCompositeOperation = "overlay"; c.globalAlpha = .5; c.fillStyle = c.createPattern(paper(), "repeat"); c.fillRect(0, 0, 1e4, 1e4); c.restore(); }, 0);
+</script>
