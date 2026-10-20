@@ -32,6 +32,7 @@ Get the site live on Netlify and turn visitors into quote requests. Revenue come
 
 ## Status
 - Done: image prompts (v2), overlay assets, static site built (home, services, process, about, quote form with Netlify Forms, thanks, 404)
+- Videos (from Drive 'Summit Spaces' folder, compressed in `assets/video/`): hero house-to-mountain line drawing, modular concrete construct (promise), materials (services), B&W workshop (CTA). Not used (off the matte-black standard): door, logo reveal, floating-house clips. Large stock clips in Drive 'Website Assets' not pulled.
 - Placeholder: no photos yet (new business). Using CSS gradients, blueprint overlays and an SVG house-with-lit-window on the CTA; the 5 hero images from the kit live in Wix, not Drive
 - To do: service area + license wording, real photos (v2 prompts or job photos), privacy policy, deploy to Netlify and confirm the form works, Google Business Profile, analytics, domain
 
