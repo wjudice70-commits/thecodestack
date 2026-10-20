@@ -16,7 +16,8 @@ export async function play(id, opts) {
     kicker: `${L({ tr: "Vardın", en: "You arrived" })} · ${L({ tr: `Durak ${n} / ${of}`, en: `Stop ${n} of ${of}` })}`,
     endKicker: L({ tr: `${opts.name} atasözü`, en: `${opts.name} proverb` }),
     proverb: prov.tr.join(" "), trans: lang === "en" ? prov.en : "", cta: L({ tr: "Devam", en: "Continue" }),
-    bench: `films/bench-${id}.mp4`,
+    bench: window.YY_BENCH_SRC || `films/bench-${id}.mp4`,
+    benchAnime: `films/bench-${id}-anime.jpg`, benchPoster: `films/bench-${id}-poster.jpg`,
   };
   book ||= new Book();
   window.YYcine = book;

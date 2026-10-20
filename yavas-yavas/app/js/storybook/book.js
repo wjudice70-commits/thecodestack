@@ -1,13 +1,18 @@
-/* Yavaş Yavaş storybook film player. One canvas, four watercolor sheets, Nesrin's silhouette,
+/* Yavaş Yavaş storybook film player. One canvas, the city as four sliding sheets, Nesrin's silhouette,
    and the bench clip as a real video. Same captions, ticks, tap zones and mode chip as before.
-   Beats: the hill · the city paints itself · four moments as she explores · the bench · the proverb. */
+   Beats: the hill · the city paints itself in watercolor · four moments as she explores, while waves of
+   royal light sweep across and repaint the city, first as an anime dusk, then as night · the arrival,
+   where the clip's own first frame blooms in and a gold wave turns it real · the bench clip · the proverb. */
 import * as Wc from "./wash.js";
-import { buildLayers, painter, W, H } from "./scene.js";
+import { buildLayers, painter, reflect, W, H } from "./scene.js";
+import { buildAnime } from "./anime.js";
 import { figure, STRIDE, CADENCE } from "./figure.js";
 const { clamp, smooth, lerp, rng } = YY;
 const reduce = () => !!(window.YY && YY.reduceMotion);
 const easeFilm = (t) => { t = clamp(t); return 1 - Math.pow(1 - t, 3); };
 const PAR = { sky: .12, far: .3, mid: .58, near: 1 };
+// The colours a wave of change is made of: amethyst, sapphire, rose, gold and pearl.
+const ROYAL = ["#7b4dff", "#3d6bff", "#ff5fa8", "#ffd27a", "#fff6e8"];
 
 export class Book {
   constructor() {
@@ -65,7 +70,12 @@ export class Book {
     const key = `${this.cityId}@${k.toFixed(2)}`;
     this.L = this.cache[key] ||= buildLayers(this.city, k);
     this.hill = this.cache[key + "hill"] ||= this.paintHill(k);
+    this.sk = { key, k };
+    // the anime dusk and night are needed from the second moment on: paint them while the hill plays
+    clearTimeout(this.pre); this.pre = setTimeout(() => { this.A; this.pre = setTimeout(() => this.N, 300); }, 600);
   }
+  get A() { const { key, k } = this.sk; return this.cache[key + "A"] ||= buildAnime(this.city, k, reflect); }
+  get N() { const { key, k } = this.sk; return this.cache[key + "N"] ||= buildAnime(this.city, k, reflect, true); }
   // The hill she climbs before the city: one dark wash with a bright crest.
   paintHill(k) {
     const cv = Wc.canvas(W * k, H * k), c = cv.getContext("2d"); c.scale(k, k);
@@ -87,6 +97,8 @@ export class Book {
     this.paint();
     requestAnimationFrame(() => this.el.classList.add("is-in"));
     this.video.src = data.bench; this.video.load();
+    const img = (src) => { if (!src) return null; const i = new Image(); i.decoding = "async"; i.src = src; return i; };
+    this.still = { anime: img(data.benchAnime), real: img(data.benchPoster) };
     this.beats = this.makeBeats();
     let acc = 0; for (const b of this.beats) { b.start = acc; acc += b.dur; }
     this.total = acc;
@@ -116,9 +128,12 @@ export class Book {
       cap: { kicker: `${i + 1} / ${clips.length}`, title: L(cl.title), text: L(cl.text) }, hand: true,
       draw: (lt, k) => this.drawWalk(spots[i] - 260, spots[i] + 40, lt / 6.5, i, lt),
     }));
-    // 4. The bench clip
-    beats.push({ dur: 10.1, video: true, cap: { kicker: L(d.text.benchTitle), text: L(d.text.bench) }, draw: (lt) => this.drawBench(lt) });
-    // 5. The proverb
+    // 4. Arrival: the clip's first frame blooms in, then a gold wave turns the painting into the clip
+    const benchCap = { kicker: L(d.text.benchTitle), text: L(d.text.bench) };
+    beats.push({ dur: 4.6, fadeIn: 0, fadeOut: 0, cap: benchCap, draw: (lt) => this.drawArrive(lt), clean: (lt) => smooth(3.4, 4.5, lt) });
+    // 5. The bench clip
+    beats.push({ dur: 10.1, join: true, keepCap: true, fadeIn: 0, video: true, cap: benchCap, draw: (lt) => this.drawBench(lt) });
+    // 6. The proverb
     beats.push({ dur: 9, still: 8.9, end: { kicker: d.endKicker, proverb: d.proverb, trans: d.trans, cta: d.cta }, draw: (lt, k) => this.drawEnd(lt, k) });
     return beats;
   }
@@ -130,25 +145,88 @@ export class Book {
     const k = img.width / W, vw = this.view.w / z, vh = this.view.h / z;
     const cxf = W / 2 + (cam - W / 2) * f;
     const sx = clamp(cxf - vw / 2, 0, W - vw), sy = (H - vh) * .5 + yOff;
-    this.c.globalAlpha = alpha;
-    this.c.drawImage(img, sx * k, sy * k, vw * k, vh * k, 0, 0, this.canvas.width, this.canvas.height);
-    this.c.globalAlpha = 1;
+    const g = this.g || this.c;
+    g.globalAlpha = alpha;
+    g.drawImage(img, sx * k, sy * k, vw * k, vh * k, 0, 0, this.canvas.width, this.canvas.height);
+    g.globalAlpha = 1;
   }
   toScreen(x, y, cam, z = 1, f = 1) {
     const vw = this.view.w / z, vh = this.view.h / z, cxf = W / 2 + (cam - W / 2) * f;
     const sx = clamp(cxf - vw / 2, 0, W - vw), sy = (H - vh) * .5;
     return [(x - sx) * this.S * z, (y - sy) * this.S * z, this.S * z];
   }
-  layers(cam, z, o = {}) {
-    const L = this.L;
+  layers(cam, z, o = {}, L = this.L) {
     this.sheet(L.sky, PAR.sky, cam, z);
     this.rays(cam);
     this.sheet(L.far, PAR.far, cam, z, 0, o.far ?? 1);
     this.sheet(L.mid, PAR.mid, cam, z, o.midY || 0, o.mid ?? 1);
   }
+  // The whole city in one style, or two styles split by a wave sweeping left to right (w: 0..1).
+  // `mid` draws between the city and the near sheet (the memory glow); her figure goes on top after.
+  world(cam, z, st, mid) {
+    const draw = (S) => { this.layers(cam, z, {}, S); mid?.(); this.sheet(S.near, PAR.near, cam, z); };
+    const w = st.b ? st.w : 0;
+    if (w >= 1) return draw(st.b);
+    draw(st.a);
+    if (w <= 0) return;
+    const cw = this.canvas.width, ch = this.canvas.height;
+    this.off ||= Wc.canvas(cw, ch); if (this.off.width !== cw || this.off.height !== ch) { this.off.width = cw; this.off.height = ch; }
+    const o = this.off.getContext("2d");
+    o.globalCompositeOperation = "source-over"; o.clearRect(0, 0, cw, ch);
+    this.g = o; draw(st.b); this.g = null;
+    o.globalCompositeOperation = "destination-in"; o.fillStyle = "#000"; this.wavePath(o, w, st.seed || 1, true); o.fill();
+    o.globalCompositeOperation = "source-over";
+    this.c.drawImage(this.off, 0, 0);
+    this.waveFront(w, st.seed || 1, st.cols || ROYAL);
+  }
+  // The leading edge of a wave: a tilted, breathing, paint-ragged line. closed=true closes it on the left.
+  wavePath(c, w, seed, closed) {
+    const cw = this.canvas.width, ch = this.canvas.height, t = reduce() ? 0 : this.clock, n = 28;
+    const X = lerp(-.3, 1.3, w) * cw;
+    c.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const v = i / n, y = lerp(-.05, 1.05, v) * ch;
+      const x = X + (v - .5) * cw * .1 + Math.sin(v * 5 + seed + t * 1.3) * cw * .04 + Math.sin(v * 13 + seed * 3 - t * 2.1) * cw * .014 + Math.sin(v * 37 + seed) * cw * .005;
+      if (closed && !i) { c.moveTo(-10, -.05 * ch); c.lineTo(x, y); } else c[i ? "lineTo" : "moveTo"](x, y);
+    }
+    if (closed) { c.lineTo(-10, 1.05 * ch); c.closePath(); }
+  }
+  waveFront(w, seed, cols) {
+    const c = this.c, s = this.S, t = reduce() ? 0 : this.clock, life = Math.sin(clamp(w) * Math.PI);
+    c.save(); c.globalCompositeOperation = "lighter"; c.lineJoin = "round"; c.lineCap = "round";
+    [[110, cols[0], .14], [50, cols[1], .22], [20, cols[2], .34], [7, cols[3], .55], [2, cols[4], .7]].forEach(([lw, col, a], j) => {
+      c.save(); c.translate(-j * 4 * s, 0); c.strokeStyle = col; c.shadowColor = col; c.shadowBlur = lw * s * .8; c.globalAlpha = a * (.4 + .6 * life);
+      c.lineWidth = lw * s; this.wavePath(c, w, seed, false); c.stroke(); c.restore();
+    });
+    // sparks thrown off the crest
+    const R = rng(seed * 7), cw = this.canvas.width, ch = this.canvas.height, X = lerp(-.3, 1.3, w) * cw;
+    for (let i = 0; i < 70; i++) {
+      const v = R(), y = v * ch, ph = (R() + t * lerp(.3, .9, R())) % 1;
+      const x = X + (v - .5) * cw * .1 + Math.sin(v * 5 + seed + t * 1.3) * cw * .04 - ph * lerp(40, 160, R()) * s;
+      c.globalAlpha = (1 - ph) * .9 * life; c.fillStyle = cols[i % cols.length];
+      c.beginPath(); c.arc(x, y - ph * 30 * s, lerp(.8, 2.6, R()) * s, 0, 6.283); c.fill();
+    }
+    c.restore();
+  }
+  // Where the clip sits on screen (the video element's box), in canvas pixels.
+  clipRect() { const h = this.canvas.height, w = h * 9 / 16; return [(this.canvas.width - w) / 2, 0, w, h]; }
+  drawStill(img, mask) {
+    if (!img?.complete || !img.naturalWidth) return false;
+    const [x, y, w, h] = this.clipRect(), cw = this.canvas.width, ch = this.canvas.height;
+    this.tmp2 ||= Wc.canvas(cw, ch); if (this.tmp2.width !== cw || this.tmp2.height !== ch) { this.tmp2.width = cw; this.tmp2.height = ch; }
+    const t = this.tmp2.getContext("2d");
+    t.globalCompositeOperation = "source-over"; t.clearRect(0, 0, cw, ch); t.drawImage(img, x, y, w, h);
+    if (w < cw) { // wide screens: the same feathered sides as the video
+      const g = t.createLinearGradient(x, 0, x + w, 0); g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(.12, "#000"); g.addColorStop(.88, "#000"); g.addColorStop(1, "rgba(0,0,0,0)");
+      t.globalCompositeOperation = "destination-in"; t.fillStyle = g; t.fillRect(0, 0, cw, ch);
+    }
+    if (mask) { t.globalCompositeOperation = "destination-in"; mask(t); }
+    this.c.drawImage(this.tmp2, 0, 0);
+    return true;
+  }
   rays(cam) {
     if (reduce()) return;
-    const c = this.c, t = this.clock, w = this.canvas.width, h = this.canvas.height;
+    const c = this.g || this.c, t = this.clock, w = this.canvas.width, h = this.canvas.height;
     c.save(); c.globalCompositeOperation = "lighter";
     for (let i = 0; i < 4; i++) {
       const x = w * (.5 + .45 * Math.sin(t * .05 + i * 1.7)) - cam * .02 * this.S, a = .035 + .02 * Math.sin(t * .4 + i);
@@ -176,18 +254,19 @@ export class Book {
     }
     c.restore();
   }
-  finish2D(fade) {
+  finish2D(fade, clean = 0) {
     const c = this.c, w = this.canvas.width, h = this.canvas.height;
     c.save();
-    c.globalCompositeOperation = "overlay"; c.globalAlpha = .42; c.fillStyle = this.paperPat ||= c.createPattern(Wc.paper(), "repeat"); c.fillRect(0, 0, w, h);
+    if (clean >= 1) { if (fade > 0) { c.fillStyle = `rgba(0,0,0,${fade})`; c.fillRect(0, 0, w, h); } c.restore(); return; }
+    c.globalCompositeOperation = "overlay"; c.globalAlpha = .42 * (1 - clean); c.fillStyle = this.paperPat ||= c.createPattern(Wc.paper(), "repeat"); c.fillRect(0, 0, w, h);
     c.globalCompositeOperation = "source-over"; c.globalAlpha = 1;
     const g = c.createRadialGradient(w / 2, h * .45, Math.min(w, h) * .3, w / 2, h * .5, Math.hypot(w, h) * .62);
-    g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(4,1,4,.72)"); c.fillStyle = g; c.fillRect(0, 0, w, h);
+    g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, `rgba(4,1,4,${.72 * (1 - clean)})`); c.fillStyle = g; c.fillRect(0, 0, w, h);
     if (fade > 0) { c.fillStyle = `rgba(0,0,0,${fade})`; c.fillRect(0, 0, w, h); }
     c.restore();
   }
   // Reveal a sheet through blooming splashes (the city painting itself).
-  reveal(img, f, cam, z, k, seed, yOff = 0) {
+  reveal(img, f, cam, z, k, seed, yOff = 0, tint = false) {
     if (k >= 1) return this.sheet(img, f, cam, z, yOff);
     if (k <= 0) return;
     const w = this.canvas.width, h = this.canvas.height;
@@ -206,6 +285,14 @@ export class Book {
     const kk = img.width / W, vw = this.view.w / z, vh = this.view.h / z, cxf = W / 2 + (cam - W / 2) * f;
     t.drawImage(img, clamp(cxf - vw / 2, 0, W - vw) * kk, ((H - vh) * .5 + yOff) * kk, vw * kk, vh * kk, 0, 0, w, h);
     this.c.drawImage(this.tmp, 0, 0);
+    if (!tint || reduce()) return;
+    // royal and heavenly colour blooms where the paint is still wet
+    const R2 = rng(seed);
+    for (let i = 0; i < 26; i++) {
+      const x = R2() * w, y = lerp(.35, 1.1, R2()) * h, d = R2() * .55, p = (k - d) / .45, r = Math.max(0, easeFilm(p)) * Math.max(w, h) * lerp(.25, .55, R2());
+      if (p <= 0 || p >= 1.4) continue;
+      Wc.glow(this.c, x, y, r * 1.05, ROYAL[i % 4], .16 * Math.sin(clamp(p / 1.4) * Math.PI));
+    }
   }
 
   her(x, y, cam, z, phase, alpha = 1) {
@@ -227,9 +314,9 @@ export class Book {
     const k = lt / 8, cam = W / 2 - 180 + lt * 14, z = 1.06 - easeFilm(k) * .06;
     this.sheet(this.L.sky, PAR.sky, cam, z);
     this.rays(cam);
-    this.reveal(this.L.far, PAR.far, cam, z, smooth(0, .4, k), 41);
-    this.reveal(this.L.mid, PAR.mid, cam, z, smooth(.1, .75, k), 43, (1 - easeFilm(smooth(.05, .8, k))) * 60);
-    this.reveal(this.L.near, PAR.near, cam, z, smooth(.35, .95, k), 47);
+    this.reveal(this.L.far, PAR.far, cam, z, smooth(0, .4, k), 41, 0, true);
+    this.reveal(this.L.mid, PAR.mid, cam, z, smooth(.1, .75, k), 43, (1 - easeFilm(smooth(.05, .8, k))) * 60, true);
+    this.reveal(this.L.near, PAR.near, cam, z, smooth(.35, .95, k), 47, 0, true);
     // the hill sinks into the paint as the city rises
     this.sheet(this.hill, .8, cam, z, -easeFilm(smooth(0, .7, k)) * 300, 1 - smooth(.2, .7, k));
     const x = W / 2 - 60, m = this.mode;
@@ -240,28 +327,61 @@ export class Book {
     const m = this.mode, span = Math.min(x1 - x0, STRIDE[m] * CADENCE[m] * 6.5 * .7);
     const x = x0 + (x1 - x0 - span) / 2 + span * k;
     const cam = x + this.view.w * .12, z = 1.02;
-    this.layers(cam, z);
     // a memory blooms in the sky behind the caption
-    if (!reduce()) {
+    const memory = () => {
+      if (reduce()) return;
       const [sx, sy, s] = this.toScreen(x + 80, 330, cam, z, .58), b = easeFilm(clamp(lt / 2.5));
-      const c = this.c; c.save(); c.globalCompositeOperation = "lighter"; c.globalAlpha = .35 * b;
+      const c = this.g || this.c; c.save(); c.globalCompositeOperation = "lighter"; c.globalAlpha = .35 * b;
       Wc.glow(c, sx, sy, 160 * s * b, [this.city.pal.gold, this.city.pal.neon, this.city.pal.splash[1], this.city.pal.neon2][i % 4], .5); c.restore();
-    }
-    this.sheet(this.L.near, PAR.near, cam, z);
+    };
+    this.world(cam, z, this.styleAt(i, k), memory);
     this.her(x, (this.city.ground ?? 812) + 50, cam, z, (lt + i * 6.5) * CADENCE[m]);
     this.drawMotes(cam);
   }
+  // Which style each moment is painted in. Moment 2 sweeps watercolor into anime dusk, moment 3 sweeps
+  // dusk into night, so the city is already in the clip's world by the time she reaches the bench.
+  styleAt(i, k) {
+    const n = this.data.clips.length;
+    if (n < 3) return i ? { a: this.N } : { a: this.L };
+    if (i === 0) return { a: this.L };
+    if (i === 1) return { a: this.L, b: this.A, w: smooth(.12, .78, k), seed: 3 };
+    if (i === 2) return { a: this.A, b: this.N, w: smooth(.3, .92, k), seed: 5, cols: ["#3d6bff", "#7b4dff", "#56e1ff", "#ffd27a", "#fff6e8"] };
+    return { a: this.N };
+  }
+  drawArrive(lt) {
+    const m = this.mode, e = easeFilm(clamp(lt / 3.2));
+    const cam = W / 2 + 640 + this.view.w * .12 - e * 420, z = 1.02 + e * .2;
+    this.world(cam, z, { a: this.N });
+    const x = W / 2 + 680 + lt * STRIDE[m] * CADENCE[m] * .3;
+    this.her(x, (this.city.ground ?? 812) + 50, cam, z, (lt + 26) * CADENCE[m], 1 - smooth(.6, 1.6, lt));
+    this.drawMotes(cam);
+    // the clip's first frame, painted in anime, blooms open from the middle
+    const [rx, , rw, rh] = this.clipRect(), bloom = easeFilm(clamp(lt / 1.9));
+    const blooms = (t) => {
+      const R = rng(19); t.fillStyle = "#000"; t.beginPath();
+      for (let i = 0; i < 9; i++) {
+        const bx = rx + rw * lerp(.2, .8, R()), by = rh * lerp(.25, .8, R()), d = R() * .35, r = Math.max(0, easeFilm((bloom - d) / .65)) * rh * lerp(.45, .75, R());
+        if (r <= 0) continue;
+        for (let j = 0; j <= 16; j++) { const a = j / 16 * 6.283, rr = r * (.85 + .2 * Math.sin(a * 3 + i) + .08 * Math.sin(a * 7 + i * 2)); t[j ? "lineTo" : "moveTo"](bx + Math.cos(a) * rr, by + Math.sin(a) * rr); }
+        t.closePath();
+      }
+      t.fill();
+    };
+    if (!this.drawStill(this.still?.anime, bloom < 1 ? blooms : null)) return;
+    if (bloom < 1 && !reduce()) { const R = rng(19); for (let i = 0; i < 4; i++) Wc.glow(this.c, rx + rw * lerp(.2, .8, R()), rh * lerp(.25, .8, R()), rh * .5 * bloom, ROYAL[i], .2 * (1 - bloom)); }
+    // the gold wave: the painting becomes the clip
+    const w = smooth(2, 3.6, lt);
+    if (w > 0 && this.drawStill(this.still?.real, w < 1 ? (t) => { this.wavePath(t, w, 9, true); t.fill(); } : null) && w < 1) this.waveFront(w, 9, ["#ffb347", "#ffd27a", "#ff8ac0", "#fff1c8", "#ffffff"]);
+  }
   drawBench(lt) {
     // The clip plays as a video element; behind it (seen on wide screens) the city at night, softly.
-    const cam = W / 2, z = 1.1;
-    this.layers(cam, z);
-    this.sheet(this.L.near, PAR.near, cam, z);
-    this.c.fillStyle = "rgba(8,4,14,.55)"; this.c.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    const cam = W / 2 + 640 + this.view.w * .12 - 420, z = 1.22;
+    this.world(cam, z, { a: this.N });
+    this.c.fillStyle = "rgba(8,4,14,.35)"; this.c.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
   drawEnd(lt) {
     const cam = W / 2 + 120 - lt * 10, z = 1.08 - lt * .004;
-    this.layers(cam, z);
-    this.sheet(this.L.near, PAR.near, cam, z);
+    this.world(cam, z, { a: this.N });
     this.drawMotes(cam);
   }
 
@@ -286,7 +406,7 @@ export class Book {
     b.draw(lt, lt / b.dur);
     const fi = b.fadeIn ?? .7, fo = b.fadeOut ?? .7;
     const fade = reduce() ? 0 : 1 - Math.min(fi ? smooth(0, fi, lt) : 1, fo ? smooth(0, fo, b.dur - lt) : 1);
-    this.finish2D(fade);
+    this.finish2D(fade, b.clean ? b.clean(lt) : 0);
     if (b.video) this.syncVideo(lt, fade);
     const lis = this.ui.ticks.children;
     this.groups.forEach((g, n) => { if (lis[n]) lis[n].firstChild.style.width = `${(clamp((this.t - g.s) / (g.e - g.s)) * 100).toFixed(1)}%`; });
@@ -299,10 +419,10 @@ export class Book {
     else if (Math.abs(v.currentTime - lt) > .4) v.currentTime = lt;
   }
   showBeat(b) {
-    const u = this.ui, c = b.cap;
+    const u = this.ui; let c = b.cap;
     this.el.classList.toggle("is-video", !!b.video);
     if (!b.video) { this.video.pause(); }
-    u.cap.classList.remove("is-on"); void u.cap.offsetWidth;
+    if (b.keepCap) c = null; else { u.cap.classList.remove("is-on"); void u.cap.offsetWidth; }
     if (c) { u.kick.textContent = c.kicker || ""; u.title.textContent = c.title || ""; u.text.textContent = c.text || ""; u.cap.classList.add("is-on"); u.cap.classList.toggle("is-hand", !!b.hand); }
     if (b.end) {
       u.endKick.textContent = b.end.kicker; u.prov.textContent = b.end.proverb; u.trans.textContent = b.end.trans || ""; u.endBtn.textContent = b.end.cta;

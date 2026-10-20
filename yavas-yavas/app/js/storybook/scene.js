@@ -102,7 +102,7 @@ function paintWater(c, pal, x0, x1, y0, y1, seed) {
 }
 
 // The city upside down in the water: a squashed, broken, darkened copy below the horizon.
-function reflect(c, cv, k, hz, depth, pal) {
+export function reflect(c, cv, k, hz, depth, pal) {
   const src = Wc.canvas(cv.width, hz * k), sx = src.getContext("2d");
   sx.drawImage(cv, 0, 0);
   c.save(); c.setTransform(1, 0, 0, 1, 0, 0);

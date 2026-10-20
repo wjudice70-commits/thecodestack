@@ -59,17 +59,85 @@ function glassTower(P, x, b, w, h, seed) {
   P.mass(t, .12, { col: mix(P.pal.shadow, P.pal.neon2, .18) }).neon(t, b, P.pal.neon2, 1).lights(P.K.windowsIn(x, b, w * .8, h * .9, 4, Math.round(h / 16), seed, .45), 2.4, "#bfe9ff");
 }
 
+// Today's city: a row of apartment blocks, flat roofs and rooftop tanks, as one stepped outline with lit windows.
+function blocks(P, x0, x1, b, h, seed, t = .26) {
+  const R = rng(seed), pts = [[x0, b + 30]], win = [];
+  let x = x0;
+  while (x < x1) {
+    const w = lerp(26, 58, R()), hh = h * lerp(.45, 1, R());
+    pts.push([x, b - hh]);
+    if (R() < .3) pts.push([x + w * .3, b - hh], [x + w * .3, b - hh - 7], [x + w * .45, b - hh - 7], [x + w * .45, b - hh]);
+    pts.push([x + w, b - hh]);
+    const cols = Math.max(2, Math.round(w / 9)), rows = Math.max(2, Math.round(hh / 11));
+    for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) if (R() < .42) win.push([x + w * (i + .5) / cols, b - hh * (j + .5) / rows]);
+    x += w * lerp(.92, 1.04, R());
+  }
+  pts.push([x1, b + 30]);
+  P.mass(pts, t, { spread: .1, flat: 1 }).lights(win, 2.6);
+}
+// A suspension bridge strung across the strait, its cables lit like a necklace.
+function bridge(P, x0, x1, b, h, col) {
+  const c = P.c, K = P.K, d = b - h * .3, t0 = lerp(x0, x1, .2), t1 = lerp(x0, x1, .8), top = b - h;
+  P.mass(K.rect(lerp(x0, x1, .5), d + 3, x1 - x0, 6), .08, { flat: 1, rim: 0 });
+  for (const t of [t0, t1]) P.mass([[t - 7, b], [t - 5, top], [t + 5, top], [t + 7, b]], .12, { flat: 1 });
+  const cable = [[x0, d]];
+  for (let i = 0; i <= 8; i++) cable.push([lerp(x0, t0, i / 8), lerp(d, top, Math.pow(i / 8, 1.6))]);
+  for (let i = 1; i <= 24; i++) { const v = i / 24; cable.push([lerp(t0, t1, v), top + (d - 8 - top) * (1 - Math.pow(2 * v - 1, 2))]); }
+  for (let i = 1; i <= 8; i++) cable.push([lerp(t1, x1, i / 8), lerp(top, d, 1 - Math.pow(1 - i / 8, 1.6))]);
+  c.save(); c.strokeStyle = P.Wc.rgba(col, .3); c.lineWidth = .7;
+  for (const [x, y] of cable) { if (x <= x0 || x >= x1) continue; c.beginPath(); c.moveTo(x, y); c.lineTo(x, d); c.stroke(); }
+  c.restore();
+  P.Wc.glowLine(c, cable, col, 1.6, 10, .95);
+  const deck = []; for (let x = x0; x <= x1; x += 9) deck.push([x, d + 1]);
+  P.lights(deck, 1.8);
+}
+// A Bosphorus ferry: white hull, glowing cabin windows, a soft wake.
+function ferry(P, x, y, s, dir = 1) {
+  const c = P.c, hull = [[x - 46 * s, y], [x - 52 * s * dir, y - 9 * s], [x + 52 * s * dir, y - 9 * s], [x + 42 * s, y]];
+  P.mass(hull, .95, { col: "#ece4dc", flat: 1, rim: 0 });
+  P.mass(P.K.rect(x, y - 9 * s, 70 * s, 11 * s), .9, { col: "#f4ece2", flat: 1, rim: 0 });
+  P.mass(P.K.rect(x + 8 * s * dir, y - 20 * s, 9 * s, 10 * s), .5, { col: "#3a2a3a", flat: 1, rim: 0 });
+  const win = []; for (let i = 0; i < 9; i++) win.push([x - 30 * s + i * 7.5 * s, y - 13 * s]);
+  P.lights(win, 2.2);
+  c.save(); c.globalCompositeOperation = "lighter"; c.fillStyle = "rgba(255,236,210,.18)";
+  for (let i = 0; i < 5; i++) c.fillRect(x - (60 + i * 26) * s * dir - (dir < 0 ? 0 : 22 * s), y + 2 + i * 2.2, 22 * s, 1.2);
+  c.restore();
+}
+// The coast road: street lamps and the red and white streaks of evening traffic.
+function coastRoad(P, x0, x1, y, seed) {
+  const R = rng(seed), c = P.c, lamps = [];
+  for (let x = x0; x < x1; x += 34) lamps.push([x + R() * 6, y - 6]);
+  P.lights(lamps, 2.4);
+  c.save(); c.globalCompositeOperation = "lighter";
+  for (let i = 0; i < (x1 - x0) / 18; i++) { const x = lerp(x0, x1, R()), l = lerp(10, 40, R()), red = R() < .5; c.fillStyle = red ? "rgba(255,70,60,.55)" : "rgba(255,244,220,.6)"; c.fillRect(x, y + (red ? 1.5 : -.5), l, 1.1); }
+  c.restore();
+}
+
 /* ---------- the cities ---------- */
 export const CITIES = {
   istanbul: city({
     seed: 11, pal: { sky: ["#2a1446", "#7a2a52", "#d2604a", "#f6b56a"], sun: { x: .62, y: .78, col: "#ffbe6a", disc: "#fff0c8" }, water: ["#3a1a3a", "#120814", "#f2a35c"] },
+    // the Asian shore across the water: low hills, Çamlıca's tower, the towers of the new city and the bridge
+    far(P, x, b) {
+      const K = P.K;
+      P.ridge(x - 1250, x + 1250, b, 70, P.pal.far[0], { shape: (v) => .5 + .5 * Math.sin(v * 5 + 1.2) });
+      const cam = [[x - 905, b], [x - 902, b - 210], [x - 912, b - 222], [x - 900, b - 250], [x - 898, b - 330], [x - 896, b - 250], [x - 884, b - 222], [x - 894, b - 210], [x - 891, b]];
+      P.mass(cam, .3, { flat: 1 }).neon(cam, b, P.pal.neon2, .8);
+      [[640, 38, 150], [690, 46, 230], [740, 34, 180], [785, 50, 270], [835, 40, 200], [880, 30, 160], [930, 44, 210], [985, 36, 140]].forEach(([dx, w, h], i) => glassTower(P, x + dx, b, w, h, i + 4));
+      bridge(P, x - 300, x + 600, b, 190, P.pal.neon2);
+      blocks(P, x - 1250, x + 1250, b, 26, 5, .3);
+    },
+    // the historic peninsula: the old landmarks in warm stone and gold, today's city all around them
     skyline(P, x, b) {
       const K = P.K;
-      houses(P, x - 1150, x + 1150, b, 60, 4, .22);
-      const blue = K.mosque(x - 420, b, 1.15, { minarets: 6 }); P.many(blue, .3).gold(blue[5], b, 1.2); blue.slice(6).forEach(m => P.neon(m, b, P.pal.neon, 1));
-      const aya = K.mosque(x + 260, b, .9, { minarets: 4, mh: 250 }); P.many(aya, .42); aya.slice(6).forEach(m => P.gold(m, b, .9));
-      const gal = K.tower(x + 820, b, 54, 190, "galata"); P.mass(gal, .45).neon(gal, b, P.pal.neon2, 1.2).lights(K.windowsIn(x + 820, b - 40, 36, 140, 2, 5, 9, .7), 3);
-      houses(P, x + 640, x + 1150, b, 90, 8, .3);
+      blocks(P, x - 1180, x - 640, b, 70, 4, .24);
+      const blue = K.mosque(x - 420, b, 1.15, { minarets: 6 }); P.many(blue, .5).gold(blue[5], b, 1.2); blue.slice(6).forEach(m => P.gold(m, b, 1));
+      blocks(P, x - 180, x + 60, b, 48, 6, .22);
+      const aya = K.mosque(x + 260, b, .9, { minarets: 4, mh: 250 }); P.many(aya, .55, { col: "#c98a6e" }); aya.slice(6).forEach(m => P.gold(m, b, .9));
+      blocks(P, x + 470, x + 1180, b, 82, 8, .24);
+      const gal = K.tower(x + 820, b, 54, 190, "galata"); P.mass(gal, .5).gold(gal, b, 1.2).lights(K.windowsIn(x + 820, b - 40, 36, 140, 2, 5, 9, .7), 3);
+      coastRoad(P, x - 1200, x + 1200, b + 4, 12);
+      ferry(P, x - 760, b + 46, 1, 1); ferry(P, x + 520, b + 78, 1.3, -1);
       P.halo(x - 420, b - 300, 70);
     },
   }),
