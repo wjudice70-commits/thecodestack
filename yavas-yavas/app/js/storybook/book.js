@@ -31,7 +31,7 @@ export class Book {
       <button class="tap tap-next cine-next" aria-label="Next"></button>
       <div class="cine-cap"><p class="kicker"></p><h2 class="cine-title"></h2><p class="cine-text"></p></div>
       <div class="cine-end"><p class="kicker"></p><p class="cine-proverb"></p><p class="cine-trans"></p><button class="cta"></button></div>`;
-    document.body.appendChild(this.el);
+    (document.getElementById("app") || document.body).appendChild(this.el);
     const q = (s) => this.el.querySelector(s);
     this.ui = { cap: q(".cine-cap"), kick: q(".cine-cap .kicker"), title: q(".cine-title"), text: q(".cine-text"), ticks: q(".cine-ticks"),
       end: q(".cine-end"), endKick: q(".cine-end .kicker"), prov: q(".cine-proverb"), trans: q(".cine-trans"), endBtn: q(".cine-end .cta"),

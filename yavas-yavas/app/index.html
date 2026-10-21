@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
+  <div id="app">
   <canvas id="atmos" class="atmos" aria-hidden="true"></canvas>
   <div class="grain" aria-hidden="true"></div>
   <div class="vignette" aria-hidden="true"></div>
@@ -37,32 +38,36 @@
     <div class="map-wrap"><canvas id="map" aria-label=""></canvas></div>
     <header class="view-head"><p class="kicker" id="j-kicker"></p><h2 id="jt" class="view-title" data-t="journey"></h2></header>
     <div class="stop-card" id="stop-card"></div>
+    <div class="sheet-nav"><button class="round" id="stop-prev" aria-label="‹"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="round" id="stop-next" aria-label="›"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button></div>
     <ol class="stop-list" id="stop-list"></ol>
   </section>
 
   <!-- Today -->
   <section id="today" class="view" aria-labelledby="tt">
     <header class="view-head"><p class="kicker" id="t-kicker"></p><h2 id="tt" class="view-title" data-t="today"></h2></header>
-    <article class="letter" id="letter"></article>
-    <section class="wins">
+    <div class="pager" id="pager">
+    <article class="page letter" id="letter"></article>
+    <section class="page wins">
       <h3 class="section-title" data-t="smallWins"></h3>
       <p class="hint" data-t="smallWinsHint"></p>
       <div class="sky-wrap"><canvas id="sky" class="sky" aria-hidden="true"></canvas><p class="wins-count" id="wins-count"></p></div>
       <div class="win-grid" id="win-grid"></div>
     </section>
-    <section class="notes">
+    <section class="page notes">
       <h3 class="section-title" data-t="openWhen"></h3>
       <div class="note-list" id="note-list"></div>
     </section>
+    </div>
+    <div class="dots" id="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
   </section>
 
   <!-- Bottom navigation -->
   <nav class="tabs" id="tabs" aria-label="">
     <i class="dock-light" aria-hidden="true"></i>
     <button data-go="home"><svg viewBox="0 0 24 24"><path d="M12 20c-4-2-7-5-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4-3 7-7 9z"/></svg><span data-t="rose"></span></button>
+    <button data-go="story"><svg viewBox="0 0 24 24"><path d="M5 4h9a5 5 0 0 1 5 5v11H10a5 5 0 0 1-5-5zM9 9h6M9 13h6"/></svg><span data-t="story"></span></button>
     <button data-go="journey"><svg viewBox="0 0 24 24"><path d="M4 18c3-1 4-6 8-6s4 4 8 2M6 18a2 2 0 1 1-.1 0M18 6l2 2-2 2-2-2z"/></svg><span data-t="journey"></span></button>
     <button data-go="today"><svg viewBox="0 0 24 24"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg><span data-t="today"></span></button>
-    <button data-go="story"><svg viewBox="0 0 24 24"><path d="M5 4h9a5 5 0 0 1 5 5v11H10a5 5 0 0 1-5-5zM9 9h6M9 13h6"/></svg><span data-t="story"></span></button>
   </nav>
   <button class="lang" id="lang"></button>
 
@@ -102,11 +107,14 @@
     <button data-add="1">+1</button><button data-add="24">+24</button><button data-reset>↺</button>
   </div>
 
+  </div>
+
   <script src="js/core.js"></script>
   <script src="js/paint.js"></script>
   <script src="js/atmos.js"></script>
   <script src="js/rose.js"></script>
   <script src="js/story.js"></script>
+  <script src="js/story-rose.js"></script>
   <script src="js/cities.js"></script>
   <script src="js/map.js"></script>
   <script src="js/lanterns.js"></script>

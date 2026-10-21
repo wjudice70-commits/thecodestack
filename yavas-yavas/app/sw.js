@@ -2,7 +2,7 @@
 const VERSION = "yy-2026-10-21-1";
 const FILES = [
   "./", "index.html", "manifest.webmanifest", "css/app.css",
-  "js/core.js", "js/paint.js", "js/atmos.js", "js/lanterns.js", "js/rose.js", "js/story.js", "js/cities.js", "js/map.js", "js/main.js",
+  "js/core.js", "js/paint.js", "js/atmos.js", "js/lanterns.js", "js/rose.js", "js/story.js", "js/story-rose.js", "js/cities.js", "js/map.js", "js/main.js",
   "data/config.json", "data/stops.json", "data/story.json", "data/wins.json", "data/letters.json", "data/notes.json", "data/films.json",
   "js/storybook/index.js", "js/storybook/book.js", "js/storybook/anime.js", "js/storybook/scene.js", "js/storybook/wash.js", "js/storybook/kit.js", "js/storybook/cities.js", "js/storybook/figure.js",
   "fonts/cormorant-normal-latin.woff2", "fonts/cormorant-normal-latin-ext.woff2",

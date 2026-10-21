@@ -63,7 +63,7 @@
   function show(view) {
     current = view;
     atmos.set(view);
-    $("#tabs").style.setProperty("--i", ["home", "journey", "today", "story"].indexOf(view));
+    $("#tabs").style.setProperty("--i", ["home", "story", "journey", "today"].indexOf(view));
     $$(".view").forEach(v => v.classList.toggle("is-active", v.id === view));
     $$(".tabs button").forEach(b => b.dataset.go === view ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
     if (view === "journey") { sel = null; renderJourney(); map.resize(); map.focus(progress().reached); map.start(); } else map.stop();
@@ -87,7 +87,7 @@
   function pickStop(i) {
     sel = i; map.focus(i); renderJourney();
     const c = $("#stop-card"); c.classList.remove("is-new"); void c.offsetWidth; c.classList.add("is-new");
-    $(`[data-stop="${i}"]`)?.scrollIntoView({ behavior: YY.reduceMotion ? "auto" : "smooth", inline: "center", block: "nearest" });
+    
   }
 
   function renderToday() {
@@ -212,17 +212,21 @@
     }, 900);
   }
 
+  // Our Story is told by the black rose itself (js/story-rose.js).
   function playStory(start = 0) {
     const scenes = D.story.scenes, last = scenes.length - 1;
-    const shots = scenes.map((s, i) => ({
-      painter: YY.storyScenes[s.scene] || YY.storyScenes.lake,
-      kicker: `${t("story")} · ${i + 1} / ${scenes.length}`, title: L(s.title), text: L(s.text),
+    const list = scenes.map((s, i) => ({
+      scene: s.scene, kicker: `${t("story")} · ${i + 1} / ${scenes.length}`, title: L(s.title), text: L(s.text),
       cta: i === last ? (state.storySeen ? t("done") : t("startJourney")) : null,
     }));
-    playReel(shots, start, () => {
+    $("#tabs").classList.remove("is-on"); $("#lang").classList.remove("is-on"); document.body.classList.add("in-film"); atmos.stop();
+    YY.RoseReel.play(list, start).then((r) => {
+      document.body.classList.remove("in-film"); atmos.start();
+      $("#tabs").classList.add("is-on"); $("#lang").classList.add("is-on");
+      if (r !== "done") return;
       const first = !state.storySeen;
       state.storySeen = true; save(); setHomeCta();
-      if (first) { checkArrivals(); return "chain"; }
+      if (first) checkArrivals();
     });
   }
 
@@ -301,6 +305,9 @@
       const w = e.target.closest("[data-win]"); if (w) return logWin(w.dataset.win, w);
       const n = e.target.closest("[data-note]"); if (n) return openNote(n.dataset.note);
     });
+    $("#stop-prev").addEventListener("click", () => pickStop(Math.max(0, (sel ?? progress().reached) - 1)));
+    $("#stop-next").addEventListener("click", () => pickStop(Math.min(D.stops.stops.length - 1, (sel ?? progress().reached) + 1)));
+    $("#pager").addEventListener("scroll", (e) => { const k = Math.round(e.target.scrollLeft / e.target.clientWidth); $$("#dots i").forEach((d, i) => d.classList.toggle("on", i === k)); }, { passive: true });
     $("#tap-next").addEventListener("click", () => { if (!reel[shot].cta) next(); });
     $("#tap-back").addEventListener("click", back);
     $("#f-cta").addEventListener("click", next);

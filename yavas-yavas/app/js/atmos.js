@@ -21,7 +21,7 @@
       this.resize = this.resize.bind(this); addEventListener("resize", this.resize); this.resize();
     }
     resize() {
-      this.W = this.cv.width = Math.round(innerWidth * DPR); this.H = this.cv.height = Math.round(innerHeight * DPR);
+      this.W = this.cv.width = Math.round(this.cv.clientWidth * DPR); this.H = this.cv.height = Math.round(this.cv.clientHeight * DPR);
       const s = Math.max(this.W, this.H);
       this.bk = P.bokehSet(9, 12, [0, 0, this.W, this.H], [s * .02, s * .07], ["#ffffff"]);
       if (!this.running) this.frame(3);
