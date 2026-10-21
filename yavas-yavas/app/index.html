@@ -13,7 +13,10 @@
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
+  <canvas id="atmos" class="atmos" aria-hidden="true"></canvas>
   <div class="grain" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div id="cut" class="cut" aria-hidden="true"></div>
 
   <!-- Home: the black rose -->
   <section id="home" class="view is-active" aria-labelledby="wm">
@@ -24,14 +27,15 @@
       <p class="tagline" data-t="tagline"></p>
       <p class="where" id="where"></p>
       <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+      <ol class="track" id="track" aria-hidden="true"></ol>
       <button class="cta" id="begin" hidden></button>
     </div>
   </section>
 
   <!-- Journey: the map -->
   <section id="journey" class="view" aria-labelledby="jt">
-    <header class="view-head"><p class="kicker" id="j-kicker"></p><h2 id="jt" class="view-title" data-t="journey"></h2></header>
     <div class="map-wrap"><canvas id="map" aria-label=""></canvas></div>
+    <header class="view-head"><p class="kicker" id="j-kicker"></p><h2 id="jt" class="view-title" data-t="journey"></h2></header>
     <div class="stop-card" id="stop-card"></div>
     <ol class="stop-list" id="stop-list"></ol>
   </section>
@@ -43,7 +47,7 @@
     <section class="wins">
       <h3 class="section-title" data-t="smallWins"></h3>
       <p class="hint" data-t="smallWinsHint"></p>
-      <p class="wins-count" id="wins-count"></p>
+      <div class="sky-wrap"><canvas id="sky" class="sky" aria-hidden="true"></canvas><p class="wins-count" id="wins-count"></p></div>
       <div class="win-grid" id="win-grid"></div>
     </section>
     <section class="notes">
@@ -54,6 +58,7 @@
 
   <!-- Bottom navigation -->
   <nav class="tabs" id="tabs" aria-label="">
+    <i class="dock-light" aria-hidden="true"></i>
     <button data-go="home"><svg viewBox="0 0 24 24"><path d="M12 20c-4-2-7-5-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4-3 7-7 9z"/></svg><span data-t="rose"></span></button>
     <button data-go="journey"><svg viewBox="0 0 24 24"><path d="M4 18c3-1 4-6 8-6s4 4 8 2M6 18a2 2 0 1 1-.1 0M18 6l2 2-2 2-2-2z"/></svg><span data-t="journey"></span></button>
     <button data-go="today"><svg viewBox="0 0 24 24"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg><span data-t="today"></span></button>
@@ -99,10 +104,12 @@
 
   <script src="js/core.js"></script>
   <script src="js/paint.js"></script>
+  <script src="js/atmos.js"></script>
   <script src="js/rose.js"></script>
   <script src="js/story.js"></script>
   <script src="js/cities.js"></script>
   <script src="js/map.js"></script>
+  <script src="js/lanterns.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

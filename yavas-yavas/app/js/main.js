@@ -3,7 +3,7 @@
   "use strict";
   const { $, $$, t, L, clamp, state, save } = YY;
   const P = YY.paint;
-  let D, rose, film, map, cfg;
+  let D, rose, film, map, cfg, atmos, sky;
 
   /* ---------------- Progress ---------------- */
   const maxSteps = () => (D.stops.stops.length - 1) * cfg.stepsPerStop;
@@ -48,33 +48,46 @@
     $("#where").innerHTML = done ? `<b>${t("journeyDone")}</b>`
       : `<b>${stops[reached].name}</b> · ${t("stepsTo", left, stops[reached + 1].name)}`;
     $("#meter").style.width = `${((reached + frac) / (n - 1) * 100).toFixed(1)}%`;
+    $("#track").innerHTML = stops.map((x, i) => `<li class="${i < reached ? "got" : i === reached ? "here" : i === reached + 1 ? "next" : ""}" style="--f:${i === reached ? frac.toFixed(2) : 0}"></li>`).join("");
     if (map) map.setProgress(reached, frac);
     renderJourney(); renderToday();
   }
 
   /* ---------------- Views ---------------- */
   let current = "home";
-  function go(view) {
+  function go(view, at) {
     if (view === "story") return playStory(0);
+    if (view === current) return;
+    YY.cut(() => show(view), at);
+  }
+  function show(view) {
     current = view;
+    atmos.set(view);
+    $("#tabs").style.setProperty("--i", ["home", "journey", "today", "story"].indexOf(view));
     $$(".view").forEach(v => v.classList.toggle("is-active", v.id === view));
     $$(".tabs button").forEach(b => b.dataset.go === view ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
-    if (view === "journey") { map.resize(); map.start(); } else map.stop();
+    if (view === "journey") { sel = null; renderJourney(); map.resize(); map.focus(progress().reached); map.start(); } else map.stop();
+    if (view === "today") sky.start(); else sky.stop();
     if (view !== "home") $("#" + view).scrollTop = 0;
   }
 
+  let sel = null;   // the stop picked on the map; null follows her
   function renderJourney() {
     const stops = D.stops.stops, { reached } = progress(), rec = D.stops.recovery;
+    const i = sel == null ? reached : sel, s = stops[i], open = i <= reached || YY.preview;
     $("#j-kicker").textContent = t("stop", reached + 1, stops.length);
-    const s = stops[reached];
-    $("#stop-card").innerHTML = `<p class="kicker">${t("stage")}</p><h3>${s.name}</h3><p>${L(s.line)}</p>
-      <span class="stage-chip">${L(rec[s.stage])}</span><br><button class="cta" data-film="${reached}">${t("watch")}</button>`;
-    $("#stop-list").innerHTML = stops.map((x, i) => {
-      const open = i <= reached || YY.preview;
-      return `<li><button data-film="${i}" ${open ? "" : "disabled"} class="${i === reached ? "is-here" : ""}">
-        <span class="num">${i + 1}</span><span><span class="nm">${x.name}</span><br><span class="st">${L(rec[x.stage])}</span></span>
-        <span class="st">${open ? "" : t("locked")}</span></button></li>`;
+    $("#stop-card").innerHTML = `<p class="kicker">${i === reached ? t("stage") : t("stop", i + 1, stops.length)}</p><h3>${s.name}</h3><p>${L(s.line)}</p>
+      <span class="stage-chip">${L(rec[s.stage])}</span><br>${open ? `<button class="cta" data-film="${i}">${t("watch")}</button>` : `<span class="locked">${t("locked")}</span>`}`;
+    $("#stop-list").innerHTML = stops.map((x, k) => {
+      const ok = k <= reached || YY.preview;
+      return `<li><button data-stop="${k}" class="${k === reached ? "is-here" : ""} ${k === i ? "is-sel" : ""} ${ok ? "" : "is-locked"}">
+        <span class="num">${["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV"][k] || k + 1}</span><span class="nm">${x.name}</span><span class="st">${L(rec[x.stage])}</span></button></li>`;
     }).join("");
+  }
+  function pickStop(i) {
+    sel = i; map.focus(i); renderJourney();
+    const c = $("#stop-card"); c.classList.remove("is-new"); void c.offsetWidth; c.classList.add("is-new");
+    $(`[data-stop="${i}"]`)?.scrollIntoView({ behavior: YY.reduceMotion ? "auto" : "smooth", inline: "center", block: "nearest" });
   }
 
   function renderToday() {
@@ -84,6 +97,7 @@
     $("#letter").innerHTML = `<div><p class="kicker">${t("letter")}</p><p class="letter-text">${esc(L(lt))}</p>
       ${lt.photo ? `<img src="${lt.photo}" alt="">` : ""}<p class="signature">${esc(lt.from)}</p></div>`;
     $("#wins-count").textContent = done.length >= cap ? t("winsFull") : t("stepsToday", Math.min(done.length, cap), cap);
+    sky.set(Math.min(done.length, cap));
     $("#win-grid").innerHTML = D.wins.wins.map(w => `<button class="win ${done.includes(w.id) ? "is-done" : ""}" data-win="${w.id}" aria-pressed="${done.includes(w.id)}">${esc(L(w))}</button>`).join("");
     $("#note-list").innerHTML = D.notes.notes.map(n => `<button class="note ${state.notesOpened.includes(n.id) ? "is-open" : ""}" data-note="${n.id}">${esc(L(n.when))}</button>`).join("");
     void d;
@@ -95,7 +109,7 @@
     if (list.includes(id)) return;
     list.push(id);
     const counts = list.length <= cfg.winsPerDay;
-    if (counts) state.steps = Math.min(maxSteps(), state.steps + 1);
+    if (counts) { state.steps = Math.min(maxSteps(), state.steps + 1); sky.launch(); }
     save();
     toast(counts ? t("winLogged") : t("winsFull"));
     const before = state.seenStop;
@@ -133,7 +147,7 @@
     f.hidden = false; requestAnimationFrame(() => f.classList.add("is-in"));
     $("#tabs").classList.remove("is-on"); $("#lang").classList.remove("is-on"); document.body.classList.add("in-film");
     $("#ticks").innerHTML = shots.length > 1 ? shots.map(() => "<li><i></i></li>").join("") : "";
-    film.resize(); film.start();
+    film.resize(); film.start(); atmos.stop();
     showShot();
   }
 
@@ -193,7 +207,7 @@
     const cb = onReelEnd; onReelEnd = null;
     setTimeout(() => {
       if (cb && cb() === "chain") return;   // the callback opened another reel
-      f.hidden = true; film.stop(); document.body.classList.remove("in-film");
+      f.hidden = true; film.stop(); atmos.start(); document.body.classList.remove("in-film");
       $("#tabs").classList.add("is-on"); $("#lang").classList.add("is-on");
     }, 900);
   }
@@ -238,7 +252,7 @@
     if (!$("#film").hidden) { reel = shots; shot = 0; onReelEnd = null; $("#ticks").innerHTML = shots.length > 1 ? shots.map(() => "<li><i></i></li>").join("") : ""; $("#film").classList.add("is-in"); showShot(); }
     else playReel(shots);
   }
-  function endIfOpen() { if (!$("#film").hidden) { $("#film").hidden = true; film.stop(); document.body.classList.remove("in-film"); $("#tabs").classList.add("is-on"); $("#lang").classList.add("is-on"); } }
+  function endIfOpen() { if (!$("#film").hidden) { $("#film").hidden = true; film.stop(); atmos.start(); document.body.classList.remove("in-film"); $("#tabs").classList.add("is-on"); $("#lang").classList.add("is-on"); } }
 
   /* ---------------- Home ---------------- */
   function setHomeCta() {
@@ -270,17 +284,20 @@
   /* ---------------- Boot ---------------- */
   async function boot() {
     YY.grain($(".grain"));
+    atmos = new YY.Atmos($("#atmos")); atmos.start();
     D = await YY.load(); cfg = D.config;
     rose = YY.Rose.build($("#rose"));
     film = new P.Film($("#film-canvas"));
     map = new YY.JourneyMap($("#map")); map.setStops(D.stops.stops);
-    map.onPick = (i) => { if (i <= progress().reached || YY.preview) playReel(arrivalShots(i, true)); };
+    sky = new YY.Sky($("#sky"), cfg.winsPerDay);
+    map.onPick = (i) => pickStop(i);
     applyText();
 
-    $("#tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-go]"); if (b) go(b.dataset.go); });
+    $("#tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-go]"); if (b) { const r = b.getBoundingClientRect(); go(b.dataset.go, [r.left + r.width / 2, r.top]); } });
     $("#lang").addEventListener("click", () => { state.lang = YY.lang() === "tr" ? "en" : "tr"; save(); applyText(); map.base = null; refresh(); setHomeCta(); });
     document.addEventListener("click", (e) => {
       const f = e.target.closest("[data-film]"); if (f && !f.disabled) return playReel(arrivalShots(+f.dataset.film, true));
+      const st = e.target.closest("[data-stop]"); if (st) return pickStop(+st.dataset.stop);
       const w = e.target.closest("[data-win]"); if (w) return logWin(w.dataset.win, w);
       const n = e.target.closest("[data-note]"); if (n) return openNote(n.dataset.note);
     });
