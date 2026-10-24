@@ -8,9 +8,10 @@
 
   // Each view has a mood: where the light falls and what colour it is.
   const MOODS = {
-    home:    { glow: [.5, .38, "#5a0e1a", .4], shaft: "#ffb36a", bokeh: ["#ff7a4a", "#c43a50", "#ffd59a"] },
-    journey: { glow: [.5, .15, "#16224a", .45], shaft: "#ffc98a", bokeh: ["#7fa0ff", "#ffb36a", "#c43a50"] },
-    today:   { glow: [.5, .05, "#4a1a0c", .4], shaft: "#ffcf8a", bokeh: ["#ffb35a", "#ff7a4a", "#f4d39a"] },
+    // sky: the low dusk band each view borrows from Brother's films (violet hill dusk, clay Bosphorus blue, bazaar lanterns).
+    home:    { glow: [.5, .38, "#5a0e1a", .4], shaft: "#ffb36a", bokeh: ["#ff7a4a", "#c43a50", "#ffd59a"], sky: ["#2a1846", "#6a3a6e", "#c9785a"] },
+    journey: { glow: [.5, .15, "#16224a", .45], shaft: "#ffc98a", bokeh: ["#7fa0ff", "#ffb36a", "#c43a50"], sky: ["#0e1a40", "#24408a", "#7a6aa8"] },
+    today:   { glow: [.5, .05, "#4a1a0c", .4], shaft: "#ffcf8a", bokeh: ["#ffb35a", "#ff7a4a", "#f4d39a"], sky: ["#2a140a", "#6a3414", "#c87a2a"] },
   };
 
   class Atmos {
@@ -29,6 +30,9 @@
     set(view) { const m = MOODS[view] || MOODS.home; if (m === this.mood) return; this.from = this.mood; this.mood = m; this.k = 0; }
     paintMood(c, m, t, a) {
       const { W, H } = this, [gx, gy, gc, ga] = m.glow;
+      const sk = c.createLinearGradient(0, H * .3, 0, H);
+      sk.addColorStop(0, rgba(m.sky[0], 0)); sk.addColorStop(.55, rgba(m.sky[0], .55 * a)); sk.addColorStop(.85, rgba(m.sky[1], .45 * a)); sk.addColorStop(1, rgba(m.sky[2], .35 * a));
+      c.fillStyle = sk; c.fillRect(0, 0, W, H);
       const g = c.createRadialGradient(W * gx, H * gy, 0, W * gx, H * gy, Math.hypot(W, H) * .7);
       g.addColorStop(0, rgba(gc, ga * a)); g.addColorStop(.5, rgba(gc, ga * .3 * a)); g.addColorStop(1, rgba(gc, 0));
       c.fillStyle = g; c.fillRect(0, 0, W, H);

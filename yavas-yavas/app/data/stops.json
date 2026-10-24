@@ -1,5 +1,5 @@
 {
-  "_note": "The journey, in order. lon/lat place the city on the map; 'scene' names a painter in js/cities.js; 'stage' is the recovery stage shown on arrival (see recovery). 'stageLines' is the caption of each milestone film.",
+  "_note": "The journey, in order. flow/still (optional) = Brother's own Google Flow film for that city and a still from it; when set, the film button plays it. lon/lat place the city on the map; 'scene' names a painter in js/cities.js; 'stage' is the recovery stage shown on arrival (see recovery). 'stageLines' is the caption of each milestone film.",
   "recovery": {
     "wheelchair": {
       "tr": "Tekerlekli sandalye",
@@ -21,6 +21,8 @@
   "stops": [
     {
       "id": "istanbul",
+      "flow": "films/istanbul-flow.mp4",
+      "still": "films/istanbul-flow-poster.jpg",
       "name": "İstanbul",
       "lon": 28.98,
       "lat": 41.01,

@@ -493,3 +493,53 @@ body { background: radial-gradient(80% 80% at 50% 40%, #140a0c, #000); }
 .dots { position: absolute; left: 0; right: 0; bottom: calc(var(--tabs-h) + 26px); display: flex; justify-content: center; gap: 8px; pointer-events: none; }
 .dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(244,211,154,.3); transition: all .5s var(--ease-film); }
 .dots i.on { width: 20px; border-radius: 3px; background: var(--gold); }
+
+/* =====================================================================
+   Dream reel: the app borrows the mediums of Brother's Flow films (pencil sketch, sculpted clay,
+   lantern-lit photo) inside the one black / crimson / sodium grade. Nothing is ever plain white:
+   every paper is a dark toned paper, every card has a warm or dusk tone.
+   ===================================================================== */
+:root { --dusk: #2a1846; --lilac: #b48ac8; --clay-blue: #24408a; --lantern: #f2a03a; --sketch: rgba(240, 225, 210, .34); }
+
+/* The letter is drawn in pencil on dark toned paper, like the sketch shots of the film */
+.letter > div { background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 120' fill='none' stroke='%23f0e1d2' stroke-opacity='.16' stroke-width='1' stroke-linecap='round'%3E%3Cpath d='M2 118h216M40 118V70q30-34 60 0v48M70 36v34M62 52h16M30 118V40l3-10 3 10v78M110 118V30l3-12 3 12v88M150 118V76h34v42M158 76l9-30 9 30M167 46v-8M196 118V58l3-9 3 9v60'/%3E%3Cpath d='M44 96q26-8 52 0M152 96h30' stroke-dasharray='3 4'/%3E%3C/svg%3E") right 14px bottom 12px / 62% auto no-repeat,
+    repeating-linear-gradient(115deg, rgba(240,225,210,.03) 0 1px, transparent 1px 7px),
+    radial-gradient(120% 90% at 20% 0%, #3b2a40, #251a2b 55%, #160f19);
+  color: var(--ink); box-shadow: 0 40px 90px rgba(0,0,0,.7), 0 0 80px -24px rgba(180,138,200,.35); }
+.letter > div::after { inset: 9px; border: 1px solid var(--sketch); border-radius: 3px 22px 3px 22px; transform: rotate(-.35deg); }
+.letter > div::before { content: ""; position: absolute; inset: 13px 11px 11px 13px; border: 1px solid rgba(240,225,210,.14); border-radius: 3px 20px 3px 20px; transform: rotate(.4deg); pointer-events: none; }
+.letter .kicker { color: #e6b6a6; }
+.letter .signature { color: #f2aaa2; }
+@keyframes candle { from { box-shadow: 0 40px 90px rgba(0,0,0,.7), 0 0 70px -24px rgba(180,138,200,.28); } to { box-shadow: 0 40px 90px rgba(0,0,0,.7), 0 0 100px -16px rgba(255,170,90,.32); } }
+
+/* Open-when envelopes are sculpted clay, in the colours of the clay Bosphorus and its clouds */
+.note { color: #f6ead8; border-radius: 6px 22px 6px 22px; background: linear-gradient(160deg, #6b2f52, #3a1430);
+  box-shadow: inset 0 2px 0 rgba(255,210,200,.22), inset 0 -8px 16px rgba(0,0,0,.35), inset 6px 0 14px rgba(255,180,170,.06), 0 18px 40px rgba(0,0,0,.55); }
+.note:nth-child(4n+2) { background: linear-gradient(160deg, #74361e, #3c180c); }
+.note:nth-child(4n+3) { background: linear-gradient(160deg, #2c4a92, #14224e); }
+.note:nth-child(4n+4) { background: linear-gradient(160deg, #5a4688, #2a1e4c); }
+.note::before { border-radius: inherit; background: linear-gradient(160deg, transparent 49.4%, rgba(255,225,210,.16) 50%, transparent 50.8%), linear-gradient(20deg, transparent 49.4%, rgba(0,0,0,.25) 50%, transparent 50.8%); background-size: 100% 70%; background-repeat: no-repeat; }
+.note::after { background: radial-gradient(circle at 38% 32%, #f0a03c, #b8401e 55%, #4a1408); box-shadow: 0 2px 6px rgba(0,0,0,.5), inset 0 0 0 4px rgba(0,0,0,.18), 0 0 14px -2px rgba(242,160,58,.5); }
+.note.is-open { color: #e4d6c8; filter: saturate(.6) brightness(.8); background: linear-gradient(160deg, #4a2a3a, #24121c); }
+
+/* An opened note is lantern-lit kraft paper, the warm light of the bazaar */
+.modal-card { color: var(--ink); background:
+    repeating-linear-gradient(115deg, rgba(255,220,180,.025) 0 1px, transparent 1px 6px),
+    radial-gradient(120% 80% at 50% -10%, #5a3218, #2c170c 55%, #160b07);
+  box-shadow: 0 0 0 1px var(--hair) inset, 0 40px 90px rgba(0,0,0,.7), 0 -20px 90px -30px rgba(242,160,58,.45); }
+.modal-card .kicker { color: #f0b890; }
+.modal-card .signature { color: #f2aaa2; }
+
+/* A stop with its own film carries a still from it, under a dark scrim */
+.stop-card.has-still { background: linear-gradient(100deg, rgba(10,7,14,.94) 30%, rgba(10,7,14,.72) 70%, rgba(10,7,14,.45)), linear-gradient(0deg, rgba(8,6,10,.9), transparent 60%), var(--still) center 40% / cover; }
+
+/* Brother's Flow film, framed by its own blurred still so the edges are never empty */
+.flow { position: absolute; inset: 0; z-index: 36; display: grid; place-items: center; background: #07050c; opacity: 0; transition: opacity .9s var(--ease-film); }
+.flow.is-in { opacity: 1; }
+.flow::before { content: ""; position: absolute; inset: -40px; background: var(--still) center / cover; filter: blur(30px) brightness(.4) saturate(1.2); }
+.flow video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: transparent; }
+.flow .film-top { pointer-events: none; } .flow .round { pointer-events: auto; }
+.flow-play[hidden] { display: none; }
+.flow-play { position: absolute; width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; background: rgba(10,6,8,.6); border: 1px solid var(--hair); }
+.flow-play svg { width: 30px; height: 30px; fill: var(--ink); stroke: none; }

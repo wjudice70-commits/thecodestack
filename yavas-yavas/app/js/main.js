@@ -76,7 +76,9 @@
     const stops = D.stops.stops, { reached } = progress(), rec = D.stops.recovery;
     const i = sel == null ? reached : sel, s = stops[i], open = i <= reached || YY.preview;
     $("#j-kicker").textContent = t("stop", reached + 1, stops.length);
-    $("#stop-card").innerHTML = `<p class="kicker">${i === reached ? t("stage") : t("stop", i + 1, stops.length)}</p><h3>${s.name}</h3><p>${L(s.line)}</p>
+    const card = $("#stop-card");
+    card.classList.toggle("has-still", !!s.still); card.style.setProperty("--still", s.still ? `url(${new URL(s.still, location.href)})` : "none");
+    card.innerHTML = `<p class="kicker">${i === reached ? t("stage") : t("stop", i + 1, stops.length)}</p><h3>${s.name}</h3><p>${L(s.line)}</p>
       <span class="stage-chip">${L(rec[s.stage])}</span><br>${open ? `<button class="cta" data-film="${i}">${t("watch")}</button>` : `<span class="locked">${t("locked")}</span>`}`;
     $("#stop-list").innerHTML = stops.map((x, k) => {
       const ok = k <= reached || YY.preview;
@@ -153,14 +155,32 @@
 
   /* ---------------- Storybook city films ---------------- */
   // Watercolor films with the bench clip, loaded only when needed. ?nocine plays the painted film instead.
-  const hasCine = (id) => !!D.films?.[id]?.text && !new URLSearchParams(location.search).has("nocine");
+  const hasCine = (id) => !!D.stops.stops.find(x => x.id === id)?.flow || !!D.films?.[id]?.text && !new URLSearchParams(location.search).has("nocine");
   const STAGE_MODE = { wheelchair: "wheelchair", walker: "walker", crutches: "crutches", free: "run" };
   function cineMode(i) {
     const stage = D.stops.stops[i].stage, m = state.mobility;
     return m && m.stage === stage ? m.mode : STAGE_MODE[stage] || "walk";
   }
+  // Brother's own film for a city (made in Google Flow) plays as it is, framed by a blurred still from it.
+  function playFlow(s) {
+    return new Promise((done) => {
+      const el = document.createElement("section"); el.className = "flow"; el.style.setProperty("--still", `url(${new URL(s.still, location.href)})`);   // absolute: a url() in a variable resolves against the stylesheet
+      el.innerHTML = `<video playsinline preload="auto" poster="${s.still}" src="${s.flow}"></video>
+        <div class="film-top"><button class="round" aria-label="${t("close")}"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+        <button class="flow-play" hidden aria-label="${t("watch")}"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>`;
+      $("#app").append(el); requestAnimationFrame(() => el.classList.add("is-in"));
+      const v = el.querySelector("video"), play = el.querySelector(".flow-play");
+      const tryPlay = () => v.play().then(() => { play.hidden = true; }).catch(() => { play.hidden = false; });
+      const end = (r) => { v.pause(); el.classList.remove("is-in"); setTimeout(() => el.remove(), 900); done(r); };
+      v.addEventListener("ended", () => end("ended"), { once: true });
+      el.querySelector(".round").addEventListener("click", () => end("closed"));
+      play.addEventListener("click", tryPlay); v.addEventListener("click", () => v.paused ? tryPlay() : v.pause());
+      tryPlay();
+    });
+  }
   async function playCine(i, extra = {}) {
     const s = D.stops.stops[i], md = D.films.modes;
+    if (s.flow) return playFlow(s);
     const mod = await import("./storybook/index.js");
     return mod.play(s.id, {
       lang: YY.lang(), mode: extra.mode || cineMode(i), name: s.name, stopNo: i + 1, stops: D.stops.stops.length, data: D.films[s.id], hold: extra.hold,
