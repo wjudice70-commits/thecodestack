@@ -1,0 +1,1209 @@
+{
+ "_note": "The storybook city films. 'text' holds the captions for the hill, the city painting itself, the four moments she explores and the bench. Each city's bench clip is films/bench-<id>.mp4 (made with tools/bench). 'proverb.tr' is the proverb card, one entry per line (keep lines short); 'proverb.en' is its translation.",
+ "modes": {
+  "label": {
+   "tr": "Nesrin",
+   "en": "Nesrin"
+  },
+  "names": {
+   "wheelchair": {
+    "tr": "Tekerlekli sandalye",
+    "en": "Wheelchair"
+   },
+   "walker": {
+    "tr": "Yürüteç",
+    "en": "Walker"
+   },
+   "crutches": {
+    "tr": "Koltuk değnekleri",
+    "en": "Crutches"
+   },
+   "walk": {
+    "tr": "Yürüyüş",
+    "en": "Walking"
+   },
+   "run": {
+    "tr": "Koşu",
+    "en": "Running"
+   }
+  }
+ },
+ "istanbul": {
+  "photos": [
+   "photos/istanbul-1.jpg",
+   "photos/istanbul-2.jpg",
+   "photos/istanbul-3.jpg"
+  ],
+  "proverb": {
+   "tr": [
+    "Damlaya damlaya",
+    "göl olur."
+   ],
+   "en": "Drop by drop, a lake is formed."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için ayağa kalktı.",
+    "en": "And the city rose to meet you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Galata Kulesi",
+      "en": "Galata Tower"
+     },
+     "text": {
+      "tr": "Akşam ezanından hemen önce.",
+      "en": "Just before the evening call to prayer."
+     }
+    },
+    {
+     "title": {
+      "tr": "Nine",
+      "en": "Nine"
+     },
+     "text": {
+      "tr": "Kırmızı şemsiyesiyle, her zamanki gibi erkenden gelmiş.",
+      "en": "With her red umbrella, early as always."
+     }
+    },
+    {
+     "title": {
+      "tr": "Simit ve çay",
+      "en": "Simit and tea"
+     },
+     "text": {
+      "tr": "Vapur iskelesinde, demli ve sıcak.",
+      "en": "At the ferry pier, strong and hot."
+     }
+    },
+    {
+     "title": {
+      "tr": "Lale Festivali",
+      "en": "The Tulip Festival"
+     },
+     "text": {
+      "tr": "Emirgan Korusu, binlerce lale.",
+      "en": "Emirgan Grove, a thousand thousand tulips."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Gülhane Parkı",
+    "en": "Gülhane Park"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city's most loved bench."
+   }
+  }
+ },
+ "bursa": {
+  "proverb": {
+   "tr": [
+    "Sabrın sonu",
+    "selamettir."
+   ],
+   "en": "Patience ends in safe harbour."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Ulu Camii",
+      "en": "Ulu Camii"
+     },
+     "text": {
+      "tr": "Yirmi kubbe, tek bir sessizlik.",
+      "en": "Twenty domes, one silence."
+     }
+    },
+    {
+     "title": {
+      "tr": "Yeşil Türbe",
+      "en": "The Green Tomb"
+     },
+     "text": {
+      "tr": "Çinileri akşamda bile yeşil.",
+      "en": "Its tiles stay green even at dusk."
+     }
+    },
+    {
+     "title": {
+      "tr": "İskender",
+      "en": "İskender kebab"
+     },
+     "text": {
+      "tr": "Tereyağı, domates ve sabır.",
+      "en": "Butter, tomato and patience."
+     }
+    },
+    {
+     "title": {
+      "tr": "Uludağ",
+      "en": "Uludağ"
+     },
+     "text": {
+      "tr": "Zirvede ilk kar.",
+      "en": "The first snow on the summit."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Koza Han",
+    "en": "Koza Han"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city’s most loved bench."
+   }
+  }
+ },
+ "canakkale": {
+  "proverb": {
+   "tr": [
+    "Dost kara günde",
+    "belli olur."
+   ],
+   "en": "A friend shows on a dark day."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Truva Atı",
+      "en": "The Trojan Horse"
+     },
+     "text": {
+      "tr": "Kordonda, denize bakarak.",
+      "en": "On the seafront, facing the sea."
+     }
+    },
+    {
+     "title": {
+      "tr": "Çimenlik Kalesi",
+      "en": "Çimenlik Castle"
+     },
+     "text": {
+      "tr": "Boğazın en dar yerinde.",
+      "en": "At the narrowest point of the strait."
+     }
+    },
+    {
+     "title": {
+      "tr": "Peynir helvası",
+      "en": "Cheese halva"
+     },
+     "text": {
+      "tr": "Sıcak, tatlı, biraz da tuzlu.",
+      "en": "Warm, sweet and a little salty."
+     }
+    },
+    {
+     "title": {
+      "tr": "Feribot",
+      "en": "The ferry"
+     },
+     "text": {
+      "tr": "Martılar peşinde, iki kıta arasında.",
+      "en": "Gulls following, between two continents."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Kordonboyu",
+    "en": "The waterfront"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city’s most loved bench."
+   }
+  }
+ },
+ "izmir": {
+  "proverb": {
+   "tr": [
+    "Her gecenin",
+    "bir sabahı vardır."
+   ],
+   "en": "Every night has its morning."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Saat Kulesi",
+      "en": "The Clock Tower"
+     },
+     "text": {
+      "tr": "Konak Meydanı, güvercinler arasında.",
+      "en": "Konak Square, among the pigeons."
+     }
+    },
+    {
+     "title": {
+      "tr": "Kemeraltı",
+      "en": "Kemeraltı"
+     },
+     "text": {
+      "tr": "Baharat kokulu daracık sokaklar.",
+      "en": "Narrow streets that smell of spice."
+     }
+    },
+    {
+     "title": {
+      "tr": "Boyoz",
+      "en": "Boyoz"
+     },
+     "text": {
+      "tr": "Sabah, yanında haşlanmış yumurta.",
+      "en": "Morning, with a boiled egg on the side."
+     }
+    },
+    {
+     "title": {
+      "tr": "Asansör",
+      "en": "The Asansör"
+     },
+     "text": {
+      "tr": "Şehrin üstünden gün batımı.",
+      "en": "Sunset above the whole city."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Kordon",
+    "en": "The Kordon"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city’s most loved bench."
+   }
+  }
+ },
+ "pamukkale": {
+  "proverb": {
+   "tr": [
+    "Sabır acıdır,",
+    "meyvesi tatlıdır."
+   ],
+   "en": "Patience is bitter, its fruit is sweet."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Travertenler",
+      "en": "The travertines"
+     },
+     "text": {
+      "tr": "Çıplak ayak, ılık su.",
+      "en": "Bare feet, warm water."
+     }
+    },
+    {
+     "title": {
+      "tr": "Hierapolis Tiyatrosu",
+      "en": "The Theatre of Hierapolis"
+     },
+     "text": {
+      "tr": "İki bin yıllık taş basamaklar.",
+      "en": "Stone steps two thousand years old."
+     }
+    },
+    {
+     "title": {
+      "tr": "Antik Havuz",
+      "en": "The Antique Pool"
+     },
+     "text": {
+      "tr": "Batık sütunların arasında yüzmek.",
+      "en": "Swimming among sunken columns."
+     }
+    },
+    {
+     "title": {
+      "tr": "Denizli horozu",
+      "en": "The Denizli rooster"
+     },
+     "text": {
+      "tr": "Sabahın ilk ışığında şehrin sesi.",
+      "en": "The city’s voice at first light."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Hierapolis",
+    "en": "Hierapolis"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city’s most loved bench."
+   }
+  }
+ },
+ "antalya": {
+  "proverb": {
+   "tr": [
+    "Bir elin nesi var,",
+    "iki elin sesi var."
+   ],
+   "en": "One hand alone is silent; two hands make a sound."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Yivli Minare",
+      "en": "The Fluted Minaret"
+     },
+     "text": {
+      "tr": "Kaleiçi’nin üstünde kırmızı tuğla.",
+      "en": "Red brick above the old town."
+     }
+    },
+    {
+     "title": {
+      "tr": "Hadrian Kapısı",
+      "en": "Hadrian’s Gate"
+     },
+     "text": {
+      "tr": "Üç kemer, binlerce adım.",
+      "en": "Three arches, a thousand footsteps."
+     }
+    },
+    {
+     "title": {
+      "tr": "Piyaz",
+      "en": "Piyaz"
+     },
+     "text": {
+      "tr": "Tahinli, limonlu, bol maydanozlu.",
+      "en": "Tahini, lemon and plenty of parsley."
+     }
+    },
+    {
+     "title": {
+      "tr": "Düden Şelalesi",
+      "en": "Düden Falls"
+     },
+     "text": {
+      "tr": "Nehir denize düşerken.",
+      "en": "Where the river falls into the sea."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Karaalioğlu Parkı",
+    "en": "Karaalioğlu Park"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city’s most loved bench."
+   }
+  }
+ },
+ "konya": {
+  "proverb": {
+   "tr": [
+    "Kervan yolda",
+    "düzülür."
+   ],
+   "en": "The caravan finds its order on the road."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Mevlana Türbesi",
+      "en": "The Mevlana Tomb"
+     },
+     "text": {
+      "tr": "Turkuaz kubbe, sakin bir avlu.",
+      "en": "A turquoise dome, a quiet courtyard."
+     }
+    },
+    {
+     "title": {
+      "tr": "Sema",
+      "en": "The Sema"
+     },
+     "text": {
+      "tr": "Bir el göğe, bir el yere.",
+      "en": "One hand to the sky, one to the earth."
+     }
+    },
+    {
+     "title": {
+      "tr": "Etli ekmek",
+      "en": "Etli ekmek"
+     },
+     "text": {
+      "tr": "Bir metre boyunda, fırından yeni.",
+      "en": "A metre long, fresh from the oven."
+     }
+    },
+    {
+     "title": {
+      "tr": "Alaaddin Tepesi",
+      "en": "Alaaddin Hill"
+     },
+     "text": {
+      "tr": "Şehrin tam ortasında bir tepe.",
+      "en": "A hill in the very heart of the city."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Mevlana Bahçesi",
+    "en": "The Mevlana Garden"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city’s most loved bench."
+   }
+  }
+ },
+ "kapadokya": {
+  "proverb": {
+   "tr": [
+    "Üzüm üzüme",
+    "baka baka kararır."
+   ],
+   "en": "Grapes ripen by looking at each other."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Peri bacaları",
+      "en": "The fairy chimneys"
+     },
+     "text": {
+      "tr": "Taştan bir masal ormanı.",
+      "en": "A fairytale forest of stone."
+     }
+    },
+    {
+     "title": {
+      "tr": "Balonlar",
+      "en": "The balloons"
+     },
+     "text": {
+      "tr": "Gün doğarken yüz renk birden.",
+      "en": "A hundred colours at sunrise."
+     }
+    },
+    {
+     "title": {
+      "tr": "Testi kebabı",
+      "en": "Pottery kebab"
+     },
+     "text": {
+      "tr": "Testiyi kırmak sana kalıyor.",
+      "en": "Breaking the pot is your job."
+     }
+    },
+    {
+     "title": {
+      "tr": "Göreme",
+      "en": "Göreme"
+     },
+     "text": {
+      "tr": "Kayaya oyulmuş kiliseler.",
+      "en": "Churches carved into the rock."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Uçhisar",
+    "en": "Uçhisar"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city’s most loved bench."
+   }
+  }
+ },
+ "ankara": {
+  "proverb": {
+   "tr": [
+    "Bugünün işini",
+    "yarına bırakma."
+   ],
+   "en": "Don't leave today's work for tomorrow."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Anıtkabir",
+      "en": "Anıtkabir"
+     },
+     "text": {
+      "tr": "Aslanlı Yol’da sessiz adımlar.",
+      "en": "Quiet steps along the Road of Lions."
+     }
+    },
+    {
+     "title": {
+      "tr": "Ankara Kalesi",
+      "en": "Ankara Castle"
+     },
+     "text": {
+      "tr": "Surlardan bütün başkent.",
+      "en": "The whole capital from the walls."
+     }
+    },
+    {
+     "title": {
+      "tr": "Ankara simidi",
+      "en": "Ankara simit"
+     },
+     "text": {
+      "tr": "Daha koyu, daha çıtır.",
+      "en": "Darker and crunchier."
+     }
+    },
+    {
+     "title": {
+      "tr": "Atakule",
+      "en": "Atakule"
+     },
+     "text": {
+      "tr": "Akşam ışıkları yanarken.",
+      "en": "As the evening lights come on."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Kuğulu Park",
+    "en": "Kuğulu Park"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city’s most loved bench."
+   }
+  }
+ },
+ "trabzon": {
+  "proverb": {
+   "tr": [
+    "Gün doğmadan",
+    "neler doğar."
+   ],
+   "en": "So much is born before the sun rises."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Sümela Manastırı",
+      "en": "Sumela Monastery"
+     },
+     "text": {
+      "tr": "Kayalığa asılı, sisin içinde.",
+      "en": "Hanging on the cliff, inside the mist."
+     }
+    },
+    {
+     "title": {
+      "tr": "Uzungöl",
+      "en": "Uzungöl"
+     },
+     "text": {
+      "tr": "Ayna gibi bir göl.",
+      "en": "A lake like a mirror."
+     }
+    },
+    {
+     "title": {
+      "tr": "Hamsi",
+      "en": "Hamsi"
+     },
+     "text": {
+      "tr": "Mısır ununa bulanmış, çıtır çıtır.",
+      "en": "Rolled in cornmeal, crisp from the pan."
+     }
+    },
+    {
+     "title": {
+      "tr": "Kemençe",
+      "en": "The kemençe"
+     },
+     "text": {
+      "tr": "Horon başlarken.",
+      "en": "As the horon begins."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Meydan Parkı",
+    "en": "Meydan Park"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city’s most loved bench."
+   }
+  }
+ },
+ "erzurum": {
+  "proverb": {
+   "tr": [
+    "Ağır kazan",
+    "geç kaynar."
+   ],
+   "en": "A heavy pot boils late."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Çifte Minareli Medrese",
+      "en": "The Double Minaret Madrasa"
+     },
+     "text": {
+      "tr": "Sekiz yüz yıllık bir kapı.",
+      "en": "A gate eight hundred years old."
+     }
+    },
+    {
+     "title": {
+      "tr": "Palandöken",
+      "en": "Palandöken"
+     },
+     "text": {
+      "tr": "Karda ilk iz.",
+      "en": "The first tracks in the snow."
+     }
+    },
+    {
+     "title": {
+      "tr": "Cağ kebabı",
+      "en": "Cağ kebab"
+     },
+     "text": {
+      "tr": "Şişten doğrudan, sıcacık.",
+      "en": "Straight from the skewer, piping hot."
+     }
+    },
+    {
+     "title": {
+      "tr": "Oltu taşı",
+      "en": "Oltu stone"
+     },
+     "text": {
+      "tr": "Siyah taştan bir tespih.",
+      "en": "Prayer beads of black stone."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Erzurum Kalesi",
+    "en": "Erzurum Castle"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city’s most loved bench."
+   }
+  }
+ },
+ "kars": {
+  "proverb": {
+   "tr": [
+    "Her kışın",
+    "bir baharı vardır."
+   ],
+   "en": "Every winter has its spring."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Kars Kalesi",
+      "en": "Kars Castle"
+     },
+     "text": {
+      "tr": "Şehrin üstünde, karlar içinde.",
+      "en": "Above the city, under snow."
+     }
+    },
+    {
+     "title": {
+      "tr": "Ani",
+      "en": "Ani"
+     },
+     "text": {
+      "tr": "Bin bir kilisenin kenti.",
+      "en": "The city of a thousand and one churches."
+     }
+    },
+    {
+     "title": {
+      "tr": "Kaşar ve bal",
+      "en": "Kashar and honey"
+     },
+     "text": {
+      "tr": "Kars’ın kahvaltısı.",
+      "en": "A Kars breakfast."
+     }
+    },
+    {
+     "title": {
+      "tr": "Çıldır Gölü",
+      "en": "Lake Çıldır"
+     },
+     "text": {
+      "tr": "Buzun üstünde atlı kızaklar.",
+      "en": "Horse sleighs on the ice."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Taş Köprü",
+    "en": "The Stone Bridge"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city’s most loved bench."
+   }
+  }
+ },
+ "van": {
+  "proverb": {
+   "tr": [
+    "Dağ dağa kavuşmaz,",
+    "insan insana kavuşur."
+   ],
+   "en": "Mountains never meet, but people do."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Akdamar Adası",
+      "en": "Akdamar Island"
+     },
+     "text": {
+      "tr": "Gölün ortasında taştan bir kilise.",
+      "en": "A stone church in the middle of the lake."
+     }
+    },
+    {
+     "title": {
+      "tr": "Van Kalesi",
+      "en": "Van Fortress"
+     },
+     "text": {
+      "tr": "Kayanın üstünde, gün batarken.",
+      "en": "On the rock, as the sun goes down."
+     }
+    },
+    {
+     "title": {
+      "tr": "Van kahvaltısı",
+      "en": "A Van breakfast"
+     },
+     "text": {
+      "tr": "Otlu peynir, murtuğa, bal.",
+      "en": "Herb cheese, murtuğa and honey."
+     }
+    },
+    {
+     "title": {
+      "tr": "Van kedisi",
+      "en": "The Van cat"
+     },
+     "text": {
+      "tr": "Bir gözü mavi, bir gözü kehribar.",
+      "en": "One blue eye, one amber."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Van Gölü kıyısı",
+    "en": "The shore of Lake Van"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city’s most loved bench."
+   }
+  }
+ },
+ "gaziantep": {
+  "proverb": {
+   "tr": [
+    "Emek olmadan",
+    "yemek olmaz."
+   ],
+   "en": "No feast without effort."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Gaziantep Kalesi",
+      "en": "Gaziantep Castle"
+     },
+     "text": {
+      "tr": "Höyüğün üstünde, şehrin kalbi.",
+      "en": "On its mound, the heart of the city."
+     }
+    },
+    {
+     "title": {
+      "tr": "Zeugma",
+      "en": "Zeugma"
+     },
+     "text": {
+      "tr": "Çingene Kızı’nın bakışı.",
+      "en": "The gaze of the Gypsy Girl."
+     }
+    },
+    {
+     "title": {
+      "tr": "Baklava",
+      "en": "Baklava"
+     },
+     "text": {
+      "tr": "Fıstıklı, kırk kat.",
+      "en": "Pistachio, forty layers."
+     }
+    },
+    {
+     "title": {
+      "tr": "Bakırcılar Çarşısı",
+      "en": "The Coppersmiths’ Bazaar"
+     },
+     "text": {
+      "tr": "Çekiç sesleri arasında.",
+      "en": "Among the hammer strokes."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Kale eteği",
+    "en": "Below the castle"
+   },
+   "bench": {
+    "tr": "Şehrin en sevilen bankı.",
+    "en": "The city’s most loved bench."
+   }
+  }
+ },
+ "balikesir": {
+  "proverb": {
+   "tr": [
+    "Damlaya damlaya",
+    "göl olur."
+   ],
+   "en": "Drop by drop, a lake is made."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Saat Kulesi",
+      "en": "The Clock Tower"
+     },
+     "text": {
+      "tr": "Her saat başı, senin için çalıyor.",
+      "en": "Every hour, it rings for you."
+     }
+    },
+    {
+     "title": {
+      "tr": "Zağanos Paşa Camii",
+      "en": "Zağanos Paşa Mosque"
+     },
+     "text": {
+      "tr": "Avlusunda serin bir gölge.",
+      "en": "A cool shade in its courtyard."
+     }
+    },
+    {
+     "title": {
+      "tr": "Kuş Cenneti",
+      "en": "The Bird Paradise"
+     },
+     "text": {
+      "tr": "Göl kıyısında binlerce kanat.",
+      "en": "A thousand wings on the lakeshore."
+     }
+    },
+    {
+     "title": {
+      "tr": "Höşmerim",
+      "en": "Höşmerim"
+     },
+     "text": {
+      "tr": "Sıcacık, tatlı, paylaşmalık.",
+      "en": "Warm, sweet, made for sharing."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Kuva-yi Milliye Parkı",
+    "en": "Kuva-yi Milliye Park"
+   },
+   "bench": {
+    "tr": "Saat Kulesi'ne bakan bir bank.",
+    "en": "A bench facing the Clock Tower."
+   }
+  }
+ },
+ "giresun": {
+  "proverb": {
+   "tr": [
+    "Sabreden derviş",
+    "muradına ermiş."
+   ],
+   "en": "The patient one reaches the wish."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Giresun Adası",
+      "en": "Giresun Island"
+     },
+     "text": {
+      "tr": "Karadeniz'in tek adası, dalgaların ortasında.",
+      "en": "The Black Sea's only island, out among the waves."
+     }
+    },
+    {
+     "title": {
+      "tr": "Giresun Kalesi",
+      "en": "Giresun Castle"
+     },
+     "text": {
+      "tr": "Şehrin tepesinde, denize bakıyor.",
+      "en": "On top of the town, looking out to sea."
+     }
+    },
+    {
+     "title": {
+      "tr": "Fındık bahçeleri",
+      "en": "The hazelnut groves"
+     },
+     "text": {
+      "tr": "Yamaçlar yemyeşil.",
+      "en": "The slopes are green, green, green."
+     }
+    },
+    {
+     "title": {
+      "tr": "Kemençe",
+      "en": "The kemençe"
+     },
+     "text": {
+      "tr": "Horon başlarken.",
+      "en": "As the horon begins."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Kale Parkı",
+    "en": "Castle Park"
+   },
+   "bench": {
+    "tr": "Adaya bakan bir bank.",
+    "en": "A bench looking out to the island."
+   }
+  }
+ },
+ "savastepe": {
+  "proverb": {
+   "tr": [
+    "Gülü seven",
+    "dikenine katlanır."
+   ],
+   "en": "Whoever loves the rose bears its thorns."
+  },
+  "text": {
+   "hill": {
+    "tr": "Son tepe. Ardında ev var.",
+    "en": "The last hill. Home is just beyond it."
+   },
+   "rise": {
+    "tr": "Ve ev, seni bekliyordu.",
+    "en": "And home was waiting for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Zeytinlikler",
+      "en": "The olive groves"
+     },
+     "text": {
+      "tr": "Gümüş yapraklar, eve giden yol.",
+      "en": "Silver leaves on the road home."
+     }
+    },
+    {
+     "title": {
+      "tr": "Köy camii",
+      "en": "The village mosque"
+     },
+     "text": {
+      "tr": "Akşam ezanı, tanıdık bir ses.",
+      "en": "The evening call, a voice you know."
+     }
+    },
+    {
+     "title": {
+      "tr": "Ev yemeği",
+      "en": "Home cooking"
+     },
+     "text": {
+      "tr": "Sofra kurulmuş, seni bekliyor.",
+      "en": "The table is laid, waiting for you."
+     }
+    },
+    {
+     "title": {
+      "tr": "Pencerede ışık",
+      "en": "A light in the window"
+     },
+     "text": {
+      "tr": "Eve hoş geldin.",
+      "en": "Welcome home."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Ev",
+    "en": "Home"
+   },
+   "bench": {
+    "tr": "Yolun sonu, en sevdiğin bank.",
+    "en": "The end of the road, your favourite bench."
+   }
+  }
+ }
+}

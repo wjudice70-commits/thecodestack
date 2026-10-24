@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#050405">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Yavaş Yavaş</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div id="app">
+  <canvas id="atmos" class="atmos" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div id="cut" class="cut" aria-hidden="true"></div>
+
+  <!-- Home: the black rose -->
+  <section id="home" class="view is-active" aria-labelledby="wm">
+    <div class="home-glow" aria-hidden="true"></div>
+    <div class="rose-wrap" aria-hidden="true"><div class="rose-drift"><svg id="rose" class="rose"></svg></div></div>
+    <div class="home-copy">
+      <h1 id="wm" class="wordmark"><span class="wm-line">Yavaş</span> <span class="wm-line">Yavaş</span></h1>
+      <p class="tagline" data-t="tagline"></p>
+      <p class="where" id="where"></p>
+      <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+      <ol class="track" id="track" aria-hidden="true"></ol>
+      <button class="cta" id="begin" hidden></button>
+    </div>
+  </section>
+
+  <!-- Journey: the map -->
+  <section id="journey" class="view" aria-labelledby="jt">
+    <div class="map-wrap"><canvas id="map" aria-label=""></canvas></div>
+    <header class="view-head"><p class="kicker" id="j-kicker"></p><h2 id="jt" class="view-title" data-t="journey"></h2></header>
+    <div class="stop-card" id="stop-card"></div>
+    <div class="sheet-nav"><button class="round" id="stop-prev" aria-label="‹"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="round" id="stop-next" aria-label="›"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button></div>
+    <ol class="stop-list" id="stop-list"></ol>
+  </section>
+
+  <!-- Today -->
+  <section id="today" class="view" aria-labelledby="tt">
+    <header class="view-head"><p class="kicker" id="t-kicker"></p><h2 id="tt" class="view-title" data-t="today"></h2></header>
+    <div class="pager" id="pager">
+    <article class="page letter" id="letter"></article>
+    <section class="page wins">
+      <h3 class="section-title" data-t="smallWins"></h3>
+      <p class="hint" data-t="smallWinsHint"></p>
+      <div class="sky-wrap"><canvas id="sky" class="sky" aria-hidden="true"></canvas><p class="wins-count" id="wins-count"></p></div>
+      <div class="win-grid" id="win-grid"></div>
+    </section>
+    <section class="page notes">
+      <h3 class="section-title" data-t="openWhen"></h3>
+      <div class="note-list" id="note-list"></div>
+    </section>
+    </div>
+    <div class="dots" id="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+  </section>
+
+  <!-- Bottom navigation -->
+  <nav class="tabs" id="tabs" aria-label="">
+    <i class="dock-light" aria-hidden="true"></i>
+    <button data-go="home"><svg viewBox="0 0 24 24"><path d="M12 20c-4-2-7-5-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4-3 7-7 9z"/></svg><span data-t="rose"></span></button>
+    <button data-go="story"><svg viewBox="0 0 24 24"><path d="M5 4h9a5 5 0 0 1 5 5v11H10a5 5 0 0 1-5-5zM9 9h6M9 13h6"/></svg><span data-t="story"></span></button>
+    <button data-go="journey"><svg viewBox="0 0 24 24"><path d="M4 18c3-1 4-6 8-6s4 4 8 2M6 18a2 2 0 1 1-.1 0M18 6l2 2-2 2-2-2z"/></svg><span data-t="journey"></span></button>
+    <button data-go="today"><svg viewBox="0 0 24 24"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg><span data-t="today"></span></button>
+  </nav>
+  <button class="lang" id="lang"></button>
+
+  <!-- The film player: story chapters, arrivals, milestones -->
+  <section id="film" class="film" hidden aria-live="polite">
+    <canvas id="film-canvas" class="film-canvas" aria-hidden="true"></canvas>
+    <div class="scrim" aria-hidden="true"></div>
+    <div class="film-top">
+      <button class="round" id="film-close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <ol class="ticks" id="ticks" aria-hidden="true"></ol>
+    </div>
+    <button class="tap tap-back" id="tap-back" data-t-label="back"></button>
+    <button class="tap tap-next" id="tap-next" data-t-label="next"></button>
+    <div class="film-copy" id="film-copy">
+      <p class="kicker" id="f-kicker"></p>
+      <h2 class="film-title" id="f-title"></h2>
+      <p class="film-text" id="f-text"></p>
+      <button class="cta" id="f-cta" hidden></button>
+      <p class="tap-hint" id="f-hint"></p>
+    </div>
+  </section>
+
+  <!-- Open-when note -->
+  <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <div class="modal-card">
+      <p class="kicker" id="m-kicker"></p>
+      <h3 class="modal-title" id="m-title"></h3>
+      <p class="modal-text" id="m-text"></p>
+      <p class="signature" id="m-sign"></p>
+      <button class="cta" id="m-close" data-t="close"></button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <div class="preview-bar" id="preview-bar" hidden>
+    <span data-t="previewOn"></span>
+    <button data-add="1">+1</button><button data-add="24">+24</button><button data-reset>↺</button>
+  </div>
+
+  </div>
+
+  <script src="js/core.js"></script>
+  <script src="js/paint.js"></script>
+  <script src="js/atmos.js"></script>
+  <script src="js/rose.js"></script>
+  <script src="js/story.js"></script>
+  <script src="js/story-rose.js"></script>
+  <script src="js/cities.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/lanterns.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
