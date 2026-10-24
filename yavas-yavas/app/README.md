@@ -3,7 +3,7 @@
 A gift for Nesrin: an offline web app (plain HTML, CSS and JS, no build step) that walks her from İstanbul to Savaştepe one small step at a time while she recovers.
 
 ## What's in it
-- **Gül (home):** the black rose opens from darkness every time the app starts. Its 15 outer petals are the 15 stops; reached stops glow, the next one breathes.
+- **Gül (home):** the black rose opens from darkness every time the app starts. Its outer petals are the stops (one each); reached stops glow, the next one breathes.
 - **Hikâyemiz (Our Story):** 24 painted chapters of our story, tap to go forward or back. Plays automatically the first time.
 - **Yolculuk (Journey):** a night map of Turkey with the gold road, her position, and every reached city's film to rewatch.
 - **Bugün (Today):** the day's letter, one-tap small wins, and "open when" notes.

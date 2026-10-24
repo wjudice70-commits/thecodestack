@@ -310,7 +310,7 @@
     YY.grain($(".grain"));
     atmos = new YY.Atmos($("#atmos")); atmos.start();
     D = await YY.load(); cfg = D.config;
-    rose = YY.Rose.build($("#rose"));
+    YY.stopCount = D.stops.stops.length; rose = YY.Rose.build($("#rose"));
     film = new P.Film($("#film-canvas"));
     map = new YY.JourneyMap($("#map")); map.setStops(D.stops.stops);
     sky = new YY.Sky($("#sky"), cfg.winsPerDay);

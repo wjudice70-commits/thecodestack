@@ -999,6 +999,144 @@
    }
   }
  },
+ "balikesir": {
+  "proverb": {
+   "tr": [
+    "Damlaya damlaya",
+    "göl olur."
+   ],
+   "en": "Drop by drop, a lake is made."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Saat Kulesi",
+      "en": "The Clock Tower"
+     },
+     "text": {
+      "tr": "Her saat başı, senin için çalıyor.",
+      "en": "Every hour, it rings for you."
+     }
+    },
+    {
+     "title": {
+      "tr": "Zağanos Paşa Camii",
+      "en": "Zağanos Paşa Mosque"
+     },
+     "text": {
+      "tr": "Avlusunda serin bir gölge.",
+      "en": "A cool shade in its courtyard."
+     }
+    },
+    {
+     "title": {
+      "tr": "Kuş Cenneti",
+      "en": "The Bird Paradise"
+     },
+     "text": {
+      "tr": "Göl kıyısında binlerce kanat.",
+      "en": "A thousand wings on the lakeshore."
+     }
+    },
+    {
+     "title": {
+      "tr": "Höşmerim",
+      "en": "Höşmerim"
+     },
+     "text": {
+      "tr": "Sıcacık, tatlı, paylaşmalık.",
+      "en": "Warm, sweet, made for sharing."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Kuva-yi Milliye Parkı",
+    "en": "Kuva-yi Milliye Park"
+   },
+   "bench": {
+    "tr": "Saat Kulesi'ne bakan bir bank.",
+    "en": "A bench facing the Clock Tower."
+   }
+  }
+ },
+ "giresun": {
+  "proverb": {
+   "tr": [
+    "Sabreden derviş",
+    "muradına ermiş."
+   ],
+   "en": "The patient one reaches the wish."
+  },
+  "text": {
+   "hill": {
+    "tr": "Tepenin ardında bir şehir seni bekliyor.",
+    "en": "Beyond the hill, a city is waiting for you."
+   },
+   "rise": {
+    "tr": "Ve şehir, senin için boyandı.",
+    "en": "And the city painted itself for you."
+   },
+   "clips": [
+    {
+     "title": {
+      "tr": "Giresun Adası",
+      "en": "Giresun Island"
+     },
+     "text": {
+      "tr": "Karadeniz'in tek adası, dalgaların ortasında.",
+      "en": "The Black Sea's only island, out among the waves."
+     }
+    },
+    {
+     "title": {
+      "tr": "Giresun Kalesi",
+      "en": "Giresun Castle"
+     },
+     "text": {
+      "tr": "Şehrin tepesinde, denize bakıyor.",
+      "en": "On top of the town, looking out to sea."
+     }
+    },
+    {
+     "title": {
+      "tr": "Fındık bahçeleri",
+      "en": "The hazelnut groves"
+     },
+     "text": {
+      "tr": "Yamaçlar yemyeşil.",
+      "en": "The slopes are green, green, green."
+     }
+    },
+    {
+     "title": {
+      "tr": "Kemençe",
+      "en": "The kemençe"
+     },
+     "text": {
+      "tr": "Horon başlarken.",
+      "en": "As the horon begins."
+     }
+    }
+   ],
+   "benchTitle": {
+    "tr": "Kale Parkı",
+    "en": "Castle Park"
+   },
+   "bench": {
+    "tr": "Adaya bakan bir bank.",
+    "en": "A bench looking out to the island."
+   }
+  }
+ },
  "savastepe": {
   "proverb": {
    "tr": [

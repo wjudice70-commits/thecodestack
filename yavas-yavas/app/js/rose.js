@@ -1,10 +1,10 @@
-/* The black rose. Built once in SVG; the 15 outermost petals are the journey, numbered clockwise.
+/* The black rose. Built once in SVG; the outermost petals, one per stop, are the journey, numbered clockwise.
    bloom(): darkness, then a closed bud, then the petals unfurl from the heart outward into the full rose. */
 (() => {
   "use strict";
   const { lerp, clamp, mix, smooth, ease, rng } = YY;
   const NS = "http://www.w3.org/2000/svg";
-  const N = 44, STOPS = 15, GOLDEN = 137.508 * Math.PI / 180, LIGHT = -2.3;
+  const N = 44, GOLDEN = 137.508 * Math.PI / 180, LIGHT = -2.3;
 
   const el = (name, attrs = {}, parent) => {
     const n = document.createElementNS(NS, name);
@@ -26,7 +26,7 @@
 
   const Rose = (YY.Rose = {});
 
-  Rose.build = (svg) => {
+  Rose.build = (svg, STOPS = YY.stopCount || 6) => {
     svg.innerHTML = "";
     svg.setAttribute("viewBox", "-320 -320 640 640");
     const R = rng(11);

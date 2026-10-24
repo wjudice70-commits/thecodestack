@@ -1,4 +1,4 @@
-/* Yavaş Yavaş storybook: the fifteen cities of the journey as recipes for the painter.
+/* Yavaş Yavaş storybook: the cities of the journey as recipes for the painter.
    Each has its own dusk (pal), its own night for the bench (night), the hills behind it (far)
    and its skyline. One look across all of them: watercolor stone and sky, an angel's halo over
    the city's heart, old stone edged in gold and the newest edges traced in neon. */
@@ -310,6 +310,39 @@ export const CITIES = {
       for (const dx of [-700, -560, 520, 680]) { const d = K.dome(x + dx, b - 40, 40, { drum: 10 }); P.mass(K.rect(x + dx, b, 90, 40), .5).mass(d, .6).neon(d, b - 40, P.pal.neon, 1); }
       [K.minaret(x - 620, b, 200, 12), K.minaret(x + 600, b, 210, 12)].forEach(m => P.mass(m, .55).gold(m, b));
       P.halo(x, b - 330, 54);
+    },
+  }),
+  balikesir: city({
+    seed: 131, pal: { sky: ["#1a1438", "#5a3460", "#d0805a", "#f6c890"], sun: { x: .35, y: .78, col: "#ffc880", disc: "#fff0d0" }, far: ["#5a4a5e", "#2e2436"], haze: "#e0c8b8", cloud: ["#f0c0a0", "#a0708a", "#5a3a6a"], splash: ["#c0503a", "#e0b050", "#4a5a8a"], neon: "#ffb05a" },
+    far(P, x, b) { P.ridge(x - 1250, x + 1250, b, 90, "#4a3a50", { shape: (v) => .4 + .6 * Math.sin(v * 2.4 + .3) ** 2 }); },
+    skyline(P, x, b) {
+      const K = P.K;
+      houses(P, x - 1150, x + 1150, b, 50, 13, .4);
+      // the Clock Tower (Saat Kulesi), the heart of the city
+      const st = K.tower(x - 60, b, 58, 250, "clock"); P.mass(st, .55, { col: "#c8a888" }).gold(st, b, 1.2).lights(K.windowsIn(x - 60, b - 60, 30, 150, 1, 4, 3, .8), 3);
+      // Zağanos Paşa Mosque: one dome, two minarets
+      const zm = [K.rect(x + 420, b, 240, 70), K.dome(x + 420, b - 70, 74, { drum: 14, finial: 12 })]; P.many(zm, .5).gold(zm[1], b - 70, .9);
+      [K.minaret(x + 270, b, 250, 12), K.minaret(x + 570, b, 250, 12)].forEach(m => P.mass(m, .55).neon(m, b, P.pal.neon, 1));
+      for (let i = 0; i < 8; i++) P.wash(K.tree(x - 900 + i * 70, b, 60 + (i % 3) * 18, 50, i), "#1e2a1c", { layers: 9, alpha: .1, spread: .25, depth: 1 });
+      P.halo(x - 60, b - 420, 46);
+    },
+  }),
+  giresun: city({
+    seed: 137, pal: { sky: ["#0e1c2c", "#28485a", "#9a8a7a", "#ecd0a0"], sun: { x: .7, y: .74, col: "#ffe0a8", disc: "#fff4d8" }, water: ["#16304a", "#06101c", "#f0c080"], far: ["#2a4a44", "#142a26"], haze: "#c8dcd0", cloud: ["#e0e8e0", "#8aa8a8", "#4a6a7a"], splash: ["#1a7a5a", "#d0a060", "#2a4a8a"], tree: "#08140f", neon: "#70ffb8" },
+    far(P, x, b) {
+      P.ridge(x - 1250, x + 1250, b, 300, "#2a4a40", { shape: (v) => .5 + .5 * Math.sin(v * 3.6 + .8) });
+      // Giresun Island, out in the sea: a low green mound
+      const isl = P.K.ridge(x + 560, x + 860, b + 30, 60, 5, (v) => Math.sin(Math.PI * v) ** .7); P.mass(isl, 0, { col: "#1e3a30", rim: 0 });
+    },
+    skyline(P, x, b) {
+      const K = P.K, R = rng(13);
+      // the castle hill over the town
+      const hill = K.ridge(x - 700, x + 100, b, 220, 7, (v) => Math.sin(Math.PI * v) ** .6); P.mass(hill, 0, { col: "#24402e", rim: 0 });
+      const cas = K.castle(x - 480, x - 140, b - 210, 60, 11); P.mass(cas, .45, { col: "#8a7a68" }).gold(cas, b - 210);
+      houses(P, x - 1150, x + 400, b, 45, 17, .45);
+      // hazelnut groves on the slopes
+      for (let i = 0; i < 26; i++) { const tx = x - 1200 + i * 90 + R() * 30; if (tx > x - 760 && tx < x + 120) continue; P.wash(K.tree(tx, b, lerp(50, 90, R()), 60, i), "#10281e", { layers: 8, alpha: .12, spread: .25, depth: 1 }); }
+      P.halo(x - 310, b - 420, 46);
     },
   }),
   savastepe: city({
