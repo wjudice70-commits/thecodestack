@@ -236,7 +236,7 @@
   function playStory(start = 0) {
     const scenes = D.story.scenes, last = scenes.length - 1;
     const list = scenes.map((s, i) => ({
-      scene: s.scene, kicker: `${t("story")} · ${i + 1} / ${scenes.length}`, title: L(s.title), text: L(s.text),
+      scene: s.scene, image: s.image, fx: s.fx, rose: s.rose, kicker: `${t("story")} · ${i + 1} / ${scenes.length}`, title: L(s.title), text: L(s.text),
       cta: i === last ? (state.storySeen ? t("done") : t("startJourney")) : null,
     }));
     $("#tabs").classList.remove("is-on"); $("#lang").classList.remove("is-on"); document.body.classList.add("in-film"); atmos.stop();

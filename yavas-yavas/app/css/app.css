@@ -262,18 +262,19 @@ svg { display: block; }
 @media (prefers-reduced-motion: reduce) { .cine, .cine-end, .cine-scrap { transition: none; } .cine-cap.is-on > * { animation: none; opacity: 1; translate: 0 0; } }
 body.in-cine .preview-bar { display: none !important; }
 /* Storybook films: the bench clip is portrait. On a phone it fills the screen; on wider screens it stands
-   in the middle with its edges dissolving into the painted night behind it. */
+   in the middle, edges clean. */
 .book { overflow: hidden; }
 .book-video { position: absolute; top: 0; left: 50%; height: 100%; width: auto; aspect-ratio: 9 / 16; translate: -50% 0; object-fit: cover; z-index: 0; opacity: 0; pointer-events: none; display: none; }
 .book.is-video .book-video { display: block; }
-@media (min-aspect-ratio: 9/16) { .book-video { -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); } }
+/* Brother (2026-11-01): no shadowed edges on the bench clips, so no edge mask and no vignette while one plays. */
+body:has(.book.is-video) .vignette { opacity: 0; }
 
 /* =====================================================================
    Cinematic system v2: one room, one light, one cut.
    ===================================================================== */
 :root { --gold-2: #d9a54a; --ember: #ff7a4a; --glass: rgba(14, 9, 11, .62); --hair: rgba(244, 211, 154, .28); }
 .atmos { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-.vignette { position: fixed; inset: 0; z-index: 59; pointer-events: none;
+.vignette { position: fixed; inset: 0; z-index: 59; pointer-events: none; transition: opacity .6s;
   background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0,0,0,.55) 100%); }
 #home, #journey, #today { background: transparent; }
 .view { z-index: 1; }
@@ -426,6 +427,9 @@ body.in-cine .preview-bar { display: none !important; }
 .reel-art, .reel-rose { transition: opacity .7s var(--ease-film); }
 .reel.is-cutting .reel-art, .reel.is-cutting .reel-petals { opacity: 0; }
 .reel.is-cutting .reel-rose { opacity: .25; }
+.reel-photo { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; transition: opacity .7s var(--ease-film); }
+.reel.is-cutting .reel-photo { opacity: 0; }
+.reel.has-photo .reel-art, .reel.has-photo:not(.keep-rose) .reel-rose { opacity: 0; }
 .reel-dust { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .reel .scrim { height: 44%; }
 @media (min-width: 100000px) /* phone frame: never wide */ { .reel-stage { left: 30%; width: 70%; height: 92%; } }

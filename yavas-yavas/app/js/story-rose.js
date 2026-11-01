@@ -112,12 +112,12 @@
   </defs>`;
 
   /* ---------- The player ---------- */
-  let ui, rose, drift, stage, art, roseG, roseSvg, bg, dust, open = 1, openT = 1, raf, timer, idx = 0, scenes, done, t0;
+  let ui, photoCv, photo = null, imgs = {}, rose, drift, stage, art, roseG, roseSvg, bg, dust, open = 1, openT = 1, raf, timer, idx = 0, scenes, done, t0;
 
   function build() {
     ui = document.createElement("section");
     ui.className = "film reel"; ui.hidden = true;
-    ui.innerHTML = `<div class="reel-bg"></div>
+    ui.innerHTML = `<div class="reel-bg"></div><canvas class="reel-photo"></canvas>
       <svg class="reel-stage" viewBox="-300 -560 600 1000" preserveAspectRatio="xMidYMin meet">${DEFS}
         <rect class="reel-sky" x="-3000" y="-3000" width="6000" height="6000" fill="#000" opacity="0"/>
         <g class="reel-art"></g><g class="reel-rose"><g class="reel-drift"><svg class="reel-rose-svg" x="-300" y="-300" width="600" height="600" overflow="visible"></svg></g></g><g class="reel-petals"></g></svg>
@@ -127,7 +127,7 @@
       <div class="film-copy"><p class="kicker"></p><h2 class="film-title"></h2><p class="film-text"></p><button class="cta" hidden></button><p class="tap-hint"></p></div>`;
     (document.getElementById("app") || document.body).appendChild(ui);
     stage = ui.querySelector(".reel-stage"); art = ui.querySelector(".reel-art"); roseG = ui.querySelector(".reel-rose");
-    roseSvg = ui.querySelector(".reel-rose-svg"); drift = ui.querySelector(".reel-drift"); bg = ui.querySelector(".reel-bg"); dust = ui.querySelector(".reel-dust");
+    roseSvg = ui.querySelector(".reel-rose-svg"); drift = ui.querySelector(".reel-drift"); bg = ui.querySelector(".reel-bg"); dust = ui.querySelector(".reel-dust"); photoCv = ui.querySelector(".reel-photo");
     rose = YY.Rose.build(roseSvg); roseSvg.setAttribute("viewBox", "-320 -320 640 640");
     ui.querySelector(".reel-next").onclick = () => { if (!scenes[idx].cta) next(); };
     ui.querySelector(".reel-back").onclick = () => show(Math.max(0, idx - 1));
@@ -166,7 +166,14 @@
       roseG.style.transform = `translate(${x}px, ${y}px) scale(${k})`;
       openT = o;
       if (sc.climb) setTimeout(() => { if (idx === i) roseG.style.transform = `translate(${sc.climb[0]}px, ${sc.climb[1]}px) scale(${k * .8})`; }, 1600);
-      fall(sc.fall || sc.rise || 0, !!sc.rise);
+      // Brother's own picture for this scene, if it is in the folder; otherwise the painted still life stays.
+      photo = null; ui.classList.remove("has-photo", "keep-rose");
+      if (s.image) {
+        const im = imgs[s.image] || (imgs[s.image] = Object.assign(new Image(), { src: s.image }));
+        const on = () => { if (idx === i && im.naturalWidth) { photo = im; ui.classList.add("has-photo"); ui.classList.toggle("keep-rose", !!s.rose); } };
+        im.complete ? on() : im.addEventListener("load", on, { once: true });
+      }
+      fall(photo && !s.rose ? 0 : sc.fall || sc.rise || 0, !!sc.rise);
       ui.classList.toggle("is-sky", !!sc.sky);
       const copy = ui.querySelector(".film-copy");
       copy.querySelector(".kicker").textContent = s.kicker; copy.querySelector(".film-title").textContent = s.title; copy.querySelector(".film-text").textContent = s.text;
@@ -196,11 +203,13 @@
     const dur = clamp(6 + (s.text || "").length * .055, 7, 16) * 1000, k = clamp((now - t0) / dur);
     const li = ui.querySelectorAll(".ticks li")[idx]; if (li) li.querySelector("i").style.width = `${(k * 100).toFixed(1)}%`;
     if (k >= 1 && !s.cta && !YY.reduceMotion && !ui.classList.contains("is-cutting")) next();
-    drawDust(now / 1000);
+    drawDust(now / 1000, k, s);
     raf = requestAnimationFrame(loop);
   }
   let motes;
-  function drawDust(t) {
+  function drawDust(t, k, s) {
+    const tt = YY.reduceMotion ? 4 : t;   // reduce-motion: the effects hold still as one frame
+    const F = YY.StoryFx.drawPhoto(photoCv, photo, k, tt, s.fx) || YY.StoryFx.frame(dust.clientWidth, dust.clientHeight, 9 / 16);
     const c = dust.getContext("2d"), W = dust.width = dust.clientWidth, H = dust.height = dust.clientHeight;
     if (!motes) { const R = rng(17); motes = Array.from({ length: 60 }, () => ({ x: R(), y: R(), s: lerp(.5, 2.2, R() * R()), sp: lerp(.004, .016, R()), ph: R() * 6 })); }
     c.clearRect(0, 0, W, H); c.globalCompositeOperation = "lighter";
@@ -209,6 +218,8 @@
       c.fillStyle = `rgba(255,226,190,${(.22 * (.5 + .5 * Math.sin(t * .7 + d.ph)) * clamp(1.4 - x / W)).toFixed(3)})`;
       c.beginPath(); c.arc(x, y, d.s, 0, 7); c.fill();
     }
+    c.globalCompositeOperation = "source-over";
+    YY.StoryFx.drawFx(c, F, tt, s.fx);
   }
 
   // scenes: [{ scene, kicker, title, text, cta }]. Resolves "done" or "closed".
