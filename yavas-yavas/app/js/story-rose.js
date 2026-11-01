@@ -41,7 +41,7 @@
   const ground = (y, c = "#0a0607") => `<rect x="-3000" y="${y}" width="6000" height="3000" fill="${c}"/><path d="M-3000 ${y}H3000" stroke="rgba(244,211,154,.18)" stroke-width="1.2"/>`;
   const script = (x, y, text) => `<text class="rr-write" x="${x}" y="${y}" text-anchor="middle" font-family="Cormorant, Georgia, serif" font-style="italic" font-size="64" fill="none" stroke="#f4d39a" stroke-width="1.4">${text}</text>`;
 
-  /* ---------- The 24 scenes. rose: [x, y, size, open 0..1]; bg: two colours of the light; fall: petals that drop. ---------- */
+  /* ---------- The painted fallbacks (data/story.json picks 15 of them). rose: [x, y, size, open 0..1]; bg: two colours of the light; fall: petals that drop. ---------- */
   const SCENES = {
     lake: { bg: ["#0b1124", "#020308"], rose: [-60, 40, 230, .6], art: () => `${moon(-170, -400)}
       <path d="M90 -560H330V160H90Z" fill="#07060a"/>${windowLit(150, -250, 80, 96)}${windowLit(150, -420, 80, 96, .25)}${windowLit(150, -80, 80, 96, .2)}
