@@ -1,0 +1,210 @@
+{
+  "_note": "The journey, in order. flow/still (optional) = Brother's own Google Flow film for that city and a still from it; when set, the film button plays it. lon/lat place the city on the map; 'scene' names a painter in js/cities.js; 'stage' is the recovery stage shown on arrival (see recovery). 'stageLines' is the caption of each milestone film. 'later' holds stops taken out for now (2026-10-24, Brother: 6 stops for now); move one back into 'stops' to bring it back. Balıkesir sits a little north-east of its true spot (39.65, 27.88) so it doesn't cover Savaştepe on the map.",
+  "recovery": {
+    "wheelchair": {
+      "tr": "Tekerlekli sandalye",
+      "en": "Wheelchair"
+    },
+    "walker": {
+      "tr": "Yürüteç",
+      "en": "Walker"
+    },
+    "crutches": {
+      "tr": "Koltuk değnekleri",
+      "en": "Crutches"
+    },
+    "free": {
+      "tr": "Özgürce koşuyor",
+      "en": "Running free"
+    }
+  },
+  "stops": [
+    {
+      "id": "istanbul",
+      "flow": "films/istanbul-flow.mp4",
+      "still": "films/istanbul-flow-poster.jpg",
+      "name": "İstanbul",
+      "lon": 28.98,
+      "lat": 41.01,
+      "stage": "wheelchair",
+      "line": {
+        "tr": "Yolculuk burada başlıyor. Boğaz'ın üstünde akşam, ve sen ilk adımını attın.",
+        "en": "The journey begins here. Evening over the Bosphorus, and you've taken your first step."
+      }
+    },
+    {
+      "id": "bursa",
+      "name": "Bursa",
+      "lon": 29.06,
+      "lat": 40.19,
+      "stage": "wheelchair",
+      "line": {
+        "tr": "Uludağ'ın gölgesinde yeşil kubbeler. Yavaş ama durmadan.",
+        "en": "Green domes in the shadow of Uludağ. Slowly, but never stopping."
+      }
+    },
+    {
+      "id": "canakkale",
+      "name": "Çanakkale",
+      "lon": 26.41,
+      "lat": 40.15,
+      "stage": "walker",
+      "line": {
+        "tr": "İki kıtanın arasındaki boğaz. Sen de iki hâlin arasındasın ve öbür kıyıya geçiyorsun.",
+        "en": "A strait between two continents. You're crossing to the other shore too."
+      }
+    },
+    {
+      "id": "balikesir",
+      "name": "Balıkesir",
+      "lon": 28.3,
+      "lat": 39.9,
+      "stage": "crutches",
+      "line": {
+        "tr": "Saat Kulesi'nin çanı, Kuş Cenneti'nin kanatları. Eve çok az kaldı.",
+        "en": "The bell of the Clock Tower, the wings over the Bird Paradise. Home is very close now."
+      }
+    },
+    {
+      "id": "giresun",
+      "name": "Giresun",
+      "lon": 38.39,
+      "lat": 40.91,
+      "stage": "crutches",
+      "line": {
+        "tr": "Karadeniz'in tek adası, kalenin altında fındık bahçeleri.",
+        "en": "The Black Sea's only island, hazelnut groves below the castle."
+      }
+    },
+    {
+      "id": "savastepe",
+      "name": "Savaştepe",
+      "lon": 27.65,
+      "lat": 39.38,
+      "stage": "free",
+      "line": {
+        "tr": "Eve hoş geldin. Zeytin ağaçları, altın ışık ve seni bekleyen bir bank.",
+        "en": "Welcome home. Olive trees, golden light, and a bench that's been waiting for you."
+      }
+    }
+  ],
+  "stageLines": {
+    "wheelchair": {
+      "tr": "Şimdilik tekerlekler taşıyor seni. Her yolculuk böyle başlar: biri seni taşır, sen de iyileşirsin.",
+      "en": "For now, wheels carry you. Every journey starts this way: something carries you while you heal."
+    },
+    "walker": {
+      "tr": "Kendi ayaklarının üstündesin. Yavaş, dikkatli, ama senin adımların.",
+      "en": "You're on your own feet. Slow and careful, but your steps."
+    },
+    "crutches": {
+      "tr": "Daha hafif, daha hızlı. Arkada bıraktığın yolun uzunluğuna bak.",
+      "en": "Lighter, quicker. Look how long the road behind you is."
+    },
+    "free": {
+      "tr": "Ve şimdi, hiçbir şeye tutunmadan. Koş, sevgilim.",
+      "en": "And now, holding on to nothing. Run, my love."
+    }
+  },
+  "later": [
+    {
+      "id": "izmir",
+      "name": "İzmir",
+      "lon": 27.14,
+      "lat": 38.42,
+      "stage": "wheelchair",
+      "line": {
+        "tr": "Kordon'da gün batımı. Saat Kulesi biliyor: her saat seni biraz daha güçlü buluyor.",
+        "en": "Sunset on the Kordon. The clock tower knows: every hour finds you a little stronger."
+      }
+    },
+    {
+      "id": "pamukkale",
+      "name": "Pamukkale",
+      "lon": 29.12,
+      "lat": 37.92,
+      "stage": "walker",
+      "line": {
+        "tr": "Bu beyaz teraslar binlerce yılda, damla damla oluştu. Senin iyileşmen gibi.",
+        "en": "These white terraces formed drop by drop over thousands of years. Like your healing."
+      }
+    },
+    {
+      "id": "antalya",
+      "name": "Antalya",
+      "lon": 30.71,
+      "lat": 36.9,
+      "stage": "walker",
+      "line": {
+        "tr": "Turkuaz deniz, sıcak kayalar. Bugün biraz güneş senin hakkın.",
+        "en": "Turquoise sea, warm cliffs. A little sunshine is yours today."
+      }
+    },
+    {
+      "id": "konya",
+      "name": "Konya",
+      "lon": 32.49,
+      "lat": 37.87,
+      "stage": "walker",
+      "line": {
+        "tr": "Mevlana der ki: yara, ışığın içine girdiği yerdir.",
+        "en": "Rumi said: the wound is the place where the light enters you."
+      }
+    },
+    {
+      "id": "kapadokya",
+      "name": "Kapadokya",
+      "lon": 34.83,
+      "lat": 38.64,
+      "stage": "walker",
+      "line": {
+        "tr": "Şafakta yükselen balonlar. Sen de yükseliyorsun.",
+        "en": "Balloons rising at dawn. So are you."
+      }
+    },
+    {
+      "id": "ankara",
+      "name": "Ankara",
+      "lon": 32.86,
+      "lat": 39.93,
+      "stage": "crutches",
+      "line": {
+        "tr": "Başkentin ışıkları. Koltuk değneklerinle, başın dik.",
+        "en": "The lights of the capital. On crutches now, head held high."
+      }
+    },
+    {
+      "id": "trabzon",
+      "name": "Trabzon",
+      "lon": 39.72,
+      "lat": 41.0,
+      "stage": "crutches",
+      "line": {
+        "tr": "Sisli yeşil dağlar, çay kokusu, kayalara tutunmuş Sümela.",
+        "en": "Misty green mountains, the smell of tea, Sümela holding on to the cliff."
+      }
+    },
+    {
+      "id": "erzurum",
+      "name": "Erzurum",
+      "lon": 41.27,
+      "lat": 39.9,
+      "stage": "crutches",
+      "line": {
+        "tr": "Kar yağıyor ama içerisi sıcak. Fırtınalar geçer.",
+        "en": "Snow is falling, but it's warm inside. Storms pass."
+      }
+    },
+    {
+      "id": "kars",
+      "name": "Kars",
+      "lon": 43.1,
+      "lat": 40.6,
+      "stage": "crutches",
+      "line": {
+        "tr": "Kalenin altında beyaz sessizlik. Bu kadar uzağa geldin.",
+        "en": "White silence beneath the castle. Look how far you've come."
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "_note": "One-tap small wins. Rest counts too.",
+  "wins": [
+    { "id": "meds",     "tr": "İlaçlarımı aldım",            "en": "Took my medicine" },
+    { "id": "water",    "tr": "Bol su içtim",                "en": "Drank plenty of water" },
+    { "id": "breathe",  "tr": "Nefes egzersizi yaptım",      "en": "Did my breathing exercises" },
+    { "id": "sit",      "tr": "Kendi başıma oturdum",        "en": "Sat up on my own" },
+    { "id": "stand",    "tr": "Bir an ayağa kalktım",        "en": "Stood up for a moment" },
+    { "id": "steps",    "tr": "Birkaç adım attım",           "en": "Took a few steps" },
+    { "id": "pt",       "tr": "Fizik tedavimi yaptım",       "en": "Did my physical therapy" },
+    { "id": "meal",     "tr": "Güzel bir öğün yedim",        "en": "Ate a good meal" },
+    { "id": "hair",     "tr": "Saçımı taradım, yüzümü yıkadım", "en": "Brushed my hair, washed my face" },
+    { "id": "window",   "tr": "Pencereden dışarı baktım",    "en": "Looked out the window a while" },
+    { "id": "outside",  "tr": "Biraz temiz hava aldım",      "en": "Got some fresh air" },
+    { "id": "call",     "tr": "Sevdiğim birini aradım",      "en": "Called someone I love" },
+    { "id": "laugh",    "tr": "Bugün güldüm",                "en": "Laughed today" },
+    { "id": "rest",     "tr": "Suçluluk duymadan dinlendim", "en": "Rested without guilt" },
+    { "id": "sleep",    "tr": "İyi uyudum",                  "en": "Slept well" },
+    { "id": "help",     "tr": "Yardım istedim",              "en": "Asked for help" }
+  ]
+}

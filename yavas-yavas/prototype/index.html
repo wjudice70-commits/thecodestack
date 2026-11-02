@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050405">
+<title>Yavaş Yavaş</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Scene 0: home. The black rose; each outer petal is one step of the journey. -->
+<section class="scene scene-home" id="home" aria-label="Home">
+  <div class="home-glow" aria-hidden="true"></div>
+  <canvas class="dust" aria-hidden="true"></canvas>
+  <div class="rose-wrap" aria-hidden="true">
+    <svg class="rose" viewBox="-300 -300 600 600"></svg>
+  </div>
+  <div class="lift-wrap" aria-hidden="true">
+    <svg class="lift" viewBox="-300 -300 600 600"></svg>
+  </div>
+  <div class="home-copy">
+    <h1 class="wordmark">
+      <span class="wm-line">Yavaş</span>
+      <span class="wm-line">Yavaş</span>
+    </h1>
+    <p class="tagline">slowly, slowly, it became us</p>
+    <button class="cta" type="button" data-go="step-1">
+      <span>Begin our story</span>
+    </button>
+  </div>
+</section>
+
+<!-- Scene 1: first petal / Our Story. Night city with shallow depth of field. -->
+<section class="scene scene-step" id="step-1" aria-label="Chapter one" hidden>
+  <canvas class="city" aria-hidden="true"></canvas>
+  <svg class="falling-petal" viewBox="-50 -70 100 115" aria-hidden="true"></svg>
+  <div class="scrim" aria-hidden="true"></div>
+
+  <header class="step-top">
+    <button class="back" type="button" data-go="home" aria-label="Back to the rose">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <ol class="petals" aria-label="Journey progress"></ol>
+  </header>
+
+  <div class="step-copy">
+    <p class="kicker">Chapter I &middot; Our Story</p>
+    <h2 class="step-title">Where it began</h2>
+    <div class="story">
+      <p>One city. Two strangers. A night that refused to end.</p>
+      <p>We did not fall fast. We fell <em>yavaş yavaş</em>, slowly, slowly, and that is why it held.</p>
+    </div>
+    <button class="cta cta-small" type="button" disabled>
+      <span>Next chapter</span>
+    </button>
+  </div>
+</section>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="curtain" aria-hidden="true"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

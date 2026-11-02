@@ -1,0 +1,232 @@
+/* Yavaş Yavaş prototype: cinematic home + chapter one.
+   Type: Cormorant Garamond (display) + Inter (reading). Both self-hosted, OFL. */
+
+@font-face { font-family: "Cormorant"; font-style: normal; font-weight: 300 700; font-display: swap;
+  src: url(fonts/cormorant-normal-latin.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Cormorant"; font-style: normal; font-weight: 300 700; font-display: swap;
+  src: url(fonts/cormorant-normal-latin-ext.woff2) format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Cormorant"; font-style: italic; font-weight: 300 700; font-display: swap;
+  src: url(fonts/cormorant-italic-latin.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Cormorant"; font-style: italic; font-weight: 300 700; font-display: swap;
+  src: url(fonts/cormorant-italic-latin-ext.woff2) format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 300 700; font-display: swap;
+  src: url(fonts/inter-normal-latin.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 300 700; font-display: swap;
+  src: url(fonts/inter-normal-latin-ext.woff2) format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+:root {
+  --black: #050405;
+  --ink: #f3ece4;        /* 18:1 on black */
+  --ink-2: #cdc3ba;      /* 11:1 on black */
+  --rose-gold: #dcaaa0;  /* 9:1 on black, for small labels */
+  --crimson: #8f1d2e;    /* decoration only, never body text */
+  --ease-film: cubic-bezier(.22, .61, .21, 1);
+  --display: "Cormorant", "Cormorant Garamond", Georgia, serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; background: var(--black); color: var(--ink); }
+body {
+  font-family: var(--body);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+[hidden] { display: none !important; }
+
+.scene { position: fixed; inset: 0; overflow: hidden; }
+
+/* ---------- Home: the black rose ---------- */
+
+.scene-home {
+  background:
+    radial-gradient(60% 50% at 50% 40%, #1a0f12 0%, #0b0708 55%, var(--black) 100%);
+}
+.home-glow {
+  position: absolute; left: 50%; top: 40%;
+  width: min(130vmin, 980px); aspect-ratio: 1;
+  translate: -50% -50%;
+  background: radial-gradient(closest-side, rgba(120, 18, 34, .34), rgba(60, 8, 18, .12) 55%, transparent 75%);
+  filter: blur(20px);
+  animation: glow-breathe 9s ease-in-out infinite alternate;
+}
+@keyframes glow-breathe { from { opacity: .7; scale: .96; } to { opacity: 1; scale: 1.04; } }
+
+.dust { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.rose-wrap, .lift-wrap {
+  position: absolute; left: 50%; top: 40%;
+  width: min(84vmin, 620px); aspect-ratio: 1;
+  translate: -50% -50%;
+  will-change: transform, filter;
+}
+.lift-wrap { pointer-events: none; }
+.lift { width: 100%; height: 100%; overflow: visible; }
+.rose { width: 100%; height: 100%; overflow: visible; animation: rose-drift 32s ease-in-out infinite alternate; }
+@keyframes rose-drift {
+  from { transform: rotate(-3deg) scale(1); }
+  to   { transform: rotate(4deg) scale(1.045); }
+}
+.rose .journey-glow { animation: ember 4.5s ease-in-out infinite alternate; }
+@keyframes ember { from { opacity: .25; } to { opacity: .95; } }
+
+.home-copy {
+  position: absolute; left: 0; right: 0; bottom: max(7vh, 40px);
+  display: grid; justify-items: center; gap: 14px;
+  padding: 0 24px; text-align: center;
+}
+.wordmark {
+  font-family: var(--display); font-weight: 500;
+  font-size: clamp(52px, 9vw, 112px); line-height: .92; letter-spacing: .02em;
+  display: flex; gap: .28em; flex-wrap: wrap; justify-content: center;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, .9);
+}
+.wm-line { display: inline-block; clip-path: inset(0 0 100% 0); translate: 0 .35em; }
+.tagline {
+  font-family: var(--display); font-style: italic; font-weight: 500;
+  font-size: clamp(19px, 2.1vw, 24px); color: var(--rose-gold); letter-spacing: .02em;
+  opacity: 0;
+}
+
+.cta {
+  margin-top: 14px;
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  min-height: 52px; padding: 0 34px; border-radius: 999px;
+  font-size: 13px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--ink);
+  background: rgba(20, 10, 12, .55);
+  border: 1px solid rgba(220, 170, 160, .45);
+  backdrop-filter: blur(6px);
+  transition: border-color .6s var(--ease-film), background .6s var(--ease-film);
+  opacity: 0;
+}
+.cta:hover, .cta:focus-visible { border-color: rgba(243, 236, 228, .9); background: rgba(70, 14, 24, .55); }
+.cta:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.cta[disabled] { cursor: default; border-color: rgba(220, 170, 160, .25); color: var(--ink-2); }
+
+/* Intro timeline: everything waits for .is-in so it plays once per visit. */
+.scene-home.is-in .wm-line { animation: wipe-up 1.8s var(--ease-film) forwards; }
+.scene-home.is-in .wm-line:nth-child(2) { animation-delay: .25s; }
+.scene-home.is-in .tagline { animation: fade-up 1.6s var(--ease-film) 1.1s forwards; }
+.scene-home.is-in .cta { animation: fade-up 1.6s var(--ease-film) 1.6s forwards; }
+.scene-home.is-in .rose-wrap { animation: rose-in 4.2s var(--ease-film) both; }
+@keyframes rose-in {
+  from { opacity: 0; filter: blur(18px) brightness(.4); transform: scale(1.12); }
+  to   { opacity: 1; filter: blur(0) brightness(1); transform: scale(1); }
+}
+@keyframes wipe-up { to { clip-path: inset(0 0 -20% 0); translate: 0 0; } }
+@keyframes fade-up { from { opacity: 0; translate: 0 12px; } to { opacity: 1; translate: 0 0; } }
+
+/* Leaving home: the rose push and petal lift run from app.js (go). */
+.scene-home.is-leaving .home-copy { transition: opacity .9s ease; opacity: 0; }
+
+/* ---------- Chapter one: night city ---------- */
+
+.scene-step { background: #04040a; }
+.city { position: absolute; inset: 0; width: 100%; height: 100%; }
+.scene-step.is-in .city { animation: focus-pull 3.4s var(--ease-film) both; }
+@keyframes focus-pull {
+  from { opacity: 0; transform: scale(1.1); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.falling-petal {
+  position: absolute; left: 0; top: 0; width: clamp(54px, 7vw, 92px); height: auto;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .6));
+  will-change: transform; pointer-events: none;
+}
+
+/* Text never sits on the busy image: a deep gradient scrim carries it. */
+.scrim {
+  position: absolute; inset: auto 0 0 0; height: 72%;
+  background: linear-gradient(to top,
+    rgba(3, 2, 4, .96) 0%, rgba(3, 2, 4, .9) 30%, rgba(3, 2, 4, .55) 62%, transparent 100%);
+}
+@media (min-width: 900px) {
+  .scrim { inset: 0 auto 0 0; width: 62%; height: auto;
+    background: linear-gradient(to right, rgba(3, 2, 4, .94) 0%, rgba(3, 2, 4, .82) 45%, rgba(3, 2, 4, .3) 80%, transparent 100%); }
+}
+
+.step-top {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: max(env(safe-area-inset-top), 20px) clamp(16px, 4vw, 48px) 0;
+  opacity: 0;
+}
+.scene-step.is-in .step-top { animation: fade-up 1.2s var(--ease-film) 1.4s forwards; }
+.back {
+  width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(10, 6, 8, .55); border: 1px solid rgba(220, 170, 160, .35);
+}
+.back svg { width: 20px; height: 20px; fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.back:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.petals { list-style: none; padding: 0; display: flex; gap: 10px; }
+.petals li { width: 13px; height: 17px; }
+.petals svg { width: 100%; height: 100%; display: block; }
+
+.step-copy {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 0 clamp(22px, 6vw, 96px) max(env(safe-area-inset-bottom), 44px);
+  max-width: 720px;
+}
+@media (min-width: 900px) { .step-copy { top: 50%; bottom: auto; translate: 0 -40%; padding-bottom: 0; } }
+.kicker {
+  font-size: 12px; font-weight: 500; letter-spacing: .26em; text-transform: uppercase;
+  color: var(--rose-gold); margin-bottom: 14px;
+}
+.step-title {
+  font-family: var(--display); font-weight: 500;
+  font-size: clamp(46px, 6.4vw, 88px); line-height: .98; letter-spacing: -.005em;
+  margin-bottom: 22px;
+}
+.story { display: grid; gap: 14px; max-width: 34ch; }
+.story p {
+  font-size: clamp(17px, 1.35vw, 20px); line-height: 1.6; color: var(--ink-2);
+  font-weight: 400;
+}
+.story em { font-family: var(--display); font-style: italic; font-size: 1.15em; line-height: 1; color: var(--ink); }
+.step-copy > * { opacity: 0; }
+.scene-step.is-in .kicker      { animation: fade-up 1.4s var(--ease-film) 1.6s forwards; }
+.scene-step.is-in .step-title  { animation: title-in 2.2s var(--ease-film) 1.9s forwards; }
+.scene-step.is-in .story       { animation: fade-up 1.6s var(--ease-film) 2.8s forwards; }
+.scene-step.is-in .cta-small   { animation: fade-up 1.4s var(--ease-film) 3.6s forwards; }
+.cta-small { margin-top: 30px; }
+@keyframes title-in {
+  from { opacity: 0; filter: blur(10px); letter-spacing: .06em; }
+  to   { opacity: 1; filter: blur(0); letter-spacing: -.005em; }
+}
+
+/* ---------- Film finish, shared by every scene ---------- */
+
+.grain {
+  position: fixed; inset: -256px; pointer-events: none; z-index: 5;
+  opacity: .07; mix-blend-mode: overlay; background-size: 256px 256px;
+  animation: grain-jitter .5s steps(12) infinite;
+}
+@keyframes grain-jitter {
+  0% { transform: translate(0, 0); } 17% { transform: translate(-83px, 41px); }
+  33% { transform: translate(57px, -119px); } 50% { transform: translate(-151px, -23px); }
+  67% { transform: translate(131px, 97px); } 83% { transform: translate(-29px, 173px); }
+  100% { transform: translate(0, 0); }
+}
+.vignette {
+  position: fixed; inset: 0; pointer-events: none; z-index: 4;
+  background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0, 0, 0, .65) 100%);
+}
+.curtain {
+  position: fixed; inset: 0; z-index: 6; pointer-events: none;
+  background: #000; opacity: 1; transition: opacity 1.4s ease;
+}
+.curtain.is-open { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
+}

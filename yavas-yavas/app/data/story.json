@@ -1,0 +1,215 @@
+{
+  "_note": "Our Story, one entry per scene. 'scene' names a painter in js/story.js. Edit the words freely; keep the ids. 'image' is Brother's picture for the scene (1080x1920 portrait JPG in photos/story/); until the file exists the painted scene plays. 'fx' lists the code-drawn effects laid over it (js/story-fx.js; x, y are 0..1 of the picture). Add \"rose\": true to keep the black rose over the picture.",
+  "scenes": [
+    {
+      "id": "lake",
+      "scene": "lake",
+      "title": {
+        "tr": "Üçüncü kat",
+        "en": "The third floor"
+      },
+      "text": {
+        "tr": "Göle bakan, üçüncü kattaki bir pencere. Seninle tanışmak için o merdivenleri çıktım ve bir daha hiç gitmedim. Gece bitene kadar konuştuk. O günden sonra neredeyse hiç ayrılmadık. Hep gülen, hep sarılan, arkadaşlarımızı şakayla bıktıran iki kişi olduk.",
+        "en": "A window on the third floor, looking over the lake. I climbed those stairs to meet you, and I never really left. We talked until the night ran out. After that we were hardly ever apart: always smiling, always holding on, the kind of love our friends jokingly said made them sick."
+      },
+      "image": "photos/story/01-lake.jpg",
+      "fx": [{"type": "mist", "y": 0.6, "h": 0.15}, {"type": "glitter", "region": [0.15, 0.62, 0.7, 0.12]}, {"type": "flicker", "at": [[0.7, 0.3]], "r": 0.25, "a": 0.25}]
+    },
+    {
+      "id": "panda",
+      "scene": "lanterns",
+      "title": {
+        "tr": "Panda Fest",
+        "en": "Panda Fest"
+      },
+      "text": {
+        "tr": "Sevil ve Tommy ile ilk çifte randevumuz. Nashville'de, binlerce parlayan fenerin altında.",
+        "en": "Our first double date, with Sevil and Tommy, under a thousand glowing lanterns in Nashville."
+      },
+      "image": "photos/story/02-lanterns.jpg",
+      "fx": [{"type": "embers", "region": [0.05, 0.95, 0.9], "n": 30, "h": 1}, {"type": "bokeh", "region": [0, 0, 1, 0.5], "n": 22}]
+    },
+    {
+      "id": "kitchen",
+      "scene": "kitchen",
+      "title": {
+        "tr": "Senin mutfağın",
+        "en": "Your kitchen"
+      },
+      "text": {
+        "tr": "Elinle kapattığın mantılar. Poşette pişen tavuk ve pilav. Sıcak ekmekle bandığımız menemen. Beni ilk günden ailenden biri gibi doyurdun. Sonra ben sana et sote yapmayı denedim. Et soteden bahsetmiyoruz.",
+        "en": "Mantı folded by hand. Chicken baked in its bag with rice. Menemen we scooped up with warm bread. From the start you fed me like family. Then I tried to make you et sote. We do not talk about the et sote."
+      },
+      "image": "photos/story/03-kitchen.jpg",
+      "fx": [{"type": "steam", "at": [[0.55, 0.55]]}, {"type": "heat", "region": [0.3, 0.3, 0.5, 0.25]}, {"type": "flicker", "at": [[0.55, 0.5]], "r": 0.4, "a": 0.25}]
+    },
+    {
+      "id": "friends",
+      "scene": "balcony",
+      "title": {
+        "tr": "Senin dünyan",
+        "en": "Your world"
+      },
+      "text": {
+        "tr": "Beni kendi dünyana aldın: Eda ile Mehmet'in güzel evi, Türk restoranları, balkonlarda elden ele dolaşan Türk kahveleri. Kaygım yüzünden erken kalkmak zorunda kaldığımız her gece bir kez bile şikâyet etmedin. Herkese yorgun olanın sen olduğunu söyledin.",
+        "en": "You brought me into your world: Eda and Mehmet's beautiful home, Turkish restaurants, Turkish coffee passed around on balconies late into the night. Every night my anxiety made us leave early, you never once complained. You told everyone you were the tired one."
+      },
+      "image": "photos/story/04-balcony.jpg",
+      "fx": [{"type": "bokeh", "region": [0, 0, 1, 0.45], "n": 26}, {"type": "steam", "at": [[0.7, 0.55]], "n": 5, "a": 0.1}]
+    },
+    {
+      "id": "held",
+      "scene": "water",
+      "title": {
+        "tr": "Beni tuttun",
+        "en": "You held me"
+      },
+      "text": {
+        "tr": "Her nöbette yanımdaydın. Benim acım için ağladın, geçene kadar beni tuttun ve bedenim kendine gelene kadar su içmeme yardım ettin.",
+        "en": "Through every seizure you were there. You cried for my pain, held me until it passed, and helped me drink water until my body came back to me."
+      },
+      "image": "photos/story/05-water.jpg",
+      "fx": [{"type": "petals", "n": 6, "speed": 0.6}, {"type": "dust", "color": "cool", "n": 30}]
+    },
+    {
+      "id": "splash",
+      "scene": "shop",
+      "title": {
+        "tr": "On iki saatlik günler",
+        "en": "Twelve-hour days"
+      },
+      "text": {
+        "tr": "Splash'te, sabunların ve mumların arasında on, on iki saat çalıştın. Sonra eve gelip yine yemek yaptın, yine benimle ilgilendin. Günde yüz kere \"Gurban\" dedin. Bir ev ilacı, sıcak bir tabak, başımda bir el. Hep hasta olan bana hem hemşire hem yuva oldun.",
+        "en": "You worked ten, twelve hours at Splash among the soaps and candles. Then you came home and still cooked, and still took care of me. \"Gurban,\" a hundred times a day. A home remedy, a warm plate, a hand on my head. I was always sick, and you were my nurse and my home."
+      },
+      "image": "photos/story/06-shop.jpg",
+      "fx": [{"type": "flicker", "at": [[0.25, 0.3], [0.6, 0.45], [0.8, 0.25]], "r": 0.2}, {"type": "bokeh", "n": 14, "region": [0, 0, 1, 0.7]}, {"type": "steam", "at": [[0.6, 0.5]]}]
+    },
+    {
+      "id": "stayed",
+      "scene": "rain",
+      "title": {
+        "tr": "Kaldın",
+        "en": "You stayed"
+      },
+      "text": {
+        "tr": "Uzun süre kaybolmuştum. Bizi tek başına taşıdın. Gitmek için her sebebin vardı ama kaldın. Bunun sana neye mal olduğunu biliyorum ve asla unutmayacağım.",
+        "en": "I was lost for a long time, and you carried us both on your own. You had every reason to leave, and you stayed. I know what that cost you, and I will never forget it."
+      },
+      "image": "photos/story/07-rain.jpg",
+      "fx": [{"type": "rain", "n": 160}, {"type": "petals", "n": 5, "speed": 1.4, "wind": 0.12}]
+    },
+    {
+      "id": "candlenight",
+      "scene": "candleroom",
+      "title": {
+        "tr": "Mumlar gecesi",
+        "en": "The night of candles"
+      },
+      "text": {
+        "tr": "Yavaş yavaş kendime gelmeye başladım. Çiçekler. Pırıl pırıl bir ev. Çarşamba akşamları sinema, sadece ikimiz. Eve geldiğinde her yerde mumlar vardı. Beyaz halının üstünde gül yaprakları, balkonda ışıklar, İtalyan yemeğinin yanında çiçekler.",
+        "en": "Slowly, I started showing up. Flowers. A spotless home. Wednesday nights at the movies, just us. You came home to candles everywhere, rose petals on the white carpet, lights strung across the balcony, and flowers beside an Italian dinner."
+      },
+      "image": "photos/story/08-candleroom.jpg",
+      "fx": [{"type": "petals", "n": 18}, {"type": "wisps", "at": [[0.2, 0.62], [0.8, 0.6]]}, {"type": "flicker", "at": [[0.2, 0.62], [0.8, 0.6]], "r": 0.3}]
+    },
+    {
+      "id": "storm",
+      "scene": "icestorm",
+      "title": {
+        "tr": "Buz fırtınası",
+        "en": "The ice storm"
+      },
+      "text": {
+        "tr": "Dondurucu fırtına Nashville'i durdurduğunda elimizdeki bütün mumları yaktık ve birbirimizi ısıttık. Yatağı salona taşıdık, sandalyelerin üstüne çarşaf serdik ve çocuklar gibi kendimize bir kale kurduk.",
+        "en": "When the freezing storm shut Nashville down, we lit every candle we had and kept each other warm. We dragged the mattress into the living room, draped sheets over the chairs, and built ourselves a fort like kids."
+      },
+      "image": "photos/story/09-icestorm.jpg",
+      "fx": [{"type": "snow", "n": 110}, {"type": "flicker", "at": [[0.35, 0.6], [0.65, 0.6]], "r": 0.35}, {"type": "bokeh", "region": [0.15, 0.3, 0.7, 0.3], "n": 18, "color": "gold"}]
+    },
+    {
+      "id": "birthdays",
+      "scene": "cake",
+      "title": {
+        "tr": "Doğum günleri",
+        "en": "Birthdays"
+      },
+      "text": {
+        "tr": "Birbirimizin doğum günlerinde güzel yemekler, mumlar, kadehler. Artık dilek tutmama gerek yoktu; dileğim karşımda oturuyordu. Kahverengi Levi's deri ceket. Onu ne kadar sevdiğimi biliyordun. Ben kollarımı geçirirken sen tutuyordun.",
+        "en": "Birthday dinners for each other, candles, raised glasses. I didn't need to make a wish anymore. It was sitting across from me. The brown Levi's leather jacket. You knew how much I loved it. You held it open while I slipped my arms in."
+      },
+      "image": "photos/story/10-cake.jpg",
+      "fx": [{"type": "wisps", "at": [[0.4, 0.45], [0.5, 0.44], [0.6, 0.45]], "h": 0.1}, {"type": "flicker", "at": [[0.5, 0.44]], "r": 0.35}, {"type": "bokeh", "n": 10, "region": [0, 0, 1, 0.35]}]
+    },
+    {
+      "id": "morning",
+      "scene": "emptybed",
+      "title": {
+        "tr": "O sabah",
+        "en": "That morning"
+      },
+      "text": {
+        "tr": "Saat altı gibi evde olman gerekiyordu. Uyandım, yatağın senin tarafı boştu. Sonra telefon çaldı ve dünyam durdu.",
+        "en": "You were supposed to be home by six. I woke up and your side of the bed was empty. Then the phone rang, and my whole world stopped."
+      },
+      "image": "photos/story/11-emptybed.jpg",
+      "fx": [{"type": "dust", "color": "cool", "region": [0.4, 0.1, 0.5, 0.5], "n": 40}, {"type": "petals", "n": 3, "speed": 0.5}]
+    },
+    {
+      "id": "hospital",
+      "scene": "hospital",
+      "title": {
+        "tr": "Başka biri oldum",
+        "en": "I became someone else"
+      },
+      "text": {
+        "tr": "Bildiğim bütün dualarla sana nazik olmalarını istedim. İkinci gün başka biri oldum: sana dayanak olacak biri.",
+        "en": "I prayed to every God I knew to be gentle with you. On the second day I became someone else: someone strong enough to be your rock."
+      },
+      "image": "photos/story/12-hospital.jpg",
+      "fx": [{"type": "flicker", "at": [[0.5, 0.25]], "r": 0.3, "color": "cool", "a": 0.2}, {"type": "dust", "color": "cool", "n": 25}]
+    },
+    {
+      "id": "palm",
+      "scene": "palm",
+      "title": {
+        "tr": "Avucumda",
+        "en": "On my palm"
+      },
+      "text": {
+        "tr": "Sonra biraz uyandın ve parmağınla avucuma \"seni seviyorum\" yazdın. Odanın köşesinde gece geç saatlere kadar çalıştım. Arada başımı kaldırıp sana baktım ve hâlâ burada olduğun için şükrettim.",
+        "en": "Then you woke a little, and with one finger you wrote \"I love you\" on my palm. I worked from the corner of your room late into the night, looking up now and then at you, grateful beyond words that you were still here."
+      },
+      "image": "photos/story/13-palm.jpg",
+      "fx": [{"type": "petals", "n": 8, "speed": 0.5}, {"type": "flicker", "at": [[0.5, 0.5]], "r": 0.45, "a": 0.2}]
+    },
+    {
+      "id": "stairs",
+      "scene": "stairs",
+      "title": {
+        "tr": "Üç kat, eve",
+        "en": "Three flights home"
+      },
+      "text": {
+        "tr": "O üç kat merdiveni birlikte çıktık. Tekerlekli sandalyen rahat geçsin diye evi baştan düzenlemiştim.",
+        "en": "We made it up those three flights together. I had already rearranged our home so your wheelchair could pass."
+      },
+      "image": "photos/story/14-stairs.jpg",
+      "fx": [{"type": "dust", "n": 45}, {"type": "flicker", "at": [[0.8, 0.15]], "r": 0.3}]
+    },
+    {
+      "id": "now",
+      "scene": "dawn",
+      "title": {
+        "tr": "Artık ben buradayım",
+        "en": "I've got this now"
+      },
+      "text": {
+        "tr": "Bizi o kadar uzun taşıdın ki. Şimdi bırak ben seni taşıyayım. Sen sadece iyileş. Yavaş olsun; en güzel şeyler zaman alır. Yavaş yavaş.",
+        "en": "You carried us for so long. Now let me carry you. You just focus on getting better. Let it be slow; the greatest things take time. Yavaş yavaş."
+      },
+      "image": "photos/story/15-dawn.jpg",
+      "fx": [{"type": "petals", "n": 12, "dir": "rise"}, {"type": "glitter", "region": [0.1, 0.6, 0.8, 0.2], "n": 80}, {"type": "heat", "region": [0.1, 0.52, 0.8, 0.12], "amp": 2}]
+    }
+  ]
+}
