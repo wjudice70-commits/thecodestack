@@ -1,5 +1,5 @@
 {
-  "_note": "'Open when...' notes from Michael. Drafts to edit.",
+  "_note": "'Open when...' petals from Michael. She can break these seals any time. Drafts to edit.",
   "notes": [
     {
       "id": "pain",
@@ -54,6 +54,24 @@
       },
       "tr": "Kırık kaburgalar, kırık göğüs kemiği ve omuz, yorgun bir kalp, ve sen hâlâ gülümsüyorsun. Tanıdığım en güçlü insan sensin.",
       "en": "Broken ribs, a broken sternum and shoulder, a tired heart, and you're still smiling. You are the strongest person I have ever known."
+    },
+    {
+      "id": "miss",
+      "when": {
+        "tr": "Beni özlediğinde aç",
+        "en": "Open when you miss me"
+      },
+      "tr": "Elini kalbine koy. O ritim benim sana söylediğim her 'seni seviyorum'. Yan odadayım bile olsam, seni şimdiden özlüyorum.",
+      "en": "Put your hand on your heart. That rhythm is every 'I love you' I've ever said to you. Even if I'm only in the next room, I already miss you too."
+    },
+    {
+      "id": "laugh",
+      "when": {
+        "tr": "Gülmek istediğinde aç",
+        "en": "Open when you need to laugh"
+      },
+      "tr": "Et sote. Başka bir şey söylememe gerek yok. Ama yine de söyleyeyim: o akşam bile seninle masada oturmak dünyanın en güzel şeyiydi.",
+      "en": "Et sote. I don't need to say anything else. But I will anyway: even that night, sitting at the table with you was the best thing in the world."
     }
   ]
 }

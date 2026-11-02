@@ -95,14 +95,48 @@
   function renderToday() {
     const d = YY.today(), done = winsToday(), cap = cfg.winsPerDay;
     $("#t-kicker").textContent = new Date().toLocaleDateString(YY.lang() === "tr" ? "tr-TR" : "en-US", { weekday: "long", day: "numeric", month: "long" });
-    const letters = D.letters.letters, idx = Math.max(0, (state.dayCount || 1) - 1) % letters.length, lt = letters[idx];
-    $("#letter").innerHTML = `<div><p class="kicker">${t("letter")}</p><p class="letter-text">${esc(L(lt))}</p>
-      ${lt.photo ? `<img src="${lt.photo}" alt="">` : ""}<p class="signature">${esc(lt.from)}</p></div>`;
+    const opened = state.lettersOpened || (state.lettersOpened = []);
+    $("#letter-petals").innerHTML = D.letters.letters.map(lt => {
+      const st = opened.includes(lt.id) ? "is-open" : letterReady(lt) ? "is-ready" : "is-sealed";
+      const label = st === "is-ready" ? t("openMe") : lt.opens === "later" ? t("someday") : lt.opens === "now" ? "" : fmtDate(lt.opens);
+      return petalBtn(`data-letter="${lt.id}"`, st, label);
+    }).join("");
     $("#wins-count").textContent = done.length >= cap ? t("winsFull") : t("stepsToday", Math.min(done.length, cap), cap);
     sky.set(Math.min(done.length, cap));
     $("#win-grid").innerHTML = D.wins.wins.map(w => `<button class="win ${done.includes(w.id) ? "is-done" : ""}" data-win="${w.id}" aria-pressed="${done.includes(w.id)}">${esc(L(w))}</button>`).join("");
-    $("#note-list").innerHTML = D.notes.notes.map(n => `<button class="note ${state.notesOpened.includes(n.id) ? "is-open" : ""}" data-note="${n.id}">${esc(L(n.when))}</button>`).join("");
+    $("#note-list").innerHTML = D.notes.notes.map(n => petalBtn(`data-note="${n.id}"`, state.notesOpened.includes(n.id) ? "is-open" : "is-ready", L(n.when))).join("");
     void d;
+  }
+  // A sealed petal: the black-rose petal, lit from the upper left, closed with a wax seal.
+  const petalBtn = (attr, st, label) => `<button class="petal ${st}" ${attr}><svg viewBox="0 0 60 80" aria-hidden="true">
+      <use href="#petal-path" fill="url(#petal-lit)"/><path class="vein" d="M30 74C28 56 28 32 30 14"/>
+      <g class="seal"><circle cx="30" cy="46" r="9" fill="url(#seal-lit)"/><circle cx="30" cy="46" r="6" class="seal-ring"/><path class="crack" d="M24 41l4 4-2 3 5 2 3 5"/></g></svg>
+      <span class="petal-label">${esc(label)}</span></button>`;
+  const letterReady = (lt) => YY.preview || lt.opens === "now" || (lt.opens !== "later" && lt.opens <= YY.today());
+  const fmtDate = (iso) => new Date(iso + "T12:00").toLocaleDateString(YY.lang() === "tr" ? "tr-TR" : "en-US", { day: "numeric", month: "long" });
+  // The signature move: the petal lifts toward the camera, then the letter appears.
+  function liftPetal(btn, then) {
+    if (YY.reduceMotion || !btn) return then();
+    btn.classList.add("is-lifting");
+    setTimeout(then, 950);
+    setTimeout(() => btn.classList.remove("is-lifting"), 1400);
+  }
+  function showLetter(kicker, title, text, sign, photo) {
+    $("#m-kicker").textContent = kicker;
+    $("#m-title").textContent = title; $("#m-title").hidden = !title;
+    $("#m-text").textContent = text;
+    $("#m-photo").hidden = !photo; if (photo) $("#m-photo").src = photo;
+    $("#m-sign").textContent = sign;
+    $("#modal").hidden = false; $("#m-close").focus();
+  }
+  function openLetter(id, btn) {
+    const lt = D.letters.letters.find(x => x.id === id);
+    if (!letterReady(lt)) return toast(lt.opens === "later" ? t("sealedLater") : t("sealedUntil", fmtDate(lt.opens)));
+    liftPetal(btn, () => {
+      if (!state.lettersOpened.includes(id)) { state.lettersOpened.push(id); save(); }
+      showLetter(lt.opens.length === 10 ? fmtDate(lt.opens) : t("petals"), "", L(lt), lt.from, lt.photo);
+      renderToday();
+    });
   }
   const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
@@ -121,15 +155,13 @@
     void btn;
   }
 
-  function openNote(id) {
+  function openNote(id, btn) {
     const n = D.notes.notes.find(x => x.id === id);
-    if (!state.notesOpened.includes(id)) { state.notesOpened.push(id); save(); }
-    $("#m-kicker").textContent = t("openWhen");
-    $("#m-title").textContent = L(n.when);
-    $("#m-text").textContent = L(n);
-    $("#m-sign").textContent = cfg.from;
-    $("#modal").hidden = false; $("#m-close").focus();
-    renderToday();
+    liftPetal(btn, () => {
+      if (!state.notesOpened.includes(id)) { state.notesOpened.push(id); save(); }
+      showLetter(t("openWhen"), L(n.when), L(n), cfg.from);
+      renderToday();
+    });
   }
 
   let toastTimer;
@@ -284,6 +316,11 @@
     b.hidden = false;
     b.textContent = state.storySeen ? t("today") : t("begin");
     b.onclick = () => state.storySeen ? go("today") : playStory(0);
+    const tile = $("#story-tile"); tile.hidden = !state.storySeen && !YY.preview;
+    tile.onclick = () => playStory(0);
+    tile.setAttribute("aria-label", t("storyWatch"));
+    $("#story-tile .kicker").textContent = `${t("story")} · ${D.story.scenes.length} ${YY.lang() === "tr" ? "sahne" : "scenes"}`;
+    $("#story-tile .story-name").textContent = t("storyWatch");
   }
 
   function openingSequence() {
@@ -323,7 +360,8 @@
       const f = e.target.closest("[data-film]"); if (f && !f.disabled) return playReel(arrivalShots(+f.dataset.film, true));
       const st = e.target.closest("[data-stop]"); if (st) return pickStop(+st.dataset.stop);
       const w = e.target.closest("[data-win]"); if (w) return logWin(w.dataset.win, w);
-      const n = e.target.closest("[data-note]"); if (n) return openNote(n.dataset.note);
+      const n = e.target.closest("[data-note]"); if (n) return openNote(n.dataset.note, n);
+      const lt = e.target.closest("[data-letter]"); if (lt) return openLetter(lt.dataset.letter, lt);
     });
     $("#stop-prev").addEventListener("click", () => pickStop(Math.max(0, (sel ?? progress().reached) - 1)));
     $("#stop-next").addEventListener("click", () => pickStop(Math.min(D.stops.stops.length - 1, (sel ?? progress().reached) + 1)));

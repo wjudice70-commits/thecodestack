@@ -38,7 +38,7 @@
 
   /* ---------------- Storage ---------------- */
   const KEY = "yavas-yavas.v1";
-  const blank = () => ({ steps: 0, lastOpen: null, wins: {}, seenStop: -1, storySeen: false, lang: null, lettersRead: 0, notesOpened: [] });
+  const blank = () => ({ steps: 0, lastOpen: null, wins: {}, seenStop: -1, storySeen: false, lang: null, lettersRead: 0, notesOpened: [], lettersOpened: [] });
   YY.state = (() => {
     try { return Object.assign(blank(), JSON.parse(localStorage.getItem(KEY) || "{}")); }
     catch { return blank(); }
@@ -62,7 +62,10 @@
       stop: (i, n) => `Durak ${i} / ${n}`, stage: "Bu durakta", watch: "Filmi izle", locked: "Henüz değil",
       steps: "adım", lang: "English", progress: (s, n) => `${s} / ${n} adım`, next: "Sonraki", back: "Geri",
       done: "Bitti", journeyDone: "Savaştepe'ye vardın. Eve hoş geldin.", previewOn: "Önizleme modu: her şey açık",
-      addStep: "+1 adım", stepsToday: (n, m) => `Bugün ${n}/${m}`, from_michael: "Michael"
+      addStep: "+1 adım", stepsToday: (n, m) => `Bugün ${n}/${m}`, from_michael: "Michael",
+      petals: "Mühürlü yapraklar", petalsHint: "Her yaprak bir mektup. Günü gelince mührü kendiliğinden çözülür.", openWhenHint: "Bu mühürleri istediğin an kırabilirsin.",
+      openMe: "Aç beni", opensOn: (d) => `${d} günü açılır`, sealedUntil: (d) => `Bu yaprak ${d} günü açılacak.`, sealedLater: "Bu yaprak doğru zamanı bekliyor.", someday: "Bir gün",
+      storyKicker: "15 sahne", storyWatch: "Hikâyemizi izle"
     },
     en: {
       tagline: "slowly, slowly, it became us",
@@ -76,7 +79,10 @@
       stop: (i, n) => `Stop ${i} of ${n}`, stage: "At this stop", watch: "Watch the film", locked: "Not yet",
       steps: "steps", lang: "Türkçe", progress: (s, n) => `${s} of ${n} steps`, next: "Next", back: "Back",
       done: "Done", journeyDone: "You reached Savaştepe. Welcome home.", previewOn: "Preview mode: everything unlocked",
-      addStep: "+1 step", stepsToday: (n, m) => `Today ${n}/${m}`, from_michael: "Michael"
+      addStep: "+1 step", stepsToday: (n, m) => `Today ${n}/${m}`, from_michael: "Michael",
+      petals: "Sealed petals", petalsHint: "Each petal is a letter. When its day comes, the seal opens on its own.", openWhenHint: "You can break these seals whenever you need to.",
+      openMe: "Open me", opensOn: (d) => `Opens ${d}`, sealedUntil: (d) => `This petal opens on ${d}.`, sealedLater: "This petal is waiting for the right moment.", someday: "Someday",
+      storyKicker: "15 scenes", storyWatch: "Watch our story"
     }
   };
   YY.lang = () => YY.state.lang || (YY.data && YY.data.config.defaultLang) || "tr";

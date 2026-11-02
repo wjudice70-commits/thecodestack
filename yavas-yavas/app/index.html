@@ -14,6 +14,11 @@
 </head>
 <body>
   <div id="app">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <radialGradient id="petal-lit" cx=".3" cy=".22" r=".95"><stop offset="0" stop-color="#7a1a28"/><stop offset=".45" stop-color="#3a0a12"/><stop offset="1" stop-color="#0c0205"/></radialGradient>
+    <radialGradient id="seal-lit" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#d0485a"/><stop offset=".6" stop-color="#8f1d2e"/><stop offset="1" stop-color="#4a0c16"/></radialGradient>
+    <path id="petal-path" d="M30 78C9 62 2 36 9 18 14 6 24 2 30 9 36 2 46 6 51 18 58 36 51 62 30 78Z"/>
+  </defs></svg>
   <canvas id="atmos" class="atmos" aria-hidden="true"></canvas>
   <div class="grain" aria-hidden="true"></div>
   <div class="vignette" aria-hidden="true"></div>
@@ -30,6 +35,11 @@
       <div class="meter" aria-hidden="true"><i id="meter"></i></div>
       <ol class="track" id="track" aria-hidden="true"></ol>
       <button class="cta" id="begin" hidden></button>
+      <button class="story-tile" id="story-tile" hidden>
+        <span class="story-thumb" aria-hidden="true"><svg viewBox="0 0 60 80"><use href="#petal-path"/></svg></span>
+        <span class="story-words"><span class="kicker" data-t="storyKicker"></span><span class="story-name" data-t="story"></span></span>
+        <svg class="story-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l9 6-9 6z"/></svg>
+      </button>
     </div>
   </section>
 
@@ -46,7 +56,11 @@
   <section id="today" class="view" aria-labelledby="tt">
     <header class="view-head"><p class="kicker" id="t-kicker"></p><h2 id="tt" class="view-title" data-t="today"></h2></header>
     <div class="pager" id="pager">
-    <article class="page letter" id="letter"></article>
+    <section class="page petals">
+      <h3 class="section-title" data-t="petals"></h3>
+      <p class="hint" data-t="petalsHint"></p>
+      <div class="petal-grid" id="letter-petals"></div>
+    </section>
     <section class="page wins">
       <h3 class="section-title" data-t="smallWins"></h3>
       <p class="hint" data-t="smallWinsHint"></p>
@@ -55,7 +69,8 @@
     </section>
     <section class="page notes">
       <h3 class="section-title" data-t="openWhen"></h3>
-      <div class="note-list" id="note-list"></div>
+      <p class="hint" data-t="openWhenHint"></p>
+      <div class="petal-grid" id="note-list"></div>
     </section>
     </div>
     <div class="dots" id="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
@@ -96,6 +111,7 @@
       <p class="kicker" id="m-kicker"></p>
       <h3 class="modal-title" id="m-title"></h3>
       <p class="modal-text" id="m-text"></p>
+      <img class="modal-photo" id="m-photo" alt="" hidden>
       <p class="signature" id="m-sign"></p>
       <button class="cta" id="m-close" data-t="close"></button>
     </div>
